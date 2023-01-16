@@ -1,0 +1,8 @@
+ddddocr
+python_telegram
+toml
+click
+schedule
+appdirs
+loguru
+faker
