@@ -1,8 +1,11 @@
 ddddocr
-python_telegram
+python-telegram
 toml
 click
 schedule
 appdirs
 loguru
 faker
+embypy
+python-dateutil
+rich
