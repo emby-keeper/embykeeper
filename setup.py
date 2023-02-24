@@ -9,7 +9,7 @@ with open("requirements.txt") as requirements_file:
 setup(
     author="jackzzs",
     author_email="jackzzs@outlook.com",
-    python_requires=">=3.6",
+    python_requires=">=3.6,<3.11",
     classifiers=[
         "Natural Language :: Chinese",
         "Programming Language :: Python :: 3",

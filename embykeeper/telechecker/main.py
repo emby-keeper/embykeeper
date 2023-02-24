@@ -2,19 +2,16 @@ import time
 from threading import Event
 
 import click
-import toml
 from appdirs import user_cache_dir
 from loguru import logger
 from telegram.client import AuthorizationState, Telegram
 
 from . import *
 
+# CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin)
 CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin)
 
-
 def main(config, follow=False):
-    with open(config) as f:
-        config = toml.load(f)
     proxy = config.get("proxy", None)
     if proxy:
         proxy_host = proxy.get("host", "127.0.0.1")
@@ -24,8 +21,6 @@ def main(config, follow=False):
             proxy_type = {"@type": "proxyTypeSocks5"}
         elif proxy_type.lower() in ("http", "https"):
             proxy_type = {"@type": "proxyTypeHttp"}
-        elif proxy_type.lower() == "mtproto":
-            proxy_type = {"@type": "proxyTypeMtproto"}
         else:
             raise ValueError(f'proxy_type "{proxy_type}" is not supported.')
     else:
@@ -46,7 +41,7 @@ def main(config, follow=False):
         state = tg.login(blocking=False)
         while not state == AuthorizationState.READY:
             if config.get("quiet", False) == True:
-                logger.warning(f'账号 "{a["phone"]}" 需要额外的信息以登录, 但由于quiet模式而跳过.')
+                logger.error(f'账号 "{a["phone"]}" 需要额外的信息以登录, 但由于quiet模式而跳过.')
                 continue
             if state == AuthorizationState.WAIT_CODE:
                 tg.send_code(click.prompt(f'请在客户端接收验证码 ({a["phone"]})', type=str))
@@ -58,7 +53,7 @@ def main(config, follow=False):
         me = tg.get_me()
         me.wait()
         if me.error:
-            logger.warning(f'账号 "{tg.phone}" 无法读取用户名而跳过.')
+            logger.error(f'账号 "{tg.phone}" 无法读取用户名而跳过.')
             continue
         else:
             tg.username = f"{me.update['first_name']} {me.update['last_name']}"
@@ -66,7 +61,7 @@ def main(config, follow=False):
         chats = tg.get_chats()
         chats.wait()
         if chats.error:
-            logger.warning(f'账号 "{tg.username}" 无法读取会话而跳过.')
+            logger.error(f'账号 "{tg.username}" 无法读取会话而跳过.')
             continue
         if follow:
             logger.info(f"等待新消息更新以获取 ChatID.")

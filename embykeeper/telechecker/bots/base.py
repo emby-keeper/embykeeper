@@ -106,7 +106,7 @@ class BotCheckin:
         )
         ret.wait()
         if ret.error:
-            logger.warning(self.msg(f"读取验证码图片异常错误."))
+            logger.error(self.msg(f"读取验证码图片异常错误."))
 
     def _captcha_handler(self, update):
         if update["file"]["id"] in self._downloaded_file_ids:

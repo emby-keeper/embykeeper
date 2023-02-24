@@ -9,3 +9,5 @@ faker
 embypy
 python-dateutil
 rich
+thefuzz
+aiohttp_socks

@@ -1,4 +1,6 @@
 accounts.toml
+test.py
+swig.json
 
 .vscode/*
 !.vscode/settings.json
