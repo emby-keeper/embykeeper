@@ -10,6 +10,7 @@ from . import *
 
 CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin)
 
+
 def login(config):
     proxy = config.get("proxy", None)
     if proxy:
@@ -89,7 +90,7 @@ def _parse_update(tg, update, cache={}):
             sender_name.strip(),
             (text[:50] + "...") if len(text) > 50 else text,
             update["message"]["chat_id"],
-            sender_id
+            sender_id,
         )
 
 

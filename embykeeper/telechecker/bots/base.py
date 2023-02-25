@@ -59,12 +59,13 @@ class BotCheckin:
         ret.wait()
         if ret.error:
             return False
-        ret = self.client.call_method("setChatNotificationSettings", params={
-            'chat_id': self.BOT_USER_ID,
-            'notification_settings': {
-                'mute_for': 2592000
-            }
-        })
+        ret = self.client.call_method(
+            "setChatNotificationSettings",
+            params={
+                "chat_id": self.BOT_USER_ID,
+                "notification_settings": {"mute_for": 2592000},
+            },
+        )
         ret.wait()
         if ret.error:
             return False
