@@ -1,5 +1,6 @@
 accounts.toml
 test.py
+test.ipynb
 swig.json
 
 .vscode/*

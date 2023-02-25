@@ -12,8 +12,8 @@ from faker.providers import internet, profile
 from loguru import logger
 from rich.logging import Console, RichHandler
 
-from .embywatcher import main as embywatcher
-from .telechecker import main as telechecker
+from .embywatcher import embywatcher
+from .telechecker import telechecker
 from .utils import CommandWithOptionalFlagValues
 
 logger.remove()
@@ -69,35 +69,35 @@ def _get_faked_accounts():
 @click.option("--instant/--no-instant", default=True, help="立刻执行一次计划任务")
 @click.option("--quiet/--no-quiet", default=False, help="启用批处理模式并禁用输入, 可能导致无法输入验证码")
 def cli(config, telegram, telegram_follow, emby, instant, quiet):
-        with open(config) as f:
-            config = toml.load(f)
-        if quiet == True:
-            config['quiet'] = True
-        if telegram_follow:
-            telechecker(config, follow=True)
-        if not telegram and not emby:
-            telegram = "08:00"
-            emby = 7
-        schedule_telegram = schedule.Scheduler()
-        if telegram:
-            telegram = parser.parse(telegram).time().strftime("%H:%M")
-            schedule_telegram.every().day.at(telegram).do(telechecker, config=config)
-        schedule_emby = schedule.Scheduler()
-        if emby:
-            schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(
-                embywatcher, config=config
-            )
-        if instant:
-            schedule_telegram.run_all()
-            schedule_emby.run_all()
-        if telegram:
-            logger.info(f"下一次签到将在{int(schedule_telegram.idle_seconds/3600)}小时后进行.")
-        if emby:
-            logger.info(f"下一次保活将在{int(schedule_emby.idle_seconds/3600/24)}天后进行.")
-        while True:
-            schedule_telegram.run_pending()
-            schedule_emby.run_pending()
-            time.sleep(1)
+    with open(config) as f:
+        config = toml.load(f)
+    if quiet == True:
+        config["quiet"] = True
+    if telegram_follow:
+        telechecker(config, follow=True)
+    if not telegram and not emby:
+        telegram = "08:00"
+        emby = 7
+    schedule_telegram = schedule.Scheduler()
+    if telegram:
+        telegram = parser.parse(telegram).time().strftime("%H:%M")
+        schedule_telegram.every().day.at(telegram).do(telechecker, config=config)
+    schedule_emby = schedule.Scheduler()
+    if emby:
+        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(
+            embywatcher, config=config
+        )
+    if instant:
+        schedule_telegram.run_all()
+        schedule_emby.run_all()
+    if telegram:
+        logger.info(f"下一次签到将在{int(schedule_telegram.idle_seconds/3600)}小时后进行.")
+    if emby:
+        logger.info(f"下一次保活将在{int(schedule_emby.idle_seconds/3600/24)}天后进行.")
+    while True:
+        schedule_telegram.run_pending()
+        schedule_emby.run_pending()
+        time.sleep(1)
 
 
 if __name__ == "__main__":

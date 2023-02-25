@@ -53,7 +53,9 @@ def main(config):
                     if not last_played:
                         continue
                     last_played = last_played.strftime("%Y-%m-%d %H:%M:%S")
-                    logger.info(msg(f'成功播放视频, 当前该视频播放{obj.play_count}次, 上次播放于 {last_played}.'))
+                    logger.info(
+                        msg(f"成功播放视频, 当前该视频播放{obj.play_count}次, 上次播放于 {last_played}.")
+                    )
                     break
             except KeyboardInterrupt as e:
                 raise e from None
@@ -63,4 +65,4 @@ def main(config):
             finally:
                 watcher.hide_from_resume(obj)
         else:
-            logger.error(msg(f'由于没有成功播放的视频, 保活失败, 请重新检查配置.'))
+            logger.error(msg(f"由于没有成功播放的视频, 保活失败, 请重新检查配置."))

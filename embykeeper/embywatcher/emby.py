@@ -45,6 +45,7 @@ class Connector(_Connector):
                 self._session_uses[loop_id] += 1
             return session
 
+
 class Emby(_Emby):
     def __init__(self, url, **kargs):
         connector = Connector(url, **kargs)
