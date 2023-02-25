@@ -12,20 +12,69 @@ ocr = ddddocr.DdddOcr(beta=True, show_ad=False)
 
 
 class BotCheckin:
-    BOT_CHAT_ID = None
+    BOT_USER_ID = None
     BOT_NAME = "Bot"
 
     def __init__(self, client: Telegram, retries=10):
         self.client = client
         self.retries = retries
-        self.ok = Event()
+        self.finished = Event()
         self._downloaded_file_ids = []
         self._retries = 0
 
     def msg(self, line):
         return f"{self.BOT_NAME}> {line} ({self.client.username})"
 
+    def has_chat(self):
+        chats = self.client.get_chats()
+        chats.wait()
+        if chats.error:
+            return False
+        else:
+            return self.BOT_USER_ID in chats.update["chat_ids"]
+
+    def init_bot(self):
+        if not self.has_chat():
+            logger.info("账号中不存在与机器人的聊天, 正在初始化.")
+            ret = self.client.call_method(
+                "createPrivateChat", params={"user_id": self.BOT_USER_ID}
+            )
+            ret.wait()
+            if ret.error:
+                return False
+            ret = self.client.send_message(chat_id=self.BOT_USER_ID, text="/start")
+            ret.wait()
+            if ret.error:
+                return False
+        ret = self.client.call_method(
+            "toggleMessageSenderIsBlocked",
+            params={
+                "sender_id": {
+                    "@type": "messageSenderUser",
+                    "user_id": self.BOT_USER_ID,
+                },
+                "is_blocked": False,
+            },
+        )
+        ret.wait()
+        if ret.error:
+            return False
+        ret = self.client.call_method("setChatNotificationSettings", params={
+            'chat_id': self.BOT_USER_ID,
+            'notification_settings': {
+                'mute_for': 2592000
+            }
+        })
+        ret.wait()
+        if ret.error:
+            return False
+        return True
+
     def checkin(self):
+        if not self.init_bot():
+            logger.error(self.msg("机器人对话初始化失败."))
+            self.finished.set()
+            return
         self.client.add_update_handler("updateNewMessage", self._message_handler)
         self.client.add_update_handler("updateFile", self._captcha_handler)
         self.client.add_update_handler("updateMessageContent", self._update_handler)
@@ -40,15 +89,15 @@ class BotCheckin:
                 logger.warning(
                     self.msg(f"签到成功: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
                 )
-            self.ok.set()
+            self.finished.set()
         elif any(s in text for s in ("只能", "已经", "下次", "过了")):
             logger.warning(self.msg(f"今日已经签到过了."))
-            self.ok.set()
+            self.finished.set()
         else:
             logger.warning(self.msg(f"接收到异常返回信息: {text}"))
 
     def _on_captcha(self, captcha: str):
-        ret = self.client.send_message(chat_id=self.BOT_CHAT_ID, text=captcha)
+        ret = self.client.send_message(chat_id=self.BOT_USER_ID, text=captcha)
         ret.wait()
 
     def _send_checkin(self, retry=False, cmd="/checkin"):
@@ -58,7 +107,7 @@ class BotCheckin:
         else:
             self._retries = 0
         if self._retries <= self.retries:
-            ret = self.client.send_message(chat_id=self.BOT_CHAT_ID, text=cmd)
+            ret = self.client.send_message(chat_id=self.BOT_USER_ID, text=cmd)
             ret.wait()
 
     def _content_parser(self, content, ignore=()):
@@ -83,13 +132,13 @@ class BotCheckin:
 
     def _message_handler(self, update):
         if "message" in update:
-            if update["message"]["chat_id"] == self.BOT_CHAT_ID:
+            if update["message"]["chat_id"] == self.BOT_USER_ID:
                 for _ in self._message_parser(update["message"]):
                     pass
 
     def _update_handler(self, update):
         if "new_content" in update:
-            if update["chat_id"] == self.BOT_CHAT_ID:
+            if update["chat_id"] == self.BOT_USER_ID:
                 for _ in self._content_parser(update["new_content"]):
                     pass
 
@@ -118,7 +167,7 @@ class BotCheckin:
         message_id = 0
         while True:
             ret = self.client.get_chat_history(
-                self.BOT_CHAT_ID, from_message_id=message_id
+                self.BOT_USER_ID, from_message_id=message_id
             )
             ret.wait()
             updates = ret.update["messages"]

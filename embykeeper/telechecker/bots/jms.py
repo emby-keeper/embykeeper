@@ -4,7 +4,7 @@ from .base import AnswerBotCheckin
 
 
 class JMSCheckin(AnswerBotCheckin):
-    BOT_CHAT_ID = 1723810586
+    BOT_USER_ID = 1723810586
     BOT_NAME = "卷毛鼠"
 
     def _on_captcha(self, captcha: str):

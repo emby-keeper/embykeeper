@@ -4,7 +4,7 @@ from .base import AnswerBotCheckin
 
 
 class JMSIPTVCheckin(AnswerBotCheckin):
-    BOT_CHAT_ID = 5765103582
+    BOT_USER_ID = 5765103582
     BOT_NAME = "卷毛鼠IPTV"
 
     def _on_captcha(self, captcha: str):

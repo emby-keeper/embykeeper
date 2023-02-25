@@ -1,10 +1,12 @@
+import time
+
 from loguru import logger
 
 from .base import AnswerBotCheckin
 
 
 class LJYYCheckin(AnswerBotCheckin):
-    BOT_CHAT_ID = 1794080358
+    BOT_USER_ID = 1794080358
     BOT_NAME = "垃圾影音"
 
     def checkin(self):
@@ -22,4 +24,5 @@ class LJYYCheckin(AnswerBotCheckin):
         if len(captcha) != 4:
             self._send_checkin(retry=True)
         else:
+            time.sleep(5)
             super()._on_captcha(captcha)

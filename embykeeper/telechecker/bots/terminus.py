@@ -4,11 +4,11 @@ from .base import BotCheckin
 
 
 class TerminusCheckin(BotCheckin):
-    BOT_CHAT_ID = 1429576125
+    BOT_USER_ID = 1429576125
     BOT_NAME = "终点站"
 
     def _send_checkin(self):
-        ret = self.client.send_message(chat_id=self.BOT_CHAT_ID, text="/cancel")
+        ret = self.client.send_message(chat_id=self.BOT_USER_ID, text="/cancel")
         ret.wait()
         super()._send_checkin()
 

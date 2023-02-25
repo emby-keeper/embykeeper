@@ -8,14 +8,14 @@ from .base import AnswerBotCheckin
 
 
 class PeachCheckin(AnswerBotCheckin):
-    BOT_CHAT_ID = 5457506368
+    BOT_USER_ID = 5457506368
     BOT_NAME = "桃子"
 
     def _send_checkin(self, retry=False):
         super()._send_checkin(retry=retry, cmd="/start")
 
     def _update_handler(self, update):
-        if "new_content" in update and update["chat_id"] == self.BOT_CHAT_ID:
+        if "new_content" in update and update["chat_id"] == self.BOT_USER_ID:
             caption = update["new_content"]["caption"]["text"]
             self._on_text(caption)
 
@@ -49,5 +49,5 @@ class PeachCheckin(AnswerBotCheckin):
     def _on_captcha(self, captcha: str):
         logger.debug(self.msg(f"接收到Captcha: {captcha}"))
         time.sleep(random.randint(5, 10))
-        ret = self.client.send_message(chat_id=self.BOT_CHAT_ID, text=captcha)
+        ret = self.client.send_message(chat_id=self.BOT_USER_ID, text=captcha)
         ret.wait()
