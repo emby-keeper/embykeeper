@@ -1,4 +1,4 @@
-accounts.toml
+*.toml
 test.py
 test.ipynb
 swig.json

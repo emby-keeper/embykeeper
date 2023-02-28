@@ -47,6 +47,8 @@ class PeachCheckin(AnswerBotCheckin):
                     yield "text"
 
     def _on_captcha(self, captcha: str):
+        if not captcha.strip():
+            captcha = "unknown"
         logger.debug(self.msg(f"接收到Captcha: {captcha}"))
         time.sleep(random.randint(5, 10))
         ret = self.client.send_message(chat_id=self.BOT_USER_ID, text=captcha)

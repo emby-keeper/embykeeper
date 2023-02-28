@@ -20,7 +20,7 @@ logger.remove()
 logger.add(RichHandler(console=Console(stderr=True)), format="{message}")
 
 
-def _get_faked_accounts():
+def _get_faked_config():
     fake = Faker()
     fake.add_provider(internet)
     fake.add_provider(profile)
@@ -69,6 +69,14 @@ def _get_faked_accounts():
 @click.option("--instant/--no-instant", default=True, help="立刻执行一次计划任务")
 @click.option("--quiet/--no-quiet", default=False, help="启用批处理模式并禁用输入, 可能导致无法输入验证码")
 def cli(config, telegram, telegram_follow, emby, instant, quiet):
+    if not config:
+        logger.warning("需要输入一个toml格式的config文件.")
+        default_config = "config.toml"
+        if not Path(default_config).exists():
+            with open(default_config, "w+") as f:
+                toml.dump(_get_faked_config(), f)
+                logger.warning(f'您可以根据生成的参考配置文件"{default_config}"进行配置')
+        return
     with open(config) as f:
         config = toml.load(f)
     if quiet == True:

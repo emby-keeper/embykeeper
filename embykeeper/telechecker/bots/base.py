@@ -5,7 +5,7 @@ from threading import Event
 
 import ddddocr
 from loguru import logger
-from telegram.client import Telegram
+from teleclient.client import Telegram
 from thefuzz import fuzz
 
 ocr = ddddocr.DdddOcr(beta=True, show_ad=False)

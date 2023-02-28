@@ -4,7 +4,7 @@ from threading import Event
 import click
 from appdirs import user_cache_dir
 from loguru import logger
-from telegram.client import AuthorizationState, Telegram
+from teleclient.client import AuthorizationState, Telegram
 
 from . import *
 
