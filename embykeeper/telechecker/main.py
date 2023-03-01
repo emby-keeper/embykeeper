@@ -1,4 +1,6 @@
 import time
+from functools import partial
+from textwrap import indent
 from threading import Event
 
 import click
@@ -66,34 +68,53 @@ def login(config):
         yield tg
 
 
-def _parse_update(tg, update, cache={}):
-    if "text" in update["message"]["content"]:
-        text = update["message"]["content"]["text"]["text"]
-        text = text.replace("\n", " ")
-        sender_id = update["message"]["sender_id"]["user_id"]
-        if update["message"]["is_outgoing"]:
-            sender_name = "Me"
-        else:
-            sender_name = cache.get(sender_id, None)
-            if not sender_name:
-                sender = tg.get_user(sender_id)
-                sender.wait()
-                if sender.error:
-                    sender_name = f"<Unknown User {sender_id}>"
-                else:
-                    sender_name = (
-                        f"{sender.update['first_name']} {sender.update['last_name']}"
-                    )
-                cache[sender_id] = sender_name
-        return "{} > {}: {} (chatid = {}, userid = {}) ".format(
+def dump_update(update, tg, cache={}):
+    message = update["message"]
+    content = message["content"]
+    user_id = message["sender_id"].get("user_id", None)
+    if not user_id:
+        return
+    if "text" in content:
+        text = content["text"]["text"].strip()
+    elif "photo" in content:
+        text = content["caption"]["text"].strip()
+    else:
+        return
+    markups = message.get("reply_markup", {}).get("rows", [])
+    markup_lines = []
+    for row in markups:
+        for btn in row:
+            text = btn.get('text', None)
+            usage = btn.get('type', {})
+            usage = usage.get('url', usage.get('data', None))
+            markup_lines.append(f'{text} ({usage})')
+    if message["is_outgoing"]:
+        sender_name = "Me"
+    else:
+        sender_name = cache.get(user_id, None)
+        if not sender_name:
+            sender = tg.get_user(user_id)
+            sender.wait()
+            if sender.error:
+                sender_name = f"<Unknown User {user_id}>"
+            else:
+                sender_name = (
+                    f"{sender.update['first_name']} {sender.update['last_name']}"
+                )
+            cache[user_id] = sender_name
+    text = text.replace("\n", " ")
+    msg = "{} > {}: {} (chatid = {}, userid = {}) ".format(
             tg.username,
             sender_name.strip(),
             (text[:50] + "...") if len(text) > 50 else text,
-            update["message"]["chat_id"],
-            sender_id,
+            message["chat_id"],
+            user_id,
         )
-
-
+    if markup_lines:
+        markup_lines = indent("\n".join(markup_lines), " " * 4)
+        msg += f'\n  Buttons:\n{markup_lines}'
+    print(msg)
+    
 def main(config, follow=False):
     if not follow:
         for tg in login(config):
@@ -101,7 +122,7 @@ def main(config, follow=False):
             for c in checkiners:
                 logger.info(c.msg("开始执行签到."))
                 c.checkin()
-            endtime = time.time() + config.get("timeout", 120)
+            endtime = time.time() + config.get("timeout", 240)
             for c in checkiners:
                 timeout = endtime - time.time()
                 if timeout:
@@ -110,16 +131,10 @@ def main(config, follow=False):
                 else:
                     if not c.finished.is_set():
                         logger.error(c.msg("无法在时限内完成签到."))
-            logger.info("运行完成.")
+            logger.info("Telegram签到运行完成.")
     else:
+        cache = {}
         for tg in login(config):
             logger.info(f"等待新消息更新以获取 ChatID.")
-            cache = {}
-
-            def message_dumper(update):
-                line = _parse_update(tg, update, cache)
-                if line:
-                    print(line)
-
-            tg.add_update_handler("updateNewMessage", message_dumper)
+            tg.add_update_handler("updateNewMessage", partial(dump_update, tg=tg, cache=cache))
         Event().wait()

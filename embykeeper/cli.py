@@ -25,7 +25,7 @@ def _get_faked_config():
     fake.add_provider(internet)
     fake.add_provider(profile)
     account = {}
-    account["timeout"] = 120
+    account["timeout"] = 240
     account["retries"] = 10
     account["proxy"] = {
         "host": "127.0.0.1",
