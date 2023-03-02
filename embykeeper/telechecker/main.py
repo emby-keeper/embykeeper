@@ -116,7 +116,7 @@ async def main(config, follow=False):
                     logger.bind(username=tg.me.first_name).error(
                         f"签到失败 ({len(failed)}/{len(checkiners)}): {','.join([f.name for f in failed])}"
                     )
-        logger.info('执行完成.')
+        logger.info("执行完成.")
     else:
         columns = [
             Column("用户", style="cyan", justify="center"),

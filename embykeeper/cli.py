@@ -28,6 +28,7 @@ def _formatter(record):
             return pattern.format(*[f"{{extra[{k}]}}" for k in keys])
         else:
             return ""
+
     if scheme == "telechecker":
         username = ifextra("username", " ([cyan]{}[/])")
         name = ifextra("name", "([magenta]{}[/]) ")
