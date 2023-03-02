@@ -1,15 +1,12 @@
-from loguru import logger
+from pyrogram.types import Message
 
 from .base import AnswerBotCheckin
 
 
 class JMSIPTVCheckin(AnswerBotCheckin):
-    BOT_USER_ID = 5765103582
-    BOT_NAME = "卷毛鼠IPTV"
+    name = "卷毛鼠IPTV"
+    bot_username = "JMSIPTV_bot"
+    bot_captcha_len = [5]
 
-    def _on_captcha(self, captcha: str):
-        logger.debug(self.msg(f"接收到Captcha: {captcha}"))
-        if len(captcha) != 5:
-            self._send_checkin(retry=True)
-        else:
-            super()._on_captcha(captcha.upper())
+    async def on_captcha(self, message: Message, captcha: str):
+        await super().on_captcha(message, captcha.upper())

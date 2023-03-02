@@ -1,4 +1,6 @@
 *.toml
+*.session
+*.session-journal
 test.py
 test.ipynb
 swig.json

@@ -11,9 +11,9 @@ from .. import __version__
 
 
 class Connector(_Connector):
-    def __init__(self, url, proxy_host=None, proxy_port=None, proxy_type=None, **kargs):
+    def __init__(self, url, proxy=None, **kargs):
         super().__init__(url, **kargs)
-        self.proxy = (proxy_type, proxy_host, proxy_port)
+        self.proxy = proxy
 
     async def _get_session(self):
         loop = asyncio.get_running_loop()
@@ -28,12 +28,11 @@ class Connector(_Connector):
         async with await self._get_session_lock():
             session = self._sessions.get(loop_id)
             if not session:
-                if all(self.proxy):
-                    t, h, p = self.proxy
+                if self.proxy:
                     connector = ProxyConnector(
-                        proxy_type=ProxyType[t.upper()],
-                        host=h,
-                        port=p,
+                        proxy_type=ProxyType[self.proxy["scheme"].upper()],
+                        host=self.proxy["hostname"],
+                        port=self.proxy["port"],
                         ssl_context=self.ssl,
                     )
                 else:

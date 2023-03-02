@@ -1,22 +1,22 @@
 from loguru import logger
+from pyrogram.types import Message
 
 from .base import AnswerBotCheckin
 
 
 class JMSCheckin(AnswerBotCheckin):
-    BOT_USER_ID = 1723810586
-    BOT_NAME = "卷毛鼠"
+    name = "卷毛鼠"
+    bot_username = "jmsembybot"
+    bot_captcha_len = [4]
 
-    def _on_captcha(self, captcha: str):
-        logger.debug(self.msg(f"接收到Captcha: {captcha}"))
-        if len(captcha) != 4:
-            self._send_checkin(retry=True)
-        else:
-            for letter in captcha:
-                for answer in self._answers:
-                    if answer["text"] == letter:
-                        self._trigger_answer(answer)
-                        break
-                else:
-                    logger.info(self.msg(f'未能找到对应 "{letter}" 的按键, 正在重试.'))
-                    return self._send_checkin(retry=True)
+    async def on_captcha(self, message: Message, captcha: str):
+        async with self.operable:
+            if not self.message:
+                await self.operable.wait()
+            for l in captcha:
+                try:
+                    await self.message.click(l)
+                except ValueError:
+                    logger.info(self.msg(f'未能找到对应 "{l}" 的按键, 正在重试.'))
+                    await self.retry()
+                    break

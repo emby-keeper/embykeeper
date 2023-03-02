@@ -1,5 +1,9 @@
 import asyncio
 from datetime import datetime
+from typing import Union
+
+from embypy.objects import Episode, Movie
+from loguru import logger
 
 from .emby import Connector, Emby, EmbyObject
 
@@ -15,33 +19,28 @@ class EmbyWatcher:
     def __init__(self, emby: Emby):
         self.emby = emby
 
-    def get_oldest(self, n=10):
-        yield from self.emby.get_items(
-            ["Movie", "Episode"], limit=n, sort="DateCreated"
-        )
+    async def get_oldest(self, n=10):
+        items = await self.emby.get_items(["Movie", "Episode"], limit=n, sort="DateCreated")
+        i: Union[Movie, Episode]
+        for i in items:
+            yield i
 
-    def set_played(self, obj: EmbyObject):
+    async def set_played(self, obj: EmbyObject):
         c: Connector = obj.connector
-        return is_ok(c.post(f"/Users/{{UserId}}/PlayedItems/{obj.id}"))
+        return is_ok(await c.post(f"/Users/{{UserId}}/PlayedItems/{obj.id}"))
 
-    def hide_from_resume(self, obj: EmbyObject):
+    async def hide_from_resume(self, obj: EmbyObject):
         c: Connector = obj.connector
-        return is_ok(
-            c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True)
-        )
+        return is_ok(await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True))
 
     def get_last_played(self, obj: EmbyObject):
         last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
         return datetime.fromisoformat(last_played[:-2]) if last_played else None
 
-    def play(self, obj: EmbyObject):
+    async def play(self, obj: EmbyObject):
         c: Connector = obj.connector
         # 获取播放源
-        resp = c.postJson(
-            f"/Items/{obj.id}/PlaybackInfo",
-            isPlayBack=True,
-            AutoOpenLiveStream=True,
-        )
+        resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
         if not resp["MediaSources"]:
             return False
         else:
@@ -51,11 +50,8 @@ class EmbyWatcher:
         timeout = c.timeout
         try:
             c.timeout = 5
-            c.get(
-                f"/Videos/{obj.id}/stream",
-                static=True,
-                playSessionId=play_session_id,
-                MediaSourceId=media_source_id,
+            await c.get(
+                f"/Videos/{obj.id}/stream", static=True, playSessionId=play_session_id, MediaSourceId=media_source_id
             )
         except asyncio.TimeoutError:
             pass
@@ -69,8 +65,8 @@ class EmbyWatcher:
             "MediaSourceId": media_source_id,
             "CanSeek": True,
         }
-        if not is_ok(c.post("/Sessions/Playing", **playing_info)):
+        if not is_ok(await c.post("/Sessions/Playing", **playing_info)):
             return False
-        if not is_ok(c.post("/Sessions/Playing/Stopped", **playing_info)):
+        if not is_ok(await c.post("/Sessions/Playing/Stopped", **playing_info)):
             return False
         return True

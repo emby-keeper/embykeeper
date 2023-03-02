@@ -1,3 +1,4 @@
+import asyncio
 import time
 import uuid
 from datetime import datetime
@@ -14,10 +15,32 @@ from rich.logging import Console, RichHandler
 
 from .embywatcher import embywatcher
 from .telechecker import telechecker
-from .utils import CommandWithOptionalFlagValues
+from .utils import CommandWithOptionalFlagValues, to_iterable
+
+
+def _formatter(record):
+    extra = record["extra"]
+    scheme = extra.get("scheme", None)
+
+    def ifextra(keys, pattern="{}"):
+        keys = to_iterable(keys)
+        if all(k in extra for k in keys):
+            return pattern.format(*[f"{{extra[{k}]}}" for k in keys])
+        else:
+            return ""
+    if scheme == "telechecker":
+        username = ifextra("username", " ([cyan]{}[/])")
+        name = ifextra("name", "([magenta]{}[/]) ")
+        return f"[blue]Telechecker[/]{username}: {name}{{message}}"
+    elif scheme == "embywatcher":
+        ident = ifextra(["server", "username"], " ([cyan]{}:{}[/])")
+        return f"[blue]Embywatcher[/]{ident}: {{message}}"
+    else:
+        return "{message}"
+
 
 logger.remove()
-logger.add(RichHandler(console=Console(stderr=True)), format="{message}")
+logger.add(RichHandler(console=Console(stderr=True), markup=True), format=_formatter)
 
 
 def _get_faked_config():
@@ -30,7 +53,7 @@ def _get_faked_config():
     account["proxy"] = {
         "host": "127.0.0.1",
         "port": "1080",
-        "type": "socks5",
+        "scheme": "socks5",
     }
     account["telegram"] = []
     for _ in range(2):
@@ -62,9 +85,7 @@ def _get_faked_config():
     flag_value="08:00",
     help="每日指定时间执行Telegram bot签到",
 )
-@click.option(
-    "--telegram-follow", is_flag=True, hidden=True, help="启动Telegram监听模式以确定ChatID"
-)
+@click.option("--telegram-follow", is_flag=True, hidden=True, help="启动Telegram监听模式以确定ChatID")
 @click.option("--emby", "-e", type=int, flag_value=7, help="每隔指定天数执行Emby保活")
 @click.option("--instant/--no-instant", default=True, help="立刻执行一次计划任务")
 @click.option("--quiet/--no-quiet", default=False, help="启用批处理模式并禁用输入, 可能导致无法输入验证码")
@@ -79,22 +100,26 @@ def cli(config, telegram, telegram_follow, emby, instant, quiet):
         return
     with open(config) as f:
         config = toml.load(f)
+    # TODO: add verification
+    proxy = config.get("proxy", None)
+    if proxy:
+        proxy.setdefault("scheme", "socks5")
+        proxy.setdefault("hostname", "127.0.0.1")
+        proxy.setdefault("port", "1080")
     if quiet == True:
         config["quiet"] = True
     if telegram_follow:
-        telechecker(config, follow=True)
+        return asyncio.run(telechecker(config, follow=True))
     if not telegram and not emby:
         telegram = "08:00"
         emby = 7
     schedule_telegram = schedule.Scheduler()
     if telegram:
         telegram = parser.parse(telegram).time().strftime("%H:%M")
-        schedule_telegram.every().day.at(telegram).do(telechecker, config=config)
+        schedule_telegram.every().day.at(telegram).do(asyncio.run, telechecker(config))
     schedule_emby = schedule.Scheduler()
     if emby:
-        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(
-            embywatcher, config=config
-        )
+        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(asyncio.run, embywatcher(config))
     if instant:
         schedule_telegram.run_all()
         schedule_emby.run_all()

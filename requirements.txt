@@ -11,4 +11,7 @@ aiohttp_socks
 python-dateutil
 ddddocr
 embypy
-python-telegram-client
+pyrogram
+tgcrypto
+pillow
+asyncstdlib
