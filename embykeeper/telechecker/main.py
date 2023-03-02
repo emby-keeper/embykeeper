@@ -20,7 +20,14 @@ from .tele import Client
 
 logger = logger.bind(scheme="telechecker")
 
-CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin, NebulaCheckin)
+CHECKINERS = (
+    JMSCheckin,
+    TerminusCheckin,
+    JMSIPTVCheckin,
+    LJYYCheckin,
+    PeachCheckin,
+    NebulaCheckin,
+)
 
 
 @asynccontextmanager

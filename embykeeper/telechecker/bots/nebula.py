@@ -19,10 +19,14 @@ class NebulaCheckin(BaseBotCheckin):
         super().__init__(*args, **kw)
         self._retries = 0
         proxy = self.client.proxy
-        self.connector = ProxyConnector(
-            proxy_type=ProxyType[proxy["scheme"].upper()],
-            host=proxy["hostname"],
-            port=proxy["port"],
+        self.connector = (
+            ProxyConnector(
+                proxy_type=ProxyType[proxy["scheme"].upper()],
+                host=proxy["hostname"],
+                port=proxy["port"],
+            )
+            if proxy
+            else None
         )
 
     async def retry(self):
