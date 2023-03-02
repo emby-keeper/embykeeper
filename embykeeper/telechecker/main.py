@@ -20,7 +20,7 @@ from .tele import Client
 
 logger = logger.bind(scheme="telechecker")
 
-CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin)
+CHECKINERS = (JMSCheckin, TerminusCheckin, JMSIPTVCheckin, LJYYCheckin, PeachCheckin, NebulaCheckin)
 
 
 @asynccontextmanager
@@ -107,7 +107,12 @@ async def main(config, follow=False):
         async with login(config) as clients:
             for tg in clients:
                 checkiners = [
-                    cls(tg, retries=config.get("retries", 10), timeout=config.get("timeout", 240)) for cls in CHECKINERS
+                    cls(
+                        tg,
+                        retries=config.get("retries", 10),
+                        timeout=config.get("timeout", 240),
+                    )
+                    for cls in CHECKINERS
                 ]
                 tasks = [asyncio.create_task(c.checkin()) for c in checkiners]
                 results = await asyncio.gather(*tasks)
@@ -122,7 +127,9 @@ async def main(config, follow=False):
             Column("用户", style="cyan", justify="center"),
             Column("", max_width=1, style="white"),
             Column("", max_width=2, overflow="crop"),
-            Column("会话", style="bright_blue", no_wrap=True, justify="right", max_width=15),
+            Column(
+                "会话", style="bright_blue", no_wrap=True, justify="right", max_width=15
+            ),
             Column("(ChatID)", style="gray50", min_width=14, max_width=20),
             Column("", max_width=1, style="white"),
             Column("", max_width=2, overflow="crop"),
