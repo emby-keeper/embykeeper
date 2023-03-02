@@ -20,7 +20,9 @@ class EmbyWatcher:
         self.emby = emby
 
     async def get_oldest(self, n=10):
-        items = await self.emby.get_items(["Movie", "Episode"], limit=n, sort="DateCreated")
+        items = await self.emby.get_items(
+            ["Movie", "Episode"], limit=n, sort="DateCreated"
+        )
         i: Union[Movie, Episode]
         for i in items:
             yield i
@@ -31,7 +33,9 @@ class EmbyWatcher:
 
     async def hide_from_resume(self, obj: EmbyObject):
         c: Connector = obj.connector
-        return is_ok(await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True))
+        return is_ok(
+            await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True)
+        )
 
     def get_last_played(self, obj: EmbyObject):
         last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
@@ -40,7 +44,9 @@ class EmbyWatcher:
     async def play(self, obj: EmbyObject):
         c: Connector = obj.connector
         # 获取播放源
-        resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
+        resp = await c.postJson(
+            f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True
+        )
         if not resp["MediaSources"]:
             return False
         else:
@@ -51,7 +57,10 @@ class EmbyWatcher:
         try:
             c.timeout = 5
             await c.get(
-                f"/Videos/{obj.id}/stream", static=True, playSessionId=play_session_id, MediaSourceId=media_source_id
+                f"/Videos/{obj.id}/stream",
+                static=True,
+                playSessionId=play_session_id,
+                MediaSourceId=media_source_id,
             )
         except asyncio.TimeoutError:
             pass

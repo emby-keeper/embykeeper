@@ -86,7 +86,9 @@ def _get_faked_config():
     flag_value="08:00",
     help="每日指定时间执行Telegram bot签到",
 )
-@click.option("--telegram-follow", is_flag=True, hidden=True, help="启动Telegram监听模式以确定ChatID")
+@click.option(
+    "--telegram-follow", is_flag=True, hidden=True, help="启动Telegram监听模式以确定ChatID"
+)
 @click.option("--emby", "-e", type=int, flag_value=7, help="每隔指定天数执行Emby保活")
 @click.option("--instant/--no-instant", default=True, help="立刻执行一次计划任务")
 @click.option("--quiet/--no-quiet", default=False, help="启用批处理模式并禁用输入, 可能导致无法输入验证码")
@@ -120,7 +122,9 @@ def cli(config, telegram, telegram_follow, emby, instant, quiet):
         schedule_telegram.every().day.at(telegram).do(asyncio.run, telechecker(config))
     schedule_emby = schedule.Scheduler()
     if emby:
-        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(asyncio.run, embywatcher(config))
+        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(
+            asyncio.run, embywatcher(config)
+        )
     if instant:
         schedule_telegram.run_all()
         schedule_emby.run_all()

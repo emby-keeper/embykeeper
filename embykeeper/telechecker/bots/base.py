@@ -1,5 +1,6 @@
 import asyncio
 import re
+from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager, suppress
 from enum import Flag, auto
 
@@ -36,9 +37,25 @@ class AsyncPool(dict):
             return key
 
 
-class BotCheckin:
-    group_pool = AsyncPool()
+class BaseBotCheckin(ABC):
     name = "Bot"
+
+    def __init__(self, client: Client, retries=10, timeout=120):
+        self.client = client
+        self.retries = retries
+        self.timeout = timeout
+        self.finished = asyncio.Event()
+        self.log = logger.bind(
+            scheme="telechecker", name=self.name, username=self.client.me.first_name
+        )
+
+    @abstractmethod
+    async def checkin(self):
+        pass
+
+
+class BotCheckin(BaseBotCheckin):
+    group_pool = AsyncPool()
     bot_id = None
     bot_username = None
     bot_checkin_cmd = ["/checkin"]
@@ -47,17 +64,16 @@ class BotCheckin:
     bot_captcha_len = range(2, 7)
     bot_use_history = None
 
-    def __init__(self, client: Client, retries=10, timeout=120):
-        self.client = client
-        self.retries = retries
-        self.timeout = timeout
-        self.finished = asyncio.Event()
-        self.log = logger.bind(scheme="telechecker", name=self.name, username=self.client.me.first_name)
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
         self._retries = 0
 
     @asynccontextmanager
     async def listener(self):
-        handlers = [MessageHandler(self.message_handler), EditedMessageHandler(self.message_handler)]
+        handlers = [
+            MessageHandler(self.message_handler),
+            EditedMessageHandler(self.message_handler),
+        ]
         group = await BotCheckin.group_pool.append(handlers)
         for h in handlers:
             self.client.add_handler(h, group=group)
@@ -81,7 +97,9 @@ class BotCheckin:
             return self._retries <= self.retries
 
     async def walk_history(self, limit=0):
-        async for m in self.client.get_chat_history(self.bot_id or self.bot_username, limit=limit):
+        async for m in self.client.get_chat_history(
+            self.bot_id or self.bot_username, limit=limit
+        ):
             if MessageType.CAPTCHA in self.message_type(m):
                 await self.on_photo(m)
                 return True
@@ -97,7 +115,10 @@ class BotCheckin:
     async def message_handler(self, client: Client, message: Message):
         if not message.outgoing:
             if message.chat.type == ChatType.BOT:
-                if message.from_user.id == self.bot_id or message.from_user.username == self.bot_username:
+                if (
+                    message.from_user.id == self.bot_id
+                    or message.from_user.username == self.bot_username
+                ):
                     await self.message_parser(message)
 
     def message_type(self, message: Message):
@@ -143,11 +164,14 @@ class BotCheckin:
         if any(s in text for s in self.bot_text_ignore):
             pass
         elif any(s in text for s in ("失败", "错误", "超时")):
+            self.log.info(f"签到失败, 正在重试.")
             await self.retry()
         elif any(s in text for s in ("成功", "通过", "完成")):
             matches = re.search(r"(\d+)[^\d]*(\d+)", text)
             if matches:
-                self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
+                self.log.info(
+                    f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分."
+                )
             else:
                 matches = re.search(r"\d+", text)
                 if matches:
@@ -183,7 +207,9 @@ class AnswerBotCheckin(BotCheckin):
     async def walk_history(self, limit=0):
         answer = None
         captcha = None
-        async for m in self.client.get_chat_history(self.bot_id or self.bot_username, limit=limit):
+        async for m in self.client.get_chat_history(
+            self.bot_id or self.bot_username, limit=limit
+        ):
             if MessageType.ANSWER in self.message_type(m):
                 answer = answer or m
             if MessageType.CAPTCHA in self.message_type(m):

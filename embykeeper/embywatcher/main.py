@@ -29,7 +29,9 @@ async def login(config):
         info = await emby.info()
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
-            loggeruser.info(f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).')
+            loggeruser.info(
+                f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).'
+            )
             yield emby, loggeruser
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
@@ -51,7 +53,9 @@ async def watch(emby, logger):
                 if not last_played:
                     continue
                 last_played = last_played.strftime("%Y-%m-%d %H:%M:%S")
-                logger.info(f"[yellow]成功播放视频[/], 当前该视频播放{obj.play_count}次, 上次播放于 {last_played}.")
+                logger.info(
+                    f"[yellow]成功播放视频[/], 当前该视频播放{obj.play_count}次, 上次播放于 {last_played}."
+                )
                 break
         except KeyboardInterrupt as e:
             raise e from None

@@ -19,8 +19,12 @@ class Client(_Client):
             SentCodeType.EMAIL_CODE: "邮件",
         }
         if not self.phone_code:
-            self.phone_code = await ainput(f'请在{code_target[sent_code.type]}接收"{self.phone_number}"的两步验证码: ')
-        signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
+            self.phone_code = await ainput(
+                f'请在{code_target[sent_code.type]}接收"{self.phone_number}"的两步验证码: '
+            )
+        signed_in = await self.sign_in(
+            self.phone_number, sent_code.phone_code_hash, self.phone_code
+        )
         if isinstance(signed_in, User):
             return signed_in
         else:
