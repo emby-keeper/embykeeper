@@ -79,17 +79,24 @@ class BotCheckin(BaseBotCheckin):
             self.client.add_handler(h, group=group)
         yield
         for h in handlers:
-            self.client.remove_handler(h, group=group)
+            try:
+                self.client.remove_handler(h, group=group)
+            except ValueError:
+                pass
 
     async def checkin(self):
         self.log.info("开始执行签到.")
-        async with self.listener():
-            if self.bot_use_history is None:
-                await self.send_checkin()
-            elif not await self.walk_history(self.bot_use_history):
-                await self.send_checkin()
-            with suppress(asyncio.TimeoutError):
-                await asyncio.wait_for(self.finished.wait(), self.timeout)
+        try:
+            async with self.listener():
+                if self.bot_use_history is None:
+                    await self.send_checkin()
+                elif not await self.walk_history(self.bot_use_history):
+                    await self.send_checkin()
+                with suppress(asyncio.TimeoutError):
+                    await asyncio.wait_for(self.finished.wait(), self.timeout)
+        except OSError as e:
+            self.log.warning(f'初始化错误: "{e}".')
+            return False
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
@@ -113,13 +120,17 @@ class BotCheckin(BaseBotCheckin):
             await self.send(cmd)
 
     async def message_handler(self, client: Client, message: Message):
-        if not message.outgoing:
-            if message.chat.type == ChatType.BOT:
-                if (
-                    message.from_user.id == self.bot_id
-                    or message.from_user.username == self.bot_username
-                ):
-                    await self.message_parser(message)
+        try:
+            if not message.outgoing:
+                if message.chat.type == ChatType.BOT:
+                    if (
+                        message.from_user.id == self.bot_id
+                        or message.from_user.username == self.bot_username
+                    ):
+                        await self.message_parser(message)
+        except OSError as e:
+            self.log.info(f'出现错误: "{e}", 正在重试.')
+            self.retry()
 
     def message_type(self, message: Message):
         if message.photo:
@@ -191,7 +202,7 @@ class BotCheckin(BaseBotCheckin):
             await asyncio.sleep(5)
             await self.send_checkin()
         else:
-            self.log.error("超过最大重试次数.")
+            self.log.warning("超过最大重试次数.")
             self.finished.set()
 
 

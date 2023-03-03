@@ -119,12 +119,10 @@ def cli(config, telegram, telegram_follow, emby, instant, quiet):
     schedule_telegram = schedule.Scheduler()
     if telegram:
         telegram = parser.parse(telegram).time().strftime("%H:%M")
-        schedule_telegram.every().day.at(telegram).do(asyncio.run, telechecker(config))
+        schedule_telegram.every().day.at(telegram).do(lambda: asyncio.run(telechecker(config)))
     schedule_emby = schedule.Scheduler()
     if emby:
-        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(
-            asyncio.run, embywatcher(config)
-        )
+        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M")).do(lambda: asyncio.run(embywatcher(config)))
     if instant:
         schedule_telegram.run_all()
         schedule_emby.run_all()

@@ -35,12 +35,16 @@ class NebulaCheckin(BaseBotCheckin):
             await asyncio.sleep(5)
             await self.checkin()
         else:
-            self.log.error("超过最大重试次数.")
+            self.log.warning("超过最大重试次数.")
             self.finished.set()
 
     async def checkin(self):
-        with contextlib.suppress(asyncio.TimeoutError):
-            await asyncio.wait_for(self._checkin(), self.timeout)
+        try:
+            with contextlib.suppress(asyncio.TimeoutError):
+                await asyncio.wait_for(self._checkin(), self.timeout)
+        except OSError as e:
+            self.log.info(f'出现错误: "{e}", 正在重试.')
+            await self.retry()
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
