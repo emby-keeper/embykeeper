@@ -12,7 +12,7 @@ class LJYYCheckin(AnswerBotCheckin):
     bot_use_history = 20
     bot_text_ignore = ["下列选项"]
 
-    def retry(self):
+    async def retry(self):
         if self.message:
             self.message.click()
-        super().retry()
+        await super().retry()

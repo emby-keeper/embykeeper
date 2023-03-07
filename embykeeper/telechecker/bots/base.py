@@ -130,7 +130,7 @@ class BotCheckin(BaseBotCheckin):
                         await self.message_parser(message)
         except OSError as e:
             self.log.info(f'出现错误: "{e}", 正在重试.')
-            self.retry()
+            await self.retry()
 
     def message_type(self, message: Message):
         if message.photo:
