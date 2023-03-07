@@ -161,7 +161,7 @@ class BotCheckin(BaseBotCheckin):
         image = Image.open(data)
         captcha = ocr.classification(image).replace(" ", "")
         if len(captcha) not in self.bot_captcha_len:
-            self.log.info(f'验证码"{captcha}" 低于设定长度, 正在重试.')
+            self.log.info(f'验证码 "{captcha}" 低于设定长度, 正在重试.')
             await self.retry()
         else:
             await asyncio.sleep(1)
