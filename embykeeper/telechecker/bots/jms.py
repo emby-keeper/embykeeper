@@ -17,6 +17,6 @@ class JMSCheckin(AnswerBotCheckin):
                 try:
                     await self.message.click(l)
                 except ValueError:
-                    logger.info(self.msg(f'未能找到对应 "{l}" 的按键, 正在重试.'))
+                    logger.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
                     await self.retry()
                     break
