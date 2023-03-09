@@ -241,6 +241,8 @@ class AnswerBotCheckin(BotCheckin):
             return [k.text for r in reply_markup.keyboard for k in r]
 
     def is_valid_answer(self, message: Message):
+        if not message.reply_markup:
+            return False
         if self.bot_checkin_button_pat:
             for k in self.get_keys(message):
                 if not re.search(self.bot_checkin_button_pat, k):

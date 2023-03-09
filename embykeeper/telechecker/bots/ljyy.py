@@ -14,5 +14,5 @@ class LJYYCheckin(AnswerBotCheckin):
 
     async def retry(self):
         if self.message:
-            self.message.click()
+            await self.message.click()
         await super().retry()

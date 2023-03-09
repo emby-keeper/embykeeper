@@ -1,12 +1,12 @@
 import asyncio
 import re
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from functools import partial
 from typing import List
 
 from loguru import logger
 from pyrogram.enums import ChatType
-from pyrogram.errors import BadRequest
+from pyrogram.errors import RPCError, Unauthorized
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from rich import box
@@ -21,12 +21,12 @@ from .tele import Client
 logger = logger.bind(scheme="telechecker")
 
 CHECKINERS = (
-    JMSCheckin,
-    TerminusCheckin,
-    JMSIPTVCheckin,
+    #JMSCheckin,
+    #TerminusCheckin,
+    #JMSIPTVCheckin,
     LJYYCheckin,
-    PeachCheckin,
-    NebulaCheckin,
+    #PeachCheckin,
+    #NebulaCheckin,
 )
 
 
@@ -34,23 +34,32 @@ CHECKINERS = (
 async def login(config):
     clients: List[Client] = []
     for account in config.get("telegram", []):
-        clients.append(
-            Client(
-                app_version=f"{__name__.capitalize()} {__version__}",
-                name=account["phone"],
-                api_id=account["api_id"],
-                api_hash=account["api_hash"],
-                phone_number=account["phone"],
-                proxy=config.get("proxy", None),
-                lang_code="zh",
-            )
-        )
-    for client in clients:
-        logger.info(f'登录账号 "{client.phone_number}".')
+        logger.info(f'登录账号 "{account["phone"]}".')
         try:
-            await client.start()
-        except BadRequest as e:
-            logger.error(f'登录账号 "{client.phone_number}" 失败 ({e.MESSAGE}), 将被跳过.')
+            while True:
+                try:
+                    client = Client(
+                        app_version=f"{__name__.capitalize()} {__version__}",
+                        name=account["phone"],
+                        api_id=account["api_id"],
+                        api_hash=account["api_hash"],
+                        phone_number=account["phone"],
+                        proxy=config.get("proxy", None),
+                        lang_code="zh",
+                    )
+                    await client.start()
+                except Unauthorized:
+                    await client.storage.delete()
+                except Exception:
+                    raise
+                else:
+                    break
+        except RPCError as e:
+            logger.error(f'登录账号 "{client.phone_number}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
+        except Exception as e:
+            logger.error(f'登录账号 "{client.phone_number}" 时发生异常: {e}, 将被跳过.')
+        else:
+            clients.append(client)
     yield clients
     for client in clients:
         try:
