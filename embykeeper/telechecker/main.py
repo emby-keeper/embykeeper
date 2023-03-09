@@ -21,12 +21,12 @@ from .tele import Client
 logger = logger.bind(scheme="telechecker")
 
 CHECKINERS = (
-    #JMSCheckin,
-    #TerminusCheckin,
-    #JMSIPTVCheckin,
+    JMSCheckin,
+    TerminusCheckin,
+    JMSIPTVCheckin,
     LJYYCheckin,
-    #PeachCheckin,
-    #NebulaCheckin,
+    PeachCheckin,
+    NebulaCheckin,
 )
 
 
