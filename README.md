@@ -107,16 +107,16 @@ tmux a
 
 ## 支持 Embykeeper
 
-##### 贡献者名单
-
-* 暂无
-
-##### 活跃开发者名单
-
-* [jackzzs](https://github.com/jackzzs)
-
-<img src="https://github.com/jackzzs/embykeeper/blob/main/images/kitty.png" alt="Kitty" style="float:left;margin-right:1rem" />
-<b>通过[爱发电](https://afdian.net/a/jackzzs)赞助</b>
+<img src="https://github.com/jackzzs/embykeeper/blob/main/images/kitty.gif" alt="Kitty" style="float:left;margin-right:1rem" />
+<h5 id="-">贡献者名单</h5>
+<ul>
+  <li>暂无</li>
+</ul>
+<h5 id="-">活跃开发者名单</h5>
+<ul>
+  <li><a href="https://github.com/jackzzs">jackzzs</a></li>
+</ul>
+<h5>通过<a href="https://afdian.net/a/jackzzs">爱发电</a>赞助</h5>
 
 ## 配置项
 
