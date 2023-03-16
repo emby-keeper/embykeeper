@@ -107,20 +107,15 @@ tmux a
 
 ## 支持 Embykeeper
 
-<img src="https://github.com/jackzzs/embykeeper/blob/main/images/kitty.gif" alt="Kitty" style="float:left;margin-right:1rem" />
-<div>
-  <h5 id="-">贡献者名单</h5>
-  <ul>
-    <li>暂无</li>
-  </ul>
-  <h5 id="-">活跃开发者名单</h5>
-  <ul>
-    <li><a href="https://github.com/jackzzs">jackzzs</a></li>
-  </ul>
-  <h5 id="-">
-    通过<a href="https://afdian.net/a/jackzzs">爱发电</a>赞助
-  </h5>
-</div>
+##### 贡献者名单
+ * 暂无
+
+##### 活跃开发者名单
+ * [jackzzs] (https://github.com/jackzzs)
+
+##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
+
+![kitty](images/kitty.gif)
 
 ## 配置项
 
