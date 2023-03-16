@@ -1,9 +1,10 @@
 *.toml
+*.msgs
 *.session
 *.session-journal
-test.py
-test.ipynb
 swig.json
+/test.py
+/test.ipynb
 
 .vscode/*
 !.vscode/settings.json
@@ -70,10 +71,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
-# Translations
-*.mo
-*.pot
 
 # Django stuff:
 *.log

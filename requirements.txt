@@ -1,6 +1,6 @@
 toml
 rich
-click
+typer
 schedule
 appdirs
 loguru
@@ -16,3 +16,5 @@ tgcrypto
 pillow
 asyncstdlib
 thefuzz
+schema
+uvloop

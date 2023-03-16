@@ -27,8 +27,9 @@ lint/flake8: ## check style with flake8
 
 lint: lint/black lint/flake8 ## check style
 
+develop: clean ## install the package at current location, keeping it editable
+	pip install -e .
+
 install: clean ## install the package to the active Python's site-packages
 	pip install .
 
-develop: clean ## install the package at current location, keeping it editable
-	pip install -e .

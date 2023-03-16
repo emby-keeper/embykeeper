@@ -3,9 +3,9 @@ from pyrogram.types import Message
 from .base import BotCheckin
 
 
-class PeachCheckin(BotCheckin):
-    name = "Peach"
-    bot_username = "peach_emby_bot"
+class SingularityCheckin(BotCheckin):
+    name = "Singularity"
+    bot_username = "Singularity_Emby_Bot"
     bot_checkin_cmd = "/start"
     bot_captcha_len = 4
     bot_checkin_caption_pat = "请输入验证码"

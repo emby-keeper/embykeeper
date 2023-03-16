@@ -1,3 +1,5 @@
-__author__ = """jackzzs"""
-__email__ = "jackzzs@outlook.com"
-__version__ = "0.1.0"
+__author__ = {
+    "jackzzs": "jackzzs@outlook.com",
+}
+__version__ = "1.0.0"
+__url__ = "https://github.com/jackzzs/embykeeper"

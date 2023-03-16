@@ -20,42 +20,58 @@ class EmbyWatcher:
         self.emby = emby
 
     async def get_oldest(self, n=10):
-        items = await self.emby.get_items(
-            ["Movie", "Episode"], limit=n, sort="DateCreated"
-        )
+        items = await self.emby.get_items(["Movie", "Episode"], limit=n, sort="DateCreated")
         i: Union[Movie, Episode]
         for i in items:
             yield i
 
-    async def set_played(self, obj: EmbyObject):
+    @staticmethod
+    async def set_played(obj: EmbyObject):
         c: Connector = obj.connector
         return is_ok(await c.post(f"/Users/{{UserId}}/PlayedItems/{obj.id}"))
 
-    async def hide_from_resume(self, obj: EmbyObject):
+    @staticmethod
+    async def hide_from_resume(obj: EmbyObject):
         c: Connector = obj.connector
-        return is_ok(
-            await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True)
-        )
+        return is_ok(await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True))
 
-    def get_last_played(self, obj: EmbyObject):
+    @staticmethod
+    def get_last_played(obj: EmbyObject):
         last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
         return datetime.fromisoformat(last_played[:-2]) if last_played else None
 
-    async def play(self, obj: EmbyObject):
+    @staticmethod
+    async def send_playing(obj: EmbyObject, playing_info):
         c: Connector = obj.connector
+        while True:
+            await c.post("/Sessions/Playing", **playing_info)
+            asyncio.sleep(10)
+
+    async def play(self, obj: EmbyObject, time=800, progress=1000):
+        c: Connector = obj.connector
+        # 检查
+        if obj.object_dict.get('RunTimeTicks') < max(progress, time) * 10000000:
+            return False
         # 获取播放源
-        resp = await c.postJson(
-            f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True
-        )
+        resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
         if not resp["MediaSources"]:
             return False
         else:
             play_session_id = resp["PlaySessionId"]
             media_source_id = resp["MediaSources"][0]["Id"]
         # 模拟播放
+        playing_info = {
+            "ItemId": obj.id,
+            "PlayMethod": "DirectStream",
+            "PlaySessionId": play_session_id,
+            "MediaSourceId": media_source_id,
+            'PositionTicks': 10000000 * progress,
+            "CanSeek": True,
+        }
+        send_playing_task = asyncio.create_task(self.send_playing(obj, playing_info))
         timeout = c.timeout
         try:
-            c.timeout = 5
+            c.timeout = time
             await c.get(
                 f"/Videos/{obj.id}/stream",
                 static=True,
@@ -66,16 +82,7 @@ class EmbyWatcher:
             pass
         finally:
             c.timeout = timeout
-        # 设定播放状态
-        playing_info = {
-            "ItemId": obj.id,
-            "PlayMethod": "DirectStream",
-            "PlaySessionId": play_session_id,
-            "MediaSourceId": media_source_id,
-            "CanSeek": True,
-        }
-        if not is_ok(await c.post("/Sessions/Playing", **playing_info)):
-            return False
+        send_playing_task.cancel()
         if not is_ok(await c.post("/Sessions/Playing/Stopped", **playing_info)):
             return False
         return True

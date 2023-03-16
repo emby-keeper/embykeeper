@@ -7,11 +7,14 @@ from enum import Flag, auto
 import ddddocr
 from loguru import logger
 from PIL import Image
-from pyrogram import Client
-from pyrogram.enums import ChatType
+from pyrogram import filters
+from pyrogram.errors import UsernameNotOccupied
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
+
+from ...utils import AsyncCountPool, to_iterable
+from ..tele import Client
 
 ocr = ddddocr.DdddOcr(beta=True, show_ad=False)
 
@@ -23,56 +26,57 @@ class MessageType(Flag):
     ANSWER = auto()
 
 
-class AsyncPool(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.lock = asyncio.Lock()
-        self.next = 1001
-
-    async def append(self, value):
-        async with self.lock:
-            key = self.next
-            self[key] = value
-            self.next += 1
-            return key
-
-
 class BaseBotCheckin(ABC):
-    name = "Bot"
+    name = __name__
 
-    def __init__(self, client: Client, retries=10, timeout=120):
+    def __init__(self, client: Client, retries=10, timeout=60, nofail=True):
         self.client = client
         self.retries = retries
         self.timeout = timeout
+        self.nofail = nofail
         self.finished = asyncio.Event()
-        self.log = logger.bind(
-            scheme="telechecker", name=self.name, username=self.client.me.first_name
-        )
+        self.log = logger.bind(scheme="telechecker", name=self.name, username=self.client.me.first_name)
+
+    async def _start(self):
+        try:
+            return await self.start()
+        except Exception as e:
+            if self.nofail:
+                self.log.opt(exception=e).warning(f"初始化错误:")
+                return False
+            else:
+                raise
 
     @abstractmethod
-    async def checkin(self):
+    async def start(self):
         pass
 
 
 class BotCheckin(BaseBotCheckin):
-    group_pool = AsyncPool()
+    group_pool = AsyncCountPool(base=1000)
     bot_id = None
     bot_username = None
     bot_checkin_cmd = ["/checkin"]
     bot_checkin_caption_pat = None
     bot_text_ignore = []
     bot_captcha_len = range(2, 7)
+    bot_success_pat = r"(\d+)[^\d]*(\d+)"
     bot_use_history = None
+    chat_name = None
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+        self._is_archived = False
         self._retries = 0
 
     @asynccontextmanager
     async def listener(self):
+        filter = filters.user(self.bot_id or self.bot_username)
+        if self.chat_name:
+            filter = filter & filters.chat(self.chat_name)
         handlers = [
-            MessageHandler(self.message_handler),
-            EditedMessageHandler(self.message_handler),
+            MessageHandler(self._message_handler, filter),
+            EditedMessageHandler(self._message_handler, filter),
         ]
         group = await BotCheckin.group_pool.append(handlers)
         for h in handlers:
@@ -84,8 +88,28 @@ class BotCheckin(BaseBotCheckin):
             except ValueError:
                 pass
 
-    async def checkin(self):
-        self.log.info("开始执行签到.")
+    async def wait_finished(self, chat):
+        await self.finished.wait()
+        if self._is_archived:
+            await chat.archive()
+
+    async def start(self):
+        ident = self.chat_name or self.bot_id or self.bot_username
+        try:
+            chat = await self.client.get_chat(ident)
+        except UsernameNotOccupied:
+            self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
+            return False
+        async for d in self.client.get_dialogs(folder_id=1):
+            if d.chat.id == chat.id:
+                self._is_archived = True
+                break
+        bot = await self.client.get_users(self.bot_id or self.bot_username)
+        msg = f"开始执行签到: [green]{bot.first_name}[/] [gray50](@{bot.username})[/]"
+        if chat.title:
+            msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
+        self.log.info(msg + ".")
+        asyncio.create_task(self.wait_finished(chat))
         try:
             async with self.listener():
                 if self.bot_use_history is None:
@@ -105,7 +129,7 @@ class BotCheckin(BaseBotCheckin):
 
     async def walk_history(self, limit=0):
         async for m in self.client.get_chat_history(
-            self.bot_id or self.bot_username, limit=limit
+            self.chat_name or self.bot_id or self.bot_username, limit=limit
         ):
             if MessageType.CAPTCHA in self.message_type(m):
                 await self.on_photo(m)
@@ -113,24 +137,37 @@ class BotCheckin(BaseBotCheckin):
         return False
 
     async def send(self, cmd):
-        await self.client.send_message(self.bot_id or self.bot_username, cmd)
+        if self.chat_name:
+            bot = await self.client.get_users(self.bot_id or self.bot_username)
+            await self.client.send_message(self.chat_name, f"{cmd}@{bot.username}")
+        else:
+            await self.client.send_message(self.bot_id or self.bot_username, cmd)
 
     async def send_checkin(self):
-        for cmd in self.bot_checkin_cmd:
+        for cmd in to_iterable(self.bot_checkin_cmd):
             await self.send(cmd)
 
-    async def message_handler(self, client: Client, message: Message):
+    async def _message_handler(self, *args, **kw):
         try:
-            if not message.outgoing:
-                if message.chat.type == ChatType.BOT:
-                    if (
-                        message.from_user.id == self.bot_id
-                        or message.from_user.username == self.bot_username
-                    ):
-                        await self.message_parser(message)
+            await self.message_handler(*args, **kw)
         except OSError as e:
-            self.log.info(f'出现错误: "{e}", 正在重试.')
+            self.log.info(f'发生错误: "{e}", 正在重试.')
             await self.retry()
+        except Exception as e:
+            self.finished.set()
+            if self.nofail:
+                self.log.opt(exception=e).warning(f"发生错误:")
+            else:
+                raise
+
+    async def message_handler(self, client: Client, message: Message, type=None):
+        type = type or self.message_type(message)
+        if MessageType.TEXT in type:
+            await self.on_text(message, message.text)
+        if MessageType.CAPTION in type:
+            await self.on_text(message, message.caption)
+        if MessageType.CAPTCHA in type:
+            await self.on_photo(message)
 
     def message_type(self, message: Message):
         if message.photo:
@@ -147,20 +184,11 @@ class BotCheckin(BaseBotCheckin):
         elif message.text:
             return MessageType.TEXT
 
-    async def message_parser(self, message: Message, type=None):
-        type = type or self.message_type(message)
-        if MessageType.TEXT in type:
-            await self.on_text(message, message.text)
-        if MessageType.CAPTION in type:
-            await self.on_text(message, message.caption)
-        if MessageType.CAPTCHA in type:
-            await self.on_photo(message)
-
     async def on_photo(self, message: Message):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
         captcha = ocr.classification(image).replace(" ", "")
-        if len(captcha) not in self.bot_captcha_len:
+        if len(captcha) not in to_iterable(self.bot_captcha_len):
             self.log.info(f'验证码 "{captcha}" 低于设定长度, 正在重试.')
             await self.retry()
         else:
@@ -172,17 +200,15 @@ class BotCheckin(BaseBotCheckin):
         await message.reply(captcha)
 
     async def on_text(self, message: Message, text: str):
-        if any(s in text for s in self.bot_text_ignore):
+        if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
         elif any(s in text for s in ("失败", "错误", "超时")):
             self.log.info(f"签到失败, 正在重试.")
             await self.retry()
         elif any(s in text for s in ("成功", "通过", "完成")):
-            matches = re.search(r"(\d+)[^\d]*(\d+)", text)
+            matches = re.search(self.bot_success_pat, text)
             if matches:
-                self.log.info(
-                    f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分."
-                )
+                self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
             else:
                 matches = re.search(r"\d+", text)
                 if matches:
@@ -190,7 +216,7 @@ class BotCheckin(BaseBotCheckin):
                 else:
                     self.log.info(f"[yellow]签到成功[/].")
             self.finished.set()
-        elif any(s in text for s in ("只能", "已经", "下次", "过了")):
+        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过")):
             self.log.info(f"今日已经签到过了.")
             self.finished.set()
         else:
@@ -219,7 +245,7 @@ class AnswerBotCheckin(BotCheckin):
         answer = None
         captcha = None
         async for m in self.client.get_chat_history(
-            self.bot_id or self.bot_username, limit=limit
+            self.chat_name or self.bot_id or self.bot_username, limit=limit
         ):
             if MessageType.ANSWER in self.message_type(m):
                 answer = answer or m
@@ -255,11 +281,11 @@ class AnswerBotCheckin(BotCheckin):
         else:
             return super().message_type(message)
 
-    async def message_parser(self, message: Message):
+    async def message_handler(self, client: Client, message: Message):
         type = self.message_type(message)
         if MessageType.ANSWER in type:
             await self.on_answer(message)
-        await super().message_parser(message, type=type)
+        await super().message_handler(client, message, type=type)
 
     async def on_answer(self, message: Message):
         async with self.mutex:

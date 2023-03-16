@@ -1,4 +1,3 @@
-from loguru import logger
 from pyrogram.types import Message
 
 from .base import AnswerBotCheckin
@@ -7,7 +6,7 @@ from .base import AnswerBotCheckin
 class JMSCheckin(AnswerBotCheckin):
     name = "卷毛鼠"
     bot_username = "jmsembybot"
-    bot_captcha_len = [4]
+    bot_captcha_len = 4
 
     async def on_captcha(self, message: Message, captcha: str):
         async with self.operable:
@@ -17,6 +16,6 @@ class JMSCheckin(AnswerBotCheckin):
                 try:
                     await self.message.click(l)
                 except ValueError:
-                    logger.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
+                    self.log.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
                     await self.retry()
                     break

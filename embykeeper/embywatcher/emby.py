@@ -18,7 +18,9 @@ class Connector(_Connector):
     async def _get_session(self):
         loop = asyncio.get_running_loop()
         loop_id = hash(loop)
-        auth_header = f'MediaBrowser Client="Emby",Device="Emby",DeviceId="{self.device_id}",Version="{__version__}"'
+        auth_header = (
+            f'MediaBrowser Client="Emby",Device="Emby",DeviceId="{self.device_id}",Version="{__version__}"'
+        )
         if self.token:
             auth_header += f',Token="{self.token}"'
         headers = {"Authorization": auth_header, "X-Emby-Authorization": auth_header}

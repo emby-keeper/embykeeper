@@ -33,17 +33,17 @@ class NebulaCheckin(BaseBotCheckin):
         self._retries += 1
         if self._retries <= self.retries:
             await asyncio.sleep(5)
-            await self.checkin()
+            await self.start()
         else:
             self.log.warning("超过最大重试次数.")
             self.finished.set()
 
-    async def checkin(self):
+    async def start(self):
         try:
             with contextlib.suppress(asyncio.TimeoutError):
                 await asyncio.wait_for(self._checkin(), self.timeout)
         except OSError as e:
-            self.log.info(f'出现错误: "{e}", 正在重试.')
+            self.log.info(f'发生错误: "{e}", 正在重试.')
             await self.retry()
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
@@ -52,19 +52,17 @@ class NebulaCheckin(BaseBotCheckin):
             return self._retries <= self.retries
 
     async def _checkin(self):
-        bot = await self.client.resolve_peer(self.bot_username)
-        user_full = await self.client.invoke(GetFullUser(id=bot))
+        bot = await self.client.get_users(self.bot_username)
+        self.log.info(f"开始执行签到: [green]{bot.first_name}[/] [gray50](@{bot.username})[/].")
+        bot_peer = await self.client.resolve_peer(self.bot_username)
+        user_full = await self.client.invoke(GetFullUser(id=bot_peer))
         url = user_full.full_user.bot_info.menu_button.url
         url_auth = (
-            await self.client.invoke(
-                RequestWebView(peer=bot, bot=bot, platform="ios", url=url)
-            )
+            await self.client.invoke(RequestWebView(peer=bot_peer, bot=bot_peer, platform="ios", url=url))
         ).url
         scheme = urlparse(url_auth)
         data = remove_prefix(scheme.fragment, "tgWebAppData=")
-        user_checkin_url = scheme._replace(
-            path="/api/userCheckIn", query=f"data={data}"
-        ).geturl()
+        user_checkin_url = scheme._replace(path="/api/userCheckIn", query=f"data={data}").geturl()
         async with ClientSession(connector=self.connector) as session:
             async with session.get(user_checkin_url) as resp:
                 check_results = await resp.json()
