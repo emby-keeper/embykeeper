@@ -64,7 +64,7 @@ embykeeper
 
 ```toml
 [proxy]
-host = "127.0.0.1"
+hostname = "127.0.0.1"
 port = "1080"
 scheme = "socks5"
 
@@ -133,7 +133,7 @@ tmux a
 
 | 设置项     | 值类型  | 简介                                | 默认值        |
 | ---------- | ------- | ----------------------------------- | ------------- |
-| `host`   | `str` | 代理服务器地址                      | `localhost` |
+| `hostname`   | `str` | 代理服务器地址                      | `localhost` |
 | `port`   | `int` | 代理端口号                          | `1080`      |
 | `scheme` | `str` | 代理协议, 可以为 "socks5" 或 "http" | `socks5`    |
 
