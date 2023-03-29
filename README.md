@@ -1,4 +1,4 @@
-[![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![downloads badge](https://img.shields.io/pypi/dm/embykeeper?color=%234287f5&label=downloads&logo=Pypi&logoColor=%234287f5)](https://pypi.org/project/embykeeper/) [![python versions badge](https://img.shields.io/pypi/pyversions/embykeeper)](https://pypi.org/project/embykeeper/) [![license badge](https://img.shields.io/github/license/embykeeper/embykeeper)](https://github.com/embykeeper/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper)
+[![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![downloads badge](https://img.shields.io/pypi/dm/embykeeper?color=%234287f5&label=downloads&logoColor=%234287f5)](https://pypi.org/project/embykeeper/) [![python versions badge](https://img.shields.io/pypi/pyversions/embykeeper)](https://pypi.org/project/embykeeper/) [![license badge](https://img.shields.io/github/license/embykeeper/embykeeper)](https://github.com/embykeeper/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper)
 
 <p align="center">
   <a href='https://github.com/embykeeper/embykeeper'>
@@ -29,15 +29,15 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 - Telegram 机器人签到
   - 支持群组
-    - 终点站: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/embypub) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/EmbyPublic) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/EmbyPublicBot)
-    - 卷毛鼠: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)]() [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/Curly_Mouse) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/jmsembybot)
-    - ~~卷毛鼠 IPTV: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/CurlyMouseIPTV) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/Curly_MouseIPTV) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/JMSIPTV_bot)~~ (无响应)
-    - Peach: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/peach_emby_channel) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/peach_emby_chat) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/peach_emby_bot)
-    - 垃圾影音: [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/+3sP2A-fgeXg0ZmY1) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/zckllflbot)
-    - BlueSea: [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/blueseachat) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/blueseamusic_bot)
-    - EmbyHub: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/embyhub) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/emby_hub) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/EdHubot)
-    - Singularity: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/Singularity_Emby_Channel) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/Singularity_Emby_Group) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/Singularity_Emby_Bot)
-    - Nebula: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/Nebula_Emby) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/NebulaEmbyUser) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
+    - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
+    - 卷毛鼠: [频道]() [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
+    - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
+    - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
+    - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
+    - BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)
+    - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
+    - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
+    - Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
   - 高级特性
     - 验证码识别与自动重试
     - 多账户签到
@@ -46,10 +46,10 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - Telegram 自动水群 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
-  - NakoNako 自动水群: [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/NakoNetwork) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/nakonetwork_bot)
+  - NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)
 - Telegram 自动监控信息 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
-  - 不给看 抢邀请码: [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/Ephemeralemby) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/UnknownEmbyBot)
-  - Embyhub 开注自动注册: [![频道](https://img.shields.io/badge/TG-%E9%A2%91%E9%81%93-green)](https://t.me/embyhub) [![群组](https://img.shields.io/badge/TG-%E7%BE%A4%E7%BB%84-blue)](https://t.me/emby_hub) [![机器人](https://img.shields.io/badge/TG-%E6%9C%BA%E5%99%A8%E4%BA%BA-lightgrey)](https://t.me/EdHubot)
+  - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
+  - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
 
 ## 安装与使用
 
