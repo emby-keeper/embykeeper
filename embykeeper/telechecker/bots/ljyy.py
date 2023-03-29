@@ -1,5 +1,6 @@
 from .base import AnswerBotCheckin
 
+from pyrogram.errors import BadRequest
 
 class LJYYCheckin(AnswerBotCheckin):
     name = "垃圾影音"
@@ -12,6 +13,6 @@ class LJYYCheckin(AnswerBotCheckin):
         if self.message:
             try:
                 await self.message.click()
-            except TimeoutError:
+            except (BadRequest, TimeoutError):
                 pass
         await super().retry()

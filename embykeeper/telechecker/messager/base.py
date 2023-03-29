@@ -2,7 +2,7 @@ import asyncio
 import random
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 
 from dateutil import parser
 from loguru import logger
@@ -10,6 +10,8 @@ from schedule import CancelJob, Scheduler
 
 from ...utils import to_iterable
 from ..tele import ClientsSession
+
+__ignore__ = True
 
 
 @dataclass
@@ -22,17 +24,16 @@ class MessageSchedule:
 
 
 class Messager:
-    name = __name__
-    chat_name = None
-    messages = []
+    name: str = None  # 水群器名称
+    chat_name: str = None  # 群聊的名称
+    messages: List[str] = []  # 可用的话术列表
 
-    def __init__(self, account, loop, scheduler: Scheduler, nofail=True, proxy=None):
+    def __init__(self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None):
         self.account = account
-        self.loop = loop
         self.scheduler = scheduler
         self.nofail = nofail
         self.proxy = proxy
-        self.log = logger.bind(scheme="telemessager", name=self.name)
+        self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
 
     def start(self):
         for m in self.messages:
@@ -45,6 +46,8 @@ class Messager:
             return await self.send(*args, **kw)
         except OSError as e:
             self.log.info(f'出现错误: "{e}", 忽略.')
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             if self.nofail:
                 self.log.opt(exception=e).warning(f"发生错误:")
@@ -56,21 +59,18 @@ class Messager:
             return self.log.info(f"由于概率设置, 本次发送被跳过.")
         if only:
             today = datetime.today()
-            if only.startswith("weekdays") and today.weekday() > 4:
+            if only.startswith("weekday") and today.weekday() > 4:
                 return self.log.info(f"由于非周末, 本次发送被跳过.")
-            if only.startswith("weekends") and today.weekday() < 5:
+            if only.startswith("weekend") and today.weekday() < 5:
                 return self.log.info(f"由于非工作日, 本次发送被跳过.")
         async with ClientsSession([self.account], proxy=self.proxy) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
-                self.log.bind(username=tg.me.first_name).info(
-                    f'向聊天 "{chat.title or chat.first_name}" 发送: {message}'
-                )
+                username = f"{tg.me.first_name} {tg.me.last_name}"
+                self.log.bind(username=username).info(f'向聊天 "{chat.title or chat.first_name}" 发送: {message}')
                 await tg.send_message(self.chat_name, message)
             reschedule()
             self.next_info()
-            if self.scheduler.next_run - datetime.now() < timedelta(minutes=1):
-                await asyncio.sleep(60)
             return CancelJob
 
     def next_info(self):
@@ -108,7 +108,7 @@ class Messager:
             else:
                 n = 1
             getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(
-                self.loop.create_task, self._send(m, reschedule, possibility, only)
+                asyncio.create_task, self._send(m, reschedule, possibility, only)
             )
 
         reschedule()

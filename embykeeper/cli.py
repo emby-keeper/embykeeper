@@ -1,68 +1,18 @@
 from pathlib import Path
+from datetime import datetime, timedelta
 
-import toml
+import tomli as tomllib
 import typer
-import uvloop
-from loguru import logger
-from rich import print, traceback
-from rich.logging import Console, RichHandler
-
-uvloop.install()
-traceback.install()
+import asyncio
+from appdirs import user_data_dir
+from schedule import Scheduler
+from dateutil import parser
 
 from . import __author__, __name__, __url__, __version__
-from .settings import check_config, get_faked_config
-from .utils import Flagged, FlagValueCommand, to_iterable
+from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool, fail_message
+from .settings import prepare_config
 
-
-def _formatter(record):
-    extra = record["extra"]
-    scheme = extra.get("scheme", None)
-
-    def ifextra(keys, pattern="{}"):
-        keys = to_iterable(keys)
-        if all(k in extra for k in keys):
-            return pattern.format(*[f"{{extra[{k}]}}" for k in keys])
-        else:
-            return ""
-
-    if scheme in ("telegram", "telechecker", "telemonitor", "telemessager"):
-        username = ifextra("username", " ([cyan]{}[/])")
-        name = ifextra("name", "([magenta]{}[/]) ")
-        return f"[blue]{scheme.capitalize()}[/]{username}: {name}{{message}}"
-    elif scheme == "embywatcher":
-        ident = ifextra(["server", "username"], " ([cyan]{}:{}[/])")
-        return f"[blue]Embywatcher[/]{ident}: {{message}}"
-    else:
-        return "{message}"
-
-
-logger.remove()
-logger.add(RichHandler(console=Console(stderr=True), markup=True, rich_tracebacks=True), format=_formatter)
-
-
-def prepare_config(config=None):
-    if not config:
-        logger.warning("需要输入一个toml格式的config文件.")
-        default_config = "config.toml"
-        if not Path(default_config).exists():
-            with open(default_config, "w+") as f:
-                toml.dump(get_faked_config(), f)
-                logger.warning(f'您可以根据生成的参考配置文件"{default_config}"进行配置')
-        return
-    with open(config) as f:
-        config = toml.load(f)
-    if not check_config(config):
-        return
-    proxy = config.get("proxy", None)
-    if proxy:
-        proxy.setdefault("scheme", "socks5")
-        proxy.setdefault("hostname", "127.0.0.1")
-        proxy.setdefault("port", "1080")
-    return config
-
-
-app = typer.Typer(
+app = AsyncTyper(
     pretty_exceptions_show_locals=False,
     rich_markup_mode="rich",
     add_completion=False,
@@ -70,16 +20,21 @@ app = typer.Typer(
 )
 
 
+async def run_pending(scheduler: Scheduler):
+    while True:
+        scheduler.run_pending()
+        await asyncio.sleep(1)
+
+
 def version(version):
     if version:
         print(__version__)
         raise typer.Exit()
 
-
-@app.command(
+@app.async_command(
     cls=FlagValueCommand, help=f"欢迎使用 [orange3]{__name__.capitalize()}[/] {__version__} :cinema: 无参数默认开启全部功能."
 )
-def main(
+async def main(
     config: Path = typer.Argument(
         None,
         envvar=f"{__name__.upper()}_CONFIG",
@@ -92,37 +47,57 @@ def main(
         Flagged("", "6:00PM"),
         "--checkin",
         "-c",
-        rich_help_panel="Telegram 参数",
+        rich_help_panel="模块开关",
         show_default="不指定值时默认为6:00PM",
         help="启用每日指定时间签到",
     ),
-    monitor: bool = typer.Option(False, "--monitor", "-m", rich_help_panel="Telegram 参数", help="启用群聊监视"),
-    send: bool = typer.Option(False, "--send", "-s", rich_help_panel="Telegram 参数", help="启用自动水群"),
     emby: int = typer.Option(
-        Flagged(0, 7), "--emby", "-e", min=0, rich_help_panel="Emby 参数", help="启用Emby自动登录"
+        Flagged(0, 7),
+        "--emby",
+        "-e",
+        rich_help_panel="模块开关",
+        help="启用每隔天数Emby自动保活",
+        show_default="不指定值时默认为每7天",
     ),
+    monitor: bool = typer.Option(False, "--monitor", "-m", rich_help_panel="模块开关", help="启用群聊监视"),
+    send: bool = typer.Option(False, "--send", "-s", rich_help_panel="模块开关", help="启用自动水群"),
     instant: bool = typer.Option(
-        True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试 参数", help="立刻执行一次计划任务"
+        True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
     ),
-    debug: bool = typer.Option(False, "--debug", "-d", rich_help_panel="调试 参数", help="开启调试模式, 错误将会导致程序停止运行"),
+    once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
+    debug: bool = typer.Option(False, "--debug", "-d", rich_help_panel="调试参数", help="开启调试模式"),
+    debug_cron: bool = typer.Option(False, hidden=True, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"),
     version: bool = typer.Option(
         None,
         "--version",
         "-v",
-        rich_help_panel="调试 参数",
+        rich_help_panel="调试参数",
         callback=version,
         is_eager=True,
-        help=f"打印{__name__}版本",
+        help=f"打印 {__name__.capitalize()} 版本",
     ),
-    follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试 参数", help="仅启动消息调试"),
-    analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试 参数", help="仅启动历史信息分析"),
+    follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试参数", help="仅启动消息调试"),
+    analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试参数", help="仅启动历史信息分析"),
 ):
-    config = prepare_config(config)
+    from .log import logger, initialize
+
+    initialize(level="DEBUG" if debug else "INFO")
+
+    try:
+        config = prepare_config(config)
+    except tomllib.TOMLDecodeError as e:
+        logger.error(f"TOML 配置文件错误: {e}.")
+        raise typer.Exit(1)
     if not config:
-        raise typer.Exit()
+        raise typer.Exit(1)
+
     if debug:
         config.setdefault("nofail", False)
         logger.warning("您当前处于调试模式, 错误将会导致程序停止运行.")
+
+    if emby < 0:
+        emby = -emby
+
     if not checkin and not monitor and not emby and not send:
         checkin = "08:00"
         emby = 7
@@ -132,17 +107,17 @@ def main(
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等. 您可以通过 Ctrl+C 以结束运行.")
     logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
 
-    import asyncio
-    from datetime import datetime
-
-    import schedule
-    from dateutil import parser
+    session_dir = Path(user_data_dir(__name__))
+    session_dir.mkdir(parents=True, exist_ok=True)
+    session_dir_spec = Path("~") / session_dir.relative_to(Path.home())
+    logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
 
     from .embywatcher.main import watcher
-    from .telechecker.main import analyzer, checkiner, follower, messager, monitorer
+    from .telechecker.main import analyzer, checkiner, follower, messager, monitorer, notifier
 
     if follow:
-        return asyncio.run(follower(config))
+        return await follower(config)
+
     if analyze:
         indent = " " * 29
         chats = typer.prompt(indent + "请输入群组用户名 (以空格分隔)").split()
@@ -151,82 +126,57 @@ def main(
         timerange = typer.prompt(indent + '请输入时间范围 (以"-"分割)', default="", show_default=False)
         timerange = timerange.split("-") if timerange else []
         limit = typer.prompt(indent + "请输入各群组最大获取数量", default=1000, type=int)
-        return asyncio.run(analyzer(config, chats, keywords, timerange, limit))
+        return await analyzer(config, chats, keywords, timerange, limit)
 
-    loop = asyncio.new_event_loop()
-
-    def stop_loop():
-        try:
-            tasks = asyncio.all_tasks(loop)
-            for t in tasks:
-                t.cancel()
-            loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
-            loop.run_until_complete(loop.shutdown_asyncgens())
-            loop.run_until_complete(loop.shutdown_default_executor())
-        finally:
-            asyncio.set_event_loop(None)
-            loop.close()
-
-    def exception_handler(l, context):
-        e: Exception = context.get("exception")
-        logger.opt(exception=e).error(
-            f'发生错误, {__name__.capitalize()} 将退出, 请在 "{__url__}/issues/new" 提供反馈以帮助作者修复该问题:'
-        )
-        loop.stop()
-
-    def run_coros(coros):
-        return loop.run_until_complete(asyncio.gather(*coros))
-
-    def run_pending_async(scheduler):
-        async def wrapper():
-            while True:
-                scheduler.run_pending()
-                await asyncio.sleep(1)
-
-        return wrapper()
-
-    loop.set_exception_handler(exception_handler)
-    asyncio.set_event_loop(loop)
-
-    if instant:
+    if instant and not debug_cron:
         instants = []
         if emby:
             instants.append(watcher(config))
         if checkin:
             instants.append(checkiner(config, instant=True))
-        run_coros(instants)
+        await asyncio.gather(*instants)
 
-    if emby:
-        schedule_emby = schedule.Scheduler()
-        loop.create_task(run_pending_async(schedule_emby))
-        schedule_emby.every(emby).days.at(datetime.now().strftime("%H:%M:%S")).do(
-            lambda: loop.create_task(watcher(config))
-        )
-        logger.bind(scheme="embywatcher").info(
-            f"下一次保活将在 {schedule_emby.next_run.strftime('%m-%d %H:%M %p')} 进行."
-        )
-    if checkin:
-        schedule_checkin = schedule.Scheduler()
-        loop.create_task(run_pending_async(schedule_checkin))
-        checkin = parser.parse(checkin).time().strftime("%H:%M:%S")
-        schedule_checkin.every().day.at(checkin).do(lambda: loop.create_task(checkiner(config)))
-        logger.bind(scheme="telechecker").info(
-            f"下一次签到将在 {schedule_checkin.next_run.strftime('%m-%d %H:%M %p')} 进行."
-        )
-    if send:
-        schedule_send = schedule.Scheduler()
-        loop.create_task(run_pending_async(schedule_send))
-        messager(config, loop, schedule_send)
-    if monitor:
-        loop.create_task(monitorer(config))
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        print("\r"),
-    finally:
-        stop_loop()
-        logger.info("所有客户端已停止, 欢迎您再次使用 Embykeeper.")
-
+    if not once:
+        pool = AsyncTaskPool()
+        
+        pool.add(notifier(config))
+        
+        debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
+        if emby:
+            schedule_emby = Scheduler()
+            pool.add(run_pending(schedule_emby))
+            schedule_emby.every(1 if debug_cron else emby).days.at((debug_time or datetime.now()).strftime("%H:%M:%S")).do(
+                lambda: pool.add(watcher(config))
+            )
+            logger.bind(scheme="embywatcher").info(
+                f"下一次保活将在 {schedule_emby.next_run.strftime('%m-%d %H:%M %p')} 进行."
+            )
+        if checkin:
+            schedule_checkin = Scheduler()
+            pool.add(run_pending(schedule_checkin))
+            checkin = (debug_time or parser.parse(checkin).time()).strftime("%H:%M:%S")
+            schedule_checkin.every().day.at(checkin).do(
+                lambda: pool.add(checkiner(config, instant=debug_cron))
+            )
+            logger.bind(scheme="telechecker").info(
+                f"下一次签到将在 {schedule_checkin.next_run.strftime('%m-%d %H:%M %p')} 进行."
+            )
+        if send:
+            schedule_send = Scheduler()
+            pool.add(run_pending(schedule_send))
+            pool.add(messager(config, schedule_send))
+        if monitor:
+            pool.add(monitorer(config))
+        
+        async for t in pool.as_completed():
+            try:
+                await t
+            except Exception as e:
+                if debug:
+                    raise
+                else:
+                    logger.opt(exception=e).error("出现错误, 模块可能停止运行:")
+        
 
 if __name__ == "__main__":
     app()

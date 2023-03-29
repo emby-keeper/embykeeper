@@ -1,13 +1,14 @@
 import asyncio
-import contextlib
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 from aiohttp import ClientSession
-from aiohttp_socks import ProxyConnector, ProxyType
+from aiohttp_socks import ProxyConnector
 from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram.raw.functions.users import GetFullUser
+from fake_useragent import UserAgent
 
 from ...utils import remove_prefix
+from ..link import Link
 from .base import BaseBotCheckin
 
 
@@ -17,39 +18,26 @@ class NebulaCheckin(BaseBotCheckin):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self._retries = 0
-        proxy = self.client.proxy
-        self.connector = (
-            ProxyConnector(
-                proxy_type=ProxyType[proxy["scheme"].upper()],
-                host=proxy["hostname"],
-                port=proxy["port"],
-            )
-            if proxy
-            else None
-        )
+        self.failed = False
 
-    async def retry(self):
-        self._retries += 1
-        if self._retries <= self.retries:
-            await asyncio.sleep(5)
-            await self.start()
-        else:
-            self.log.warning("超过最大重试次数.")
-            self.finished.set()
+    async def fail(self):
+        self.failed = True
+        self.finished.set()
 
     async def start(self):
         try:
-            with contextlib.suppress(asyncio.TimeoutError):
+            try:
                 await asyncio.wait_for(self._checkin(), self.timeout)
+            except asyncio.TimeoutError:
+                pass
         except OSError as e:
-            self.log.info(f'发生错误: "{e}", 正在重试.')
-            await self.retry()
+            self.log.info(f'发生错误: "{e}".')
+            return False
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
         else:
-            return self._retries <= self.retries
+            return not self.failed
 
     async def _checkin(self):
         bot = await self.client.get_users(self.bot_username)
@@ -62,21 +50,31 @@ class NebulaCheckin(BaseBotCheckin):
         ).url
         scheme = urlparse(url_auth)
         data = remove_prefix(scheme.fragment, "tgWebAppData=")
-        user_checkin_url = scheme._replace(path="/api/proxy/userCheckIn", query=f"data={data}").geturl()
-        async with ClientSession(connector=self.connector) as session:
-            async with session.get(user_checkin_url) as resp:
-                check_results = await resp.json()
-            message = check_results["message"]
+        url_base = scheme._replace(path="/api/proxy/userCheckIn", query=f"data={data}", fragment="").geturl()
+        scheme = urlparse(url_base)
+        query = parse_qs(scheme.query, keep_blank_values=True)
+        query = {k: v for k, v in query.items() if not k.startswith("tgWebApp")}
+        token, proxy, useragent = await Link(self.client).captcha()
+        if (not token) or (not proxy):
+            self.log.warning("签到失败: 无法获得验证码.")
+            return self.fail()
+        if not useragent:
+            useragent = UserAgent(browsers=["edge"]).random
+        query["token"] = token
+        url_checkin = scheme._replace(query=urlencode(query, True)).geturl()
+        connector = ProxyConnector.from_url(proxy)
+        async with ClientSession(connector=connector) as session:
+            async with session.get(url_checkin, headers={"User-Agent": useragent}) as resp:
+                results = await resp.json()
+            message = results["message"]
             if "失败" in message:
-                self.log.info("签到失败, 正在重试.")
-                await self.retry()
+                self.log.info("签到失败.")
+                return self.fail()
             if "重复" in message:
                 self.log.info("今日已经签到过了.")
                 self.finished.set()
             elif "成功" in message:
-                self.log.info(
-                    f"[yellow]签到成功[/]: + {check_results['get_credit']} 分 -> {check_results['credit']} 分."
-                )
+                self.log.info(f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分.")
                 self.finished.set()
             else:
                 self.log.warning(f"接收到异常返回信息: {message}")
