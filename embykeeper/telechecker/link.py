@@ -107,7 +107,7 @@ class Link:
         return bool(results)
 
     async def captcha(self):
-        post = self.post("/captcha", timeout=60)
+        post = self.post("/captcha", timeout=240)
         results = await self.preprocess(post, name="请求跳过验证码")
         if results:
             return [results.get(p, None) for p in ("token", "proxy", "useragent")]
