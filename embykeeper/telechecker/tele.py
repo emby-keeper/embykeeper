@@ -1,6 +1,7 @@
 import asyncio
 from typing import AsyncGenerator, Optional
 
+from appdirs import user_data_dir
 from loguru import logger
 from pyrogram import Client as _Client
 from pyrogram import raw, types, utils
@@ -29,7 +30,7 @@ class Client(_Client):
                     SentCodeType.EMAIL_CODE: "邮件",
                 }
                 if not self.phone_code:
-                    self.phone_code = await utils.ainput(
+                    self.phone_code = input(
                         " " * 29 + f'请在{code_target[sent_code.type]}接收"{self.phone_number}"的两步验证码: '
                     )
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
@@ -116,16 +117,16 @@ class ClientsSession:
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
         return cls(accounts=accounts, proxy=config.get("proxy", None))
 
-    def __init__(self, accounts, proxy=None):
+    def __init__(self, accounts, proxy=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
         self.phones = []
         self.done = asyncio.Queue()
-        self.tasks = []
+        self.quiet = quiet
 
-    @staticmethod
-    async def login(account, proxy):
-        logger.info(f'登录账号 "{account["phone"]}".')
+    async def login(self, account, proxy):
+        if not self.quiet:
+            logger.info(f'登录账号 "{account["phone"]}".')
         try:
             while True:
                 try:
@@ -137,6 +138,7 @@ class ClientsSession:
                         phone_number=account["phone"],
                         proxy=proxy,
                         lang_code="zh",
+                        workdir=user_data_dir(__name__),
                     )
                     await client.start()
                 except Unauthorized:
@@ -163,22 +165,26 @@ class ClientsSession:
 
     async def __aenter__(self):
         for a in self.accounts:
+            phone = a["phone"]
             async with self.lock:
-                phone = a["phone"]
                 if phone in self.pool:
+                    if isinstance(self.pool[phone], asyncio.Task):
+                        self.lock.release()
+                        await self.pool[phone]
+                        await self.lock.acquire()
                     client, ref = self.pool[phone]
                     ref += 1
-                    self.pool[ref] = (client, ref)
+                    self.pool[phone] = (client, ref)
                     await self.done.put(client)
                 else:
-                    self.pool[phone] = None
-                    self.tasks.append(asyncio.create_task(self.loginer(a)))
+                    self.pool[phone] = asyncio.create_task(self.loginer(a))
         return self
 
     def __aiter__(self):
         async def aiter():
             for _ in range(len(self.accounts)):
-                yield await self.done.get()
+                client: Client = await self.done.get()
+                yield client
 
         return aiter()
 
@@ -193,10 +199,9 @@ class ClientsSession:
                 if ref:
                     self.pool[phone] = (client, ref)
                 else:
-                    logger.info(f"正在登出: {client.me.first_name}.")
                     try:
-                        await client.stop(block=True)
-                    except ConnectionError:
+                        await client.stop()
+                    except RuntimeError:
                         pass
                     finally:
-                        self.pool.pop(phone, "None")
+                        self.pool.pop(phone, None)

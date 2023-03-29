@@ -13,8 +13,10 @@ from pyrogram.errors import UsernameNotOccupied, UserNotParticipant
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message
 
-from ...utils import AsyncCountPool, to_iterable, truncate_str
+from ...utils import to_iterable, truncate_str
 from ..tele import Client
+
+__ignore__ = True
 
 
 class Session:
@@ -62,7 +64,6 @@ class Session:
 
 
 class Monitor:
-    group_pool = AsyncCountPool(base=2000)
     name = __name__
     chat_name = None
     chat_allow_outgoing = False
@@ -92,13 +93,12 @@ class Monitor:
             MessageHandler(self._message_handler, filter),
             EditedMessageHandler(self._message_handler, filter),
         ]
-        group = await Monitor.group_pool.append(handlers)
         for h in handlers:
-            self.client.add_handler(h, group=group)
+            self.client.add_handler(h)
         yield
         for h in handlers:
             try:
-                self.client.remove_handler(h, group=group)
+                self.client.remove_handler(h)
             except ValueError:
                 pass
 
@@ -166,9 +166,9 @@ class Monitor:
         else:
             return ", ".join(keys)
 
-    async def _message_handler(self, *args, **kw):
+    async def _message_handler(self, client: Client, message: Message):
         try:
-            await self.message_handler(*args, **kw)
+            await self.message_handler(client, message)
         except OSError as e:
             self.log.info(f'发生错误: "{e}", 忽略.')
         except Exception as e:
@@ -177,6 +177,8 @@ class Monitor:
                 self.log.opt(exception=e).warning(f"发生错误:")
             else:
                 raise
+        finally:
+            message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message):
         keys = self.get_key(message)

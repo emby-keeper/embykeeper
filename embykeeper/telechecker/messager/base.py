@@ -11,6 +11,8 @@ from schedule import CancelJob, Scheduler
 from ...utils import to_iterable
 from ..tele import ClientsSession
 
+__ignore__ = True
+
 
 @dataclass
 class MessageSchedule:
@@ -26,13 +28,12 @@ class Messager:
     chat_name = None
     messages = []
 
-    def __init__(self, account, loop, scheduler: Scheduler, nofail=True, proxy=None):
+    def __init__(self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None):
         self.account = account
-        self.loop = loop
         self.scheduler = scheduler
         self.nofail = nofail
         self.proxy = proxy
-        self.log = logger.bind(scheme="telemessager", name=self.name)
+        self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
 
     def start(self):
         for m in self.messages:
@@ -108,7 +109,7 @@ class Messager:
             else:
                 n = 1
             getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(
-                self.loop.create_task, self._send(m, reschedule, possibility, only)
+                asyncio.create_task, self._send(m, reschedule, possibility, only)
             )
 
         reschedule()

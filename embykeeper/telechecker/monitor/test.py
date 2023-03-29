@@ -2,6 +2,8 @@ from pyrogram.types import Message
 
 from .base import Monitor
 
+__ignore__ = True
+
 
 class TestMonitor:
     class T1(Monitor):

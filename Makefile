@@ -1,8 +1,5 @@
 .PHONY: clean clean-build clean-pyc clean-test develop help install lint lint/flake8 lint/black uninstall
-.DEFAULT_GOAL := help
-
-help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+.DEFAULT_GOAL := install
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 

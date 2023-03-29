@@ -2,6 +2,8 @@
 
 from .base import MessageSchedule as MS
 
+__ignore__ = True
+
 GOOD_DAY_NIGHT = [
     MS(
         (

@@ -12,4 +12,4 @@ class BGKMonitor(Monitor):
     async def on_trigger(self, message: Message, keys, reply):
         await self.client.send_message(self.bot_username, "/invite")
         await self.client.send_message(self.bot_username, keys[0])
-        self.log.info(f'已向Bot发送验证码: "{keys[0]}", 请查看.')
+        self.log.bind(notify=True).info(f'已向Bot发送邀请码: "{keys[0]}", 请查看.')

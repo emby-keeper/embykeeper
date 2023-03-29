@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 from aiohttp import ClientSession
 from aiohttp_socks import ProxyConnector, ProxyType
@@ -8,8 +8,10 @@ from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram.raw.functions.users import GetFullUser
 
 from ...utils import remove_prefix
+from ..link import Link
 from .base import BaseBotCheckin
 
+__ignore__ = True
 
 class NebulaCheckin(BaseBotCheckin):
     name = "Nebula"
@@ -18,16 +20,6 @@ class NebulaCheckin(BaseBotCheckin):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self._retries = 0
-        proxy = self.client.proxy
-        self.connector = (
-            ProxyConnector(
-                proxy_type=ProxyType[proxy["scheme"].upper()],
-                host=proxy["hostname"],
-                port=proxy["port"],
-            )
-            if proxy
-            else None
-        )
 
     async def retry(self):
         self._retries += 1
@@ -62,11 +54,21 @@ class NebulaCheckin(BaseBotCheckin):
         ).url
         scheme = urlparse(url_auth)
         data = remove_prefix(scheme.fragment, "tgWebAppData=")
-        user_checkin_url = scheme._replace(path="/api/userCheckIn", query=f"data={data}").geturl()
-        async with ClientSession(connector=self.connector) as session:
-            async with session.get(user_checkin_url) as resp:
-                check_results = await resp.json()
-            message = check_results["message"]
+        url_base = scheme._replace(path="/api/proxy/userCheckIn", query=f"data={data}", fragment="").geturl()
+        scheme = urlparse(url_base)
+        query = parse_qs(scheme.query, keep_blank_values=True)
+        query = {k: v for k, v in query.items() if not k.startswith("tgWebApp")}
+        token, proxy = await Link(self.client).captcha()
+        if (not token) or (not proxy):
+            self.log.info("跳过验证码失败, 正在重试.")
+            return await self.retry()
+        query["token"] = token
+        url_checkin = scheme._replace(query=urlencode(query, True)).geturl()
+        connector = ProxyConnector.from_url(proxy)
+        async with ClientSession(connector=connector) as session:
+            async with session.get(url_checkin) as resp:
+                results = await resp.json()
+            message = results["message"]
             if "失败" in message:
                 self.log.info("签到失败, 正在重试.")
                 await self.retry()
@@ -75,7 +77,7 @@ class NebulaCheckin(BaseBotCheckin):
                 self.finished.set()
             elif "成功" in message:
                 self.log.info(
-                    f"[yellow]签到成功[/]: + {check_results['get_credit']} 分 -> {check_results['credit']} 分."
+                    f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分."
                 )
                 self.finished.set()
             else:

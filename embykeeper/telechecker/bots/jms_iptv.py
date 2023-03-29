@@ -2,6 +2,8 @@ from pyrogram.types import Message
 
 from .base import AnswerBotCheckin
 
+__ignore__ = True
+
 
 class JMSIPTVCheckin(AnswerBotCheckin):
     name = "卷毛鼠IPTV"

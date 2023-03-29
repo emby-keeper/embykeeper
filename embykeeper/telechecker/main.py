@@ -1,11 +1,15 @@
 import asyncio
 import inspect
+import logging
 import operator
+import pkgutil
 import random
 from functools import partial
+from logging import StreamHandler
+from typing import List
+from importlib import import_module
 
 from dateutil import parser
-from loguru import logger
 from pyrogram.enums import ChatType
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -17,33 +21,51 @@ from rich.table import Column, Table
 from rich.text import Text
 
 from ..utils import batch, flatten, time_in_range
-from . import *
+from ..log import logger, formatter
+from . import __name__ as telechecker
+from .link import Link, TelegramStream
 from .tele import Client, ClientsSession
 
 logger = logger.bind(scheme="telegram")
 
-CHECKINERS = [
-    PeachCheckin,
-    SingularityCheckin,
-    LJYYCheckin,
-    TerminusCheckin,
-    NebulaCheckin,
-    JMSCheckin,
-    BlueseaCheckin,
-    JMSIPTVCheckin,
-    EmbyHubCheckin,
-]
 
-MONITORERS = [
-    # TestMonitor,
-    BGKMonitor,
-    EmbyhubMonitor,
-]
+def get_spec(type: str):
+    if type == "checkiner":
+        sub = "bots"
+        suffix = "checkin"
+    elif type == "monitor":
+        sub = "monitor"
+        suffix = "messager"
+    elif type == "messager":
+        sub = "messager"
+        suffix = "messager"
+    else:
+        raise ValueError(f"{type} is not a valid service.")
+    return sub, suffix
 
-MESSAGERS = [
-    # TestMessager,
-    NakonakoMessager,
-]
+
+def get_names(type: str):
+    sub, _ = get_spec(type)
+    results = []
+    typemodule = import_module(f"{telechecker}.{sub}")
+    for _, mn, _ in pkgutil.iter_modules(typemodule.__path__):
+        module = import_module(f"{telechecker}.{sub}.{mn}")
+        if not getattr(module, "__ignore__", False):
+            results.append(mn)
+    return results
+
+
+def get_cls(type: str, names: List[str] = None):
+    sub, suffix = get_spec(type)
+    if names == None:
+        names = get_names(type)
+    results = []
+    for name in names:
+        module = import_module(f"{telechecker}.{sub}.{name}")
+        for cn, cls in inspect.getmembers(module, inspect.isclass):
+            if (name.replace("_", "") + suffix).lower() == cn.lower():
+                results.append(cls)
+    return results
 
 
 def extract(clss):
@@ -113,19 +135,24 @@ async def checkin_task(checkiner, sem, wait=0):
         return await checkiner._start()
 
 
-async def checkiner(config, instant=False):
+async def checkiner(config: dict, instant=False):
     async with ClientsSession.from_config(config) as clients:
         coros = []
         async for tg in clients:
-            sem = asyncio.Semaphore(int(config.get("concurrent", 2)))
+            log = logger.bind(scheme="telechecker", username=tg.me.first_name)
+            if not await Link(tg).auth("checkiner"):
+                log.error(f"功能初始化失败: 权限校验不通过.")
+                continue
+            sem = asyncio.Semaphore(int(config.get("concurrent", 1)))
+            clses = extract(get_cls("checkiner", names=config.get("service", {}).get("checkiner", None)))
             checkiners = [
                 cls(
                     tg,
                     retries=config.get("retries", 10),
-                    timeout=config.get("timeout", 60),
+                    timeout=config.get("timeout", 120),
                     nofail=config.get("nofail", True),
                 )
-                for cls in extract(CHECKINERS)
+                for cls in clses
             ]
             tasks = []
             for c in checkiners:
@@ -141,34 +168,44 @@ async def checkiner(config, instant=False):
             tg, results = await f
             failed = [c for i, c in enumerate(checkiners) if not results[i]]
             if failed:
-                logger.bind(username=tg.me.first_name).error(
-                    f"签到失败 ({len(failed)}/{len(checkiners)}): {','.join([f.name for f in failed])}"
-                )
+                log.error(f"签到失败 ({len(failed)}/{len(checkiners)}): {','.join([f.name for f in failed])}")
+            else:
+                log.bind(notify=True).info(f"签到成功 ({len(checkiners)}/{len(checkiners)}).")
 
 
-async def monitorer(config):
+async def monitorer(config: dict):
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
-            for cls in extract(MONITORERS):
+            log = logger.bind(scheme="telemonitor", username=tg.me.first_name)
+            if not await Link(tg).auth("monitorer"):
+                log.error(f"功能初始化失败: 权限校验不通过.")
+                continue
+            clses = extract(get_cls("monitor"), names=config.get("service", {}).get("monitor", None))
+            for cls in clses:
                 jobs.append(asyncio.create_task(cls(tg, nofail=config.get("nofail", True))._start()))
         await asyncio.gather(*jobs)
 
 
-def messager(config, loop, scheduler):
-    for account in config.get("telegram", []):
-        if account.get("send", False):
-            for cls in extract(MESSAGERS):
+async def messager(config: dict, scheduler):
+    async with ClientsSession.from_config(config, send=True) as clients:
+        async for tg in clients:
+            log = logger.bind(scheme="telemessager", username=tg.me.first_name)
+            if not await Link(tg).auth("messager"):
+                log.error(f"功能初始化失败: 权限校验不通过.")
+                continue
+            clses = extract(get_cls("messager"), names=config.get("service", {}).get("messager", None))
+            for cls in clses:
                 cls(
-                    account,
-                    loop,
+                    {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
                     scheduler,
+                    username=tg.me.first_name,
                     proxy=config.get("proxy", None),
                     nofail=config.get("nofail", True),
                 ).start()
 
 
-async def follower(config):
+async def follower(config: dict):
     columns = [
         Column("用户", style="cyan", justify="center"),
         Column("", max_width=1, style="white"),
@@ -190,7 +227,7 @@ async def follower(config):
             await asyncio.Event().wait()
 
 
-async def analyzer(config, chats, keywords, timerange, limit=2000):
+async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
     def render_page(progress, texts):
         page = Table.grid()
         page.add_row(Panel(progress))
@@ -247,3 +284,43 @@ async def analyzer(config, chats, keywords, timerange, limit=2000):
                         for t, c in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
                     ]
                 )
+
+
+async def notifier(config: dict):
+    def _filter(record):
+        notify = record.get("extra", {}).get("notify", None)
+        if notify or record["level"].no == logging.ERROR:
+            return True
+        else:
+            return False
+
+    def _formatter(record):
+        notify = record.get("extra", {}).get("notify", False)
+        format = formatter(record)
+        if notify and notify != True:
+            format = format.replace("{message}", "{extra[notify]}")
+        return "{level}#" + format
+
+    accounts = config.get("telegram", [])
+    notifier = config.get("notifier", None)
+    if notifier:
+        try:
+            if notifier == True:
+                notifier = accounts[0]
+            elif isinstance(notifier, int):
+                notifier = accounts[notifier + 1]
+            elif isinstance(notifier, str):
+                for a in accounts:
+                    if a["phone"] == notifier:
+                        notifier = a
+                        break
+            else:
+                notifier = None
+        except IndexError:
+            notifier = None
+    if notifier:
+        async with ClientsSession([notifier], proxy=config.get("proxy", None), quiet=True) as clients:
+            async for tg in clients:
+                logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{tg.phone_number}" 账号.')
+                logger.add(StreamHandler(TelegramStream(link=Link(tg))), format=_formatter, filter=_filter)
+            await asyncio.Event().wait()

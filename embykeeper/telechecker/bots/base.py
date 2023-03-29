@@ -13,8 +13,10 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
 
-from ...utils import AsyncCountPool, to_iterable
+from ...utils import to_iterable
 from ..tele import Client
+
+__ignore__ = True
 
 ocr = ddddocr.DdddOcr(beta=True, show_ad=False)
 
@@ -29,7 +31,7 @@ class MessageType(Flag):
 class BaseBotCheckin(ABC):
     name = __name__
 
-    def __init__(self, client: Client, retries=10, timeout=60, nofail=True):
+    def __init__(self, client: Client, retries=10, timeout=120, nofail=True):
         self.client = client
         self.retries = retries
         self.timeout = timeout
@@ -53,7 +55,6 @@ class BaseBotCheckin(ABC):
 
 
 class BotCheckin(BaseBotCheckin):
-    group_pool = AsyncCountPool(base=1000)
     bot_id = None
     bot_username = None
     bot_checkin_cmd = ["/checkin"]
@@ -61,6 +62,7 @@ class BotCheckin(BaseBotCheckin):
     bot_text_ignore = []
     bot_captcha_len = range(2, 7)
     bot_success_pat = r"(\d+)[^\d]*(\d+)"
+    bot_retry_wait = 2
     bot_use_history = None
     chat_name = None
 
@@ -78,20 +80,22 @@ class BotCheckin(BaseBotCheckin):
             MessageHandler(self._message_handler, filter),
             EditedMessageHandler(self._message_handler, filter),
         ]
-        group = await BotCheckin.group_pool.append(handlers)
         for h in handlers:
-            self.client.add_handler(h, group=group)
+            self.client.add_handler(h)
         yield
         for h in handlers:
             try:
-                self.client.remove_handler(h, group=group)
+                self.client.remove_handler(h)
             except ValueError:
                 pass
 
     async def wait_finished(self, chat):
         await self.finished.wait()
         if self._is_archived:
-            await chat.archive()
+            try:
+                await chat.archive()
+            except Exception as e:
+                logger.info(f'折叠机器人会话失败: {e}')
 
     async def start(self):
         ident = self.chat_name or self.bot_id or self.bot_username
@@ -144,12 +148,14 @@ class BotCheckin(BaseBotCheckin):
             await self.client.send_message(self.bot_id or self.bot_username, cmd)
 
     async def send_checkin(self):
-        for cmd in to_iterable(self.bot_checkin_cmd):
+        for i, cmd in enumerate(to_iterable(self.bot_checkin_cmd)):
+            if not i:
+                await asyncio.sleep(self.bot_retry_wait)
             await self.send(cmd)
 
-    async def _message_handler(self, *args, **kw):
+    async def _message_handler(self, client: Client, message: Message):
         try:
-            await self.message_handler(*args, **kw)
+            await self.message_handler(client, message)
         except OSError as e:
             self.log.info(f'发生错误: "{e}", 正在重试.')
             await self.retry()
@@ -159,6 +165,8 @@ class BotCheckin(BaseBotCheckin):
                 self.log.opt(exception=e).warning(f"发生错误:")
             else:
                 raise
+        finally:
+            message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message, type=None):
         type = type or self.message_type(message)
@@ -188,22 +196,22 @@ class BotCheckin(BaseBotCheckin):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
         captcha = ocr.classification(image).replace(" ", "")
-        if len(captcha) not in to_iterable(self.bot_captcha_len):
-            self.log.info(f'验证码 "{captcha}" 低于设定长度, 正在重试.')
+        self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
+        if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
+            self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
             await self.retry()
         else:
             await asyncio.sleep(1)
             await self.on_captcha(message, captcha)
 
     async def on_captcha(self, message: Message, captcha: str):
-        self.log.debug(f"接收到验证码: {captcha}")
         await message.reply(captcha)
 
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
         elif any(s in text for s in ("失败", "错误", "超时")):
-            self.log.info(f"签到失败, 正在重试.")
+            self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
         elif any(s in text for s in ("成功", "通过", "完成")):
             matches = re.search(self.bot_success_pat, text)
@@ -225,7 +233,7 @@ class BotCheckin(BaseBotCheckin):
     async def retry(self):
         self._retries += 1
         if self._retries <= self.retries:
-            await asyncio.sleep(5)
+            await asyncio.sleep(self.bot_retry_wait)
             await self.send_checkin()
         else:
             self.log.warning("超过最大重试次数.")
