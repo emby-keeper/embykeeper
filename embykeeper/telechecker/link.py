@@ -17,40 +17,73 @@ class Link:
 
     def __init__(self, client: Client):
         self.client = client
-        self.log = logger.bind(scheme="telelink", username=self.client.me.first_name)
+        username = f"{self.client.me.first_name} {self.client.me.last_name}"
+        self.log = logger.bind(scheme="telelink", username=username)
 
     @property
     def instance(self):
         rd = random.Random()
         rd.seed(uuid.getnode())
         return uuid.UUID(int=rd.getrandbits(128))
-    
-    async def post(self, cmd, condition=None):
-        handler, results, ok = self.get_handler(cmd, condition)
-        handler = MessageHandler(handler, filters.text & filters.bot & filters.user(self.bot))
-        self.client.add_handler(handler)
-        messages = [
-            await self.client.send_message(self.bot, f"/start"),
-            await self.client.send_message(self.bot, cmd),
-        ]
-        try:
-            await asyncio.wait_for(ok.wait(), 10)
-            return results
-        finally:
-            self.client.remove_handler(handler)
-            for m in messages:
-                await m.delete(revoke=False)
-    
+
     @staticmethod
-    def get_handler(cmd, condition=None):
+    async def delete_messages(messages):
+        async def delete(m):
+            try:
+                await m.delete(revoke=False)
+            except asyncio.CancelledError:
+                pass
+
+        return await asyncio.gather(*[delete(m) for m in messages])
+
+    async def post(self, cmd, condition=None, timeout=10):
         results = {}
         ok = asyncio.Event()
+        handler = self.get_handler(cmd, results, ok, condition)
+        handler = MessageHandler(handler, filters.text & filters.bot & filters.user(self.bot))
+        self.client.add_handler(handler)
+        messages = []
+        messages.append(await self.client.send_message(self.bot, f"/start quiet"))
+        await asyncio.sleep(0.5)
+        messages.append(await self.client.send_message(self.bot, cmd))
+        try:
+            await asyncio.wait_for(ok.wait(), timeout=timeout)
+        except asyncio.CancelledError:
+            try:
+                await asyncio.wait_for(self.delete_messages(messages), 0.5)
+            except asyncio.TimeoutError:
+                pass
+            finally:
+                raise
+        else:
+            self.client.remove_handler(handler)
+            await self.delete_messages(messages)
+            return results
 
+    async def preprocess(self, post, name):
+        try:
+            results = await post
+        except asyncio.TimeoutError:
+            self.log.warning(f"{name}超时.")
+            return None
+        status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
+        if status == "error":
+            self.log.warning(f"{name}错误: {errmsg}.")
+            return None
+        elif status == "ok":
+            return results
+        else:
+            self.log.warning(f"{name}出现未知错误.")
+            return None
+
+    @staticmethod
+    def get_handler(cmd, results, ok, condition=None):
         async def _handler(client: Client, message: Message):
             try:
                 toml = tomli.loads(message.text)
             except tomli.TOMLDecodeError:
-                return await message.delete(revoke=False)
+                await message.delete(revoke=False)
+                return
             else:
                 if toml.get("command", None) == cmd:
                     if condition is None:
@@ -62,56 +95,30 @@ class Link:
                     if cond:
                         results.update(toml)
                         ok.set()
-                        return await message.delete(revoke=False)
+                        await message.delete(revoke=False)
+                        return
                 message.continue_propagation()
 
-        return _handler, results, ok
-    
-    async def auth(self, service: str):
-        try:
-            results = await self.post(f"/auth {service} {self.instance}")
-        except asyncio.TimeoutError:
-            self.log.warning(f'服务 {service.capitalize()} 认证超时.')
-            return False
-        status = results.get("status", None)
-        errmsg = results.get("errmsg", None)
-        if status == "error":
-            self.log.warning(f'服务 {service.capitalize()} 认证错误: {errmsg}.')
-            return False
-        elif status == "ok":
-            return True
-        else:
-            self.log.warning(f'服务 {service.capitalize()} 认证出现未知错误.')
-            return False
-        
-    async def captcha(self):
-        try:
-            results = await self.post(f"/captcha")
-        except asyncio.TimeoutError:
-            self.log.warning(f'请求跳过验证码超时.')
-            return None, None
-        status = results.get("status", None)
-        errmsg = results.get("errmsg", None)
-        token = results.get("token", None)
-        proxy = results.get("proxy", None)
-        if status == "error":
-            self.log.warning(f'请求跳过验证码错误: {errmsg}.')
-            return None, None
-        elif status == "ok":
-            return token, proxy
-        else:
-            self.log.warning(f'请求跳过验证码出现未知错误.')
-            return None, None
+        return _handler
 
+    async def auth(self, service: str):
+        post = self.post(f"/auth {service} {self.instance}")
+        results = await self.preprocess(post, name=f"服务 {service.capitalize()} 认证")
+        return bool(results)
+
+    async def captcha(self):
+        post = self.post("/captcha", timeout=60)
+        results = await self.preprocess(post, name="请求跳过验证码")
+        if results:
+            return [results.get(p, None) for p in ("token", "proxy", "useragent")]
+        else:
+            return None, None, None
 
     async def sendlog(self, message):
-        if self.client.is_connected:
-            message = await self.client.send_message(self.bot, f"/log {self.instance} {message}")
-            await message.delete(revoke=False)
+        post = self.post(f"/log {self.instance} {message}")
+        results = await self.preprocess(post, name="发送日志到 Telegram ")
+        return bool(results)
 
-    async def delete_history(self):
-        peer = await self.client.resolve_peer(self.bot)
-        await self.client.invoke(DeleteHistory(peer=peer, max_id=0, revoke=False))
 
 class TelegramStream(io.TextIOWrapper):
     def __init__(self, link: Link = None):

@@ -1,8 +1,10 @@
 import asyncio
 import re
 from abc import ABC, abstractmethod
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from enum import Flag, auto
+import string
+from typing import Iterable, List, Union
 
 import ddddocr
 from loguru import logger
@@ -13,7 +15,7 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
 
-from ...utils import to_iterable
+from ...utils import to_iterable, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
@@ -29,7 +31,7 @@ class MessageType(Flag):
 
 
 class BaseBotCheckin(ABC):
-    name = __name__
+    name = None
 
     def __init__(self, client: Client, retries=10, timeout=120, nofail=True):
         self.client = client
@@ -37,11 +39,14 @@ class BaseBotCheckin(ABC):
         self.timeout = timeout
         self.nofail = nofail
         self.finished = asyncio.Event()
-        self.log = logger.bind(scheme="telechecker", name=self.name, username=self.client.me.first_name)
+        username = f"{self.client.me.first_name} {self.client.me.last_name}"
+        self.log = logger.bind(scheme="telechecker", name=self.name, username=username)
 
     async def _start(self):
         try:
             return await self.start()
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             if self.nofail:
                 self.log.opt(exception=e).warning(f"初始化错误:")
@@ -55,16 +60,22 @@ class BaseBotCheckin(ABC):
 
 
 class BotCheckin(BaseBotCheckin):
-    bot_id = None
-    bot_username = None
-    bot_checkin_cmd = ["/checkin"]
-    bot_checkin_caption_pat = None
-    bot_text_ignore = []
-    bot_captcha_len = range(2, 7)
-    bot_success_pat = r"(\d+)[^\d]*(\d+)"
-    bot_retry_wait = 2
-    bot_use_history = None
-    chat_name = None
+    '''签到类, 用于回复模式签到.'''
+    
+    group_pool = AsyncCountPool(base=2000)
+    
+    name: str = None  # 签到器的名称
+    bot_id: int = None  # Bot 的 UserID
+    bot_username: str = None  # Bot 的 用户名
+    bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
+    bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码
+    bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息
+    bot_captcha_len: Iterable = range(2, 7)  # 验证码的可能范围
+    bot_success_pat: str = r"(\d+)[^\d]*(\d+)"  # 当接收到成功消息后, 从消息中提取数字的模式
+    bot_retry_wait: int = 2  # 失败时等待的秒数
+    bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条
+    bot_allow_from_scratch: bool = False  # 允许从未聊天情况下启动
+    chat_name: str = None  # 在群聊中向机器人签到
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -76,26 +87,21 @@ class BotCheckin(BaseBotCheckin):
         filter = filters.user(self.bot_id or self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
+        
         handlers = [
             MessageHandler(self._message_handler, filter),
             EditedMessageHandler(self._message_handler, filter),
         ]
+        
+        group = await self.group_pool.append(self)
         for h in handlers:
-            self.client.add_handler(h)
+            self.client.add_handler(h, group=group)
         yield
         for h in handlers:
             try:
-                self.client.remove_handler(h)
+                self.client.remove_handler(h, group=group)
             except ValueError:
                 pass
-
-    async def wait_finished(self, chat):
-        await self.finished.wait()
-        if self._is_archived:
-            try:
-                await chat.archive()
-            except Exception as e:
-                logger.info(f'折叠机器人会话失败: {e}')
 
     async def start(self):
         ident = self.chat_name or self.bot_id or self.bot_username
@@ -108,20 +114,35 @@ class BotCheckin(BaseBotCheckin):
             if d.chat.id == chat.id:
                 self._is_archived = True
                 break
+        else:
+            async for d in self.client.get_dialogs(folder_id=0):
+                if d.chat.id == chat.id:
+                    break
+            else:
+                if not self.bot_allow_from_scratch:
+                    self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
+                    return None
         bot = await self.client.get_users(self.bot_id or self.bot_username)
         msg = f"开始执行签到: [green]{bot.first_name}[/] [gray50](@{bot.username})[/]"
         if chat.title:
             msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
         self.log.info(msg + ".")
-        asyncio.create_task(self.wait_finished(chat))
         try:
             async with self.listener():
                 if self.bot_use_history is None:
                     await self.send_checkin()
                 elif not await self.walk_history(self.bot_use_history):
                     await self.send_checkin()
-                with suppress(asyncio.TimeoutError):
+                try:
                     await asyncio.wait_for(self.finished.wait(), self.timeout)
+                except asyncio.TimeoutError:
+                    pass
+                finally:
+                    if self._is_archived:
+                        try:
+                            await asyncio.shield(asyncio.wait_for(chat.archive(), 0.5))
+                        except asyncio.TimeoutError:
+                            pass
         except OSError as e:
             self.log.warning(f'初始化错误: "{e}".')
             return False
@@ -159,6 +180,8 @@ class BotCheckin(BaseBotCheckin):
         except OSError as e:
             self.log.info(f'发生错误: "{e}", 正在重试.')
             await self.retry()
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             self.finished.set()
             if self.nofail:
@@ -195,8 +218,8 @@ class BotCheckin(BaseBotCheckin):
     async def on_photo(self, message: Message):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
-        captcha = ocr.classification(image).replace(" ", "")
-        self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
+        captcha = ocr.classification(image).translate(str.maketrans('', '', string.punctuation)).replace(" ", "")
+        self.log.info(f"[gray50]接收验证码: {captcha}.[/]")
         if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
             self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
             await self.retry()
@@ -241,7 +264,9 @@ class BotCheckin(BaseBotCheckin):
 
 
 class AnswerBotCheckin(BotCheckin):
-    bot_checkin_button_pat = None
+    '''签到类, 用于按钮模式签到.'''
+    
+    bot_checkin_button_pat: str = None  # 所有按键需要满足的 regex 条件
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -250,22 +275,25 @@ class AnswerBotCheckin(BotCheckin):
         self.message: Message = None
 
     async def walk_history(self, limit=0):
-        answer = None
-        captcha = None
-        async for m in self.client.get_chat_history(
-            self.chat_name or self.bot_id or self.bot_username, limit=limit
-        ):
-            if MessageType.ANSWER in self.message_type(m):
-                answer = answer or m
-            if MessageType.CAPTCHA in self.message_type(m):
-                captcha = captcha or m
-            if answer and captcha:
-                break
-        else:
-            return False
-        await self.on_answer(answer)
-        await self.on_photo(captcha)
-        return True
+        try:
+            answer = None
+            captcha = None
+            async for m in self.client.get_chat_history(
+                self.chat_name or self.bot_id or self.bot_username, limit=limit
+            ):
+                if MessageType.ANSWER in self.message_type(m):
+                    answer = answer or m
+                if MessageType.CAPTCHA in self.message_type(m):
+                    captcha = captcha or m
+                if answer and captcha:
+                    break
+            else:
+                return False
+            await self.on_answer(answer)
+            await self.on_photo(captcha)
+            return True
+        except Exception as e:
+            print(e)
 
     def get_keys(self, message: Message):
         reply_markup = message.reply_markup

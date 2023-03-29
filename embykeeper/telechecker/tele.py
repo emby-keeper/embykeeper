@@ -1,12 +1,15 @@
 import asyncio
 from typing import AsyncGenerator, Optional
 
+from rich.prompt import Prompt
 from appdirs import user_data_dir
 from loguru import logger
 from pyrogram import Client as _Client
 from pyrogram import raw, types, utils
 from pyrogram.enums import SentCodeType
-from pyrogram.errors import BadRequest, PhoneCodeExpired, PhoneCodeInvalid, RPCError, Unauthorized
+from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded
+from aiocache import Cache
+from aiocache.serializers import PickleSerializer
 
 from .. import __name__, __version__
 from ..utils import to_iterable
@@ -15,9 +18,14 @@ logger = logger.bind(scheme="telegram")
 
 
 class Client(_Client):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.cache = Cache()
+    
     async def authorize(self):
         if self.bot_token:
             return await self.sign_in_bot(self.bot_token)
+        retry = False
         while True:
             try:
                 sent_code = await self.send_code(self.phone_number)
@@ -30,12 +38,29 @@ class Client(_Client):
                     SentCodeType.EMAIL_CODE: "邮件",
                 }
                 if not self.phone_code:
-                    self.phone_code = input(
-                        " " * 29 + f'请在{code_target[sent_code.type]}接收"{self.phone_number}"的两步验证码: '
-                    )
+                    if retry:
+                        msg = f'验证码错误, 请在重新输入 "{self.phone_number}" 的登录验证码: '
+                    else:
+                        msg = f'请在{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码: '
+                    self.phone_code = Prompt.ask(" " * 29 + msg)
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
-            except PhoneCodeInvalid or PhoneCodeExpired:
-                pass
+            except BadRequest:
+                self.phone_code = None
+                retry = True
+            except SessionPasswordNeeded:
+                retry = False
+                while True:
+                    if not self.password:
+                        if retry:
+                            msg = f'需要输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认): '
+                        else:
+                            msg = f'密码错误, 请重新输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认):'
+                        self.password = Prompt.ask(" " * 29 + msg, password=True)
+                    try:
+                        return await self.check_password(self.password)
+                    except BadRequest:
+                        self.password = None
+                        retry = True
             else:
                 break
         if isinstance(signed_in, types.User):
@@ -43,17 +68,20 @@ class Client(_Client):
         else:
             raise BadRequest("该账户尚未注册")
 
-    async def get_dialogs(
-        self, limit: int = 0, exclude_pinned=None, folder_id=None
-    ) -> Optional[AsyncGenerator["types.Dialog", None]]:
+    async def get_dialogs(self, limit: int = 0, exclude_pinned=None, folder_id=None) -> Optional[AsyncGenerator["types.Dialog", None]]:
+        cache_id = f'dialogs_{self.phone_number}_{folder_id}_{1 if exclude_pinned else 0}'
+        (offset_id, offset_date, offset_peer), cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
+        
         current = 0
         total = limit or (1 << 31) - 1
         limit = min(100, total)
-
-        offset_date = 0
-        offset_id = 0
-        offset_peer = raw.types.InputPeerEmpty()
-
+        
+        for c in cache:
+            yield c
+            current += 1
+            if current >= total:
+                return
+        
         while True:
             r = await self.invoke(
                 raw.functions.messages.GetDialogs(
@@ -97,6 +125,8 @@ class Client(_Client):
             offset_date = utils.datetime_to_timestamp(last.top_message.date)
             offset_peer = await self.resolve_peer(last.chat.id)
 
+            _, cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
+            await self.cache.set(cache_id, ((offset_id, offset_date, offset_peer), cache + dialogs), ttl=120)
             for dialog in dialogs:
                 yield dialog
 
@@ -109,6 +139,7 @@ class Client(_Client):
 class ClientsSession:
     pool = {}
     lock = asyncio.Lock()
+    watch = None
 
     @classmethod
     def from_config(cls, config, **kw):
@@ -117,17 +148,81 @@ class ClientsSession:
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
         return cls(accounts=accounts, proxy=config.get("proxy", None))
 
+    @classmethod
+    async def watchdog(cls, timeout=120):
+        logger.debug("Telegram 账号池 watchdog 启动.")
+        try:
+            counter = {}
+            while True:
+                await asyncio.sleep(10)
+                for p, v in cls.pool.items():
+                    try:
+                        if v[1] <= 0:
+                            if p in counter:
+                                counter[p] += 1
+                                if counter[p] >= timeout / 10:
+                                    await cls.clean(p)
+                            else:
+                                counter[p] = 1
+                        else:
+                            counter.pop(p, None)
+                    except TypeError:
+                        pass
+        except asyncio.CancelledError:
+            print("\r正在停止... ", end="")
+            await cls.shutdown()
+
+    @classmethod
+    async def clean(cls, phone):
+        async with cls.lock:
+            entry = cls.pool.get(phone, None)
+            if not entry:
+                return
+            try:
+                client, ref = entry
+            except TypeError:
+                return
+            if not ref:
+                logger.debug(f'登出账号 "{client.phone_number}".')
+                await client.stop()
+                cls.pool.pop(phone, None)
+
+    @classmethod
+    async def shutdown(cls):
+        for v in cls.pool.values():
+            if isinstance(v, asyncio.Task):
+                v.cancel()
+            else:
+                client, ref = v
+                client.dispatcher.updates_queue.put_nowait(None)
+                for t in client.dispatcher.handler_worker_tasks:
+                    try:
+                        await t
+                    except asyncio.CancelledError:
+                        pass
+        while len(asyncio.all_tasks()) > 1:
+            await asyncio.sleep(0.1)
+        print(f"Telegram 账号池停止.", end="")
+        for v in cls.pool.values():
+            if isinstance(v, tuple):
+                client: Client = v[0]
+                await client.storage.save()
+                await client.storage.close()
+                # print(f'登出账号 "{client.phone_number}".')
+
     def __init__(self, accounts, proxy=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
         self.phones = []
         self.done = asyncio.Queue()
         self.quiet = quiet
+        if not self.watch:
+            self.__class__.watch = asyncio.create_task(self.watchdog())
 
     async def login(self, account, proxy):
-        if not self.quiet:
-            logger.info(f'登录账号 "{account["phone"]}".')
         try:
+            if not self.quiet:
+                logger.info(f'登录至账号 "{account["phone"]}".')
             while True:
                 try:
                     client = Client(
@@ -143,10 +238,10 @@ class ClientsSession:
                     await client.start()
                 except Unauthorized:
                     await client.storage.delete()
-                except Exception:
-                    raise
                 else:
                     break
+        except asyncio.CancelledError:
+            raise
         except RPCError as e:
             logger.error(f'登录账号 "{client.phone_number}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
         except Exception as e:
@@ -184,24 +279,17 @@ class ClientsSession:
         async def aiter():
             for _ in range(len(self.accounts)):
                 client: Client = await self.done.get()
+                if client == None:
+                    break
                 yield client
 
         return aiter()
 
     async def __aexit__(self, type, value, tb):
-        for phone in self.phones:
-            async with self.lock:
+        async with self.lock:
+            for phone in self.phones:
                 entry = self.pool.get(phone, None)
-                if not entry:
-                    continue
                 client, ref = entry
                 ref -= 1
-                if ref:
-                    self.pool[phone] = (client, ref)
-                else:
-                    try:
-                        await client.stop()
-                    except RuntimeError:
-                        pass
-                    finally:
-                        self.pool.pop(phone, None)
+                self.pool[phone] = (client, ref)
+                # print(f"Telegram 账号池计数 {client.phone_number} => {ref}.")

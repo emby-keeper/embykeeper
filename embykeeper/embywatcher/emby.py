@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 import aiohttp
 from aiohttp_socks import ProxyConnector, ProxyType
@@ -45,6 +46,20 @@ class Connector(_Connector):
             else:
                 self._session_uses[loop_id] += 1
             return session
+    
+    @async_func
+    async def _req(self, method, path, params={}, **query):
+        await self.login_if_needed()
+        for i in range(self.tries):
+            url = self.get_url(path, **query)
+            try:
+                resp = await method(url, timeout=self.timeout, **params)
+                if await self._process_resp(resp):
+                    return resp
+                await asyncio.sleep(random.random()*i + 0.2)
+            except (aiohttp.ClientConnectionError, OSError, asyncio.TimeoutError) as e:
+                pass
+        raise aiohttp.ClientConnectionError('Emby server is probably down')
 
 
 class Emby(_Emby):

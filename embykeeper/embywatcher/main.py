@@ -50,17 +50,17 @@ def get_last_played(obj: EmbyObject):
     return datetime.fromisoformat(last_played[:-2]) if last_played else None
 
 
-async def send_playing(obj: EmbyObject, playing_info: dict, until=asyncio.Event()):
-    async def test():
-        raise TimeoutError
-
+async def send_playing(obj: EmbyObject, playing_info: dict):
     c: Connector = obj.connector
-    while not until.is_set():
-        try:
-            await asyncio.wait_for(c.post("/Sessions/Playing", **playing_info), 10)
-        except ClientError or ConnectionError or TimeoutError or asyncio.TimeoutError:
-            pass
-        await asyncio.sleep(10)
+    try:
+        while True:
+            try:
+                await asyncio.wait_for(c.post("/Sessions/Playing", **playing_info), 10)
+            except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError):
+                pass
+            await asyncio.sleep(10)
+    except asyncio.CancelledError:
+        pass
 
 
 async def play(obj: EmbyObject, time=800, progress=1000):
@@ -84,8 +84,7 @@ async def play(obj: EmbyObject, time=800, progress=1000):
         "PositionTicks": 10000000 * progress,
         "CanSeek": True,
     }
-    finished = asyncio.Event()
-    asyncio.create_task(send_playing(obj, playing_info, until=finished))
+    task = asyncio.create_task(send_playing(obj, playing_info))
     timeout = c.timeout
     try:
         c.timeout = time
@@ -99,7 +98,7 @@ async def play(obj: EmbyObject, time=800, progress=1000):
         pass
     finally:
         c.timeout = timeout
-        finished.set()
+        task.cancel()
     if not is_ok(await c.post("/Sessions/Playing/Stopped", **playing_info)):
         raise PlayError("无法正常结束播放")
     return True
@@ -131,47 +130,67 @@ async def login(config):
             continue
 
 
-async def watch(emby, time, progress, logger):
-    async for obj in get_oldest(emby):
-        logger.info(f'开始尝试播放 "{obj.name}" ({time} 秒).')
-        while True:
-            try:
-                if await play(obj, time, progress):
-                    await obj.update()
-                    if obj.play_count < 1:
-                        raise PlayError("尝试播放后播放数低于1")
-                    last_played = get_last_played(obj)
-                    if not last_played:
-                        raise PlayError("尝试播放后上次播放为空")
-                    last_played = last_played.strftime("%Y-%m-%d %H:%M")
-                    if not obj.percentage_played:
-                        raise PlayError("尝试播放后播放进度为空")
-                    logger.bind(notify="成功保活.").info(
-                        f"[yellow]成功播放视频[/], 当前该视频播放{obj.play_count}次, 进度({obj.percentage_played}), 上次播放于 {last_played}."
-                    )
-                    break
-            except KeyboardInterrupt as e:
-                raise e from None
-            except ClientError:
-                logger.info(f"连接失败, 正在重试.")
-            except PlayError as e:
-                logger.info(f"发生错误: {e}, 正在重试其他视频.")
-                break
-            except Exception as e:
-                logger.opt(exception=e).warning("发生错误:")
+async def watch(emby, time, progress, logger, retries=5):
+    retry = 0
+    while True:
+        try:
+            async for obj in get_oldest(emby):
+                logger.info(f'开始尝试播放 "{obj.name}" ({time} 秒).')
+                while True:
+                    try:
+                        if await play(obj, time, progress):
+                            await obj.update()
+                            if obj.play_count < 1:
+                                raise PlayError("尝试播放后播放数低于1")
+                            last_played = get_last_played(obj)
+                            if not last_played:
+                                raise PlayError("尝试播放后上次播放为空")
+                            last_played = last_played.strftime("%Y-%m-%d %H:%M")
+                            if not obj.percentage_played:
+                                raise PlayError("尝试播放后播放进度为空")
+                            logger.bind(notify="成功保活.").info(
+                                f"[yellow]成功播放视频[/], 当前该视频播放{obj.play_count}次, 进度({obj.percentage_played}), 上次播放于 {last_played}."
+                            )
+                            return True
+                    except (ClientError, OSError):
+                        retry += 1
+                        if retry > retries:
+                            logger.warning(f"超过最大重试次数, 保活失败.")
+                            return False
+                        else:
+                            logger.info(f"连接失败, 正在重试.")
+                    except PlayError as e:
+                        logger.info(f"发生错误: {e}, 正在重试其他视频.")
+                        break
+                    finally:
+                        await hide_from_resume(obj)
+            else:
+                logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False
-            finally:
-                await hide_from_resume(obj)
-        return True
-    else:
-        logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
-        return False
-
+        except (ClientError, OSError):
+            retry += 1
+            if retry > retries:
+                logger.warning(f"超过最大重试次数, 保活失败.")
+                return False
+            else:
+                logger.info(f"连接失败, 正在重试.")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.opt(exception=e).warning("发生错误:")
+            return False
 
 async def watcher(config):
+    async def wrapper(emby, time, progress, logger):
+        try:
+            return await asyncio.wait_for(watch(emby, time, progress, logger), max(time * 3, 180))
+        except asyncio.TimeoutError:
+            logger.warning(f"一定时间内未完成播放, 保活失败.")
+            return False
+    
     tasks = []
     async for emby, time, progress, logger in login(config):
-        tasks.append(asyncio.create_task(watch(emby, time, progress, logger)))
+        tasks.append(wrapper(emby, time, progress, logger))
     results = await asyncio.gather(*tasks)
     fails = len(tasks) - sum(results)
     if fails:

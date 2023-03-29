@@ -17,3 +17,5 @@ tgcrypto
 pillow
 thefuzz[speedup]
 schema
+fake-useragent
+aiocache

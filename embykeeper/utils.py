@@ -1,11 +1,43 @@
 import asyncio
 from collections import namedtuple
+from functools import wraps
 from typing import Any, Iterable, Union
 
+from loguru import logger
 import click
+from typer import Typer, Exit
 from typer.core import TyperCommand
 
+from . import __url__, __name__
+
 Flagged = namedtuple("Flagged", ("noflag", "flag"))
+
+
+def fail_message(e):
+    logger.opt(exception=e).critical(
+        f"发生关键错误, {__name__.capitalize()} 将退出, 请在 '{__url__}/issues/new' 提供反馈以帮助作者修复该问题:"
+    )
+
+
+class AsyncTyper(Typer):
+    def async_command(self, *args, **kwargs):
+        def decorator(async_func):
+            @wraps(async_func)
+            def sync_func(*_args, **_kwargs):
+                try:
+                    return asyncio.run(async_func(*_args, **_kwargs))
+                except KeyboardInterrupt:
+                    print("\r", end="")
+                    logger.info("所有客户端已停止, 欢迎您再次使用 Embykeeper.")
+                except Exception as e:
+                    print("\r", end="")
+                    fail_message(e)
+                    raise Exit(1) from None
+
+            self.command(*args, **kwargs)(sync_func)
+            return async_func
+
+        return decorator
 
 
 class FlagValueCommand(TyperCommand):
@@ -42,6 +74,32 @@ class FlagValueCommand(TyperCommand):
         return super().parse_args(ctx, args)
 
 
+class AsyncTaskPool:
+    def __init__(self):
+        self.waiter = asyncio.Condition()
+        self.tasks = []
+    
+    def add(self, coro):
+        async def wrapper():
+            task = asyncio.ensure_future(coro)
+            await asyncio.wait([task])
+            async with self.waiter:
+                self.waiter.notify()
+                return await task
+
+        t = asyncio.create_task(wrapper())
+        self.tasks.append(t)
+    
+    async def as_completed(self):
+        while True:
+            async with self.waiter:
+                await self.waiter.wait()
+                for t in self.tasks:
+                    if t.done():
+                        yield t
+                        self.tasks.remove(t)
+
+
 class AsyncCountPool(dict):
     def __init__(self, *args, base=1000, **kw):
         super().__init__(*args, **kw)
@@ -54,7 +112,6 @@ class AsyncCountPool(dict):
             self[key] = value
             self.next += 1
             return key
-
 
 def to_iterable(var: Union[Iterable, Any]):
     if var is None:
@@ -88,3 +145,14 @@ def batch(iterable, n=1):
 
 def flatten(l):
     return [item for sublist in l for item in sublist]
+
+
+def async_partial(f, *args1, **kw1):
+    async def func(*args2, **kw2):
+        return await f(*args1, *args2, **kw1, **kw2)
+
+    return func
+
+
+async def idle():
+    await asyncio.Event().wait()

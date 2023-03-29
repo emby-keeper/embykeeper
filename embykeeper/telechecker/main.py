@@ -4,9 +4,8 @@ import logging
 import operator
 import pkgutil
 import random
-from functools import partial
 from logging import StreamHandler
-from typing import List
+from typing import List, Type
 from importlib import import_module
 
 from dateutil import parser
@@ -20,11 +19,12 @@ from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
 from rich.table import Column, Table
 from rich.text import Text
 
-from ..utils import batch, flatten, time_in_range
+from ..utils import batch, flatten, idle, time_in_range, async_partial
 from ..log import logger, formatter
-from . import __name__ as telechecker
+from . import __name__
 from .link import Link, TelegramStream
 from .tele import Client, ClientsSession
+from .bots.base import BaseBotCheckin
 
 logger = logger.bind(scheme="telegram")
 
@@ -35,7 +35,7 @@ def get_spec(type: str):
         suffix = "checkin"
     elif type == "monitor":
         sub = "monitor"
-        suffix = "messager"
+        suffix = "monitor"
     elif type == "messager":
         sub = "messager"
         suffix = "messager"
@@ -44,31 +44,31 @@ def get_spec(type: str):
     return sub, suffix
 
 
-def get_names(type: str):
+def get_names(type: str) -> List[str]:
     sub, _ = get_spec(type)
     results = []
-    typemodule = import_module(f"{telechecker}.{sub}")
+    typemodule = import_module(f"{__name__}.{sub}")
     for _, mn, _ in pkgutil.iter_modules(typemodule.__path__):
-        module = import_module(f"{telechecker}.{sub}.{mn}")
+        module = import_module(f"{__name__}.{sub}.{mn}")
         if not getattr(module, "__ignore__", False):
             results.append(mn)
     return results
 
 
-def get_cls(type: str, names: List[str] = None):
+def get_cls(type: str, names: List[str] = None) -> List[Type]:
     sub, suffix = get_spec(type)
     if names == None:
         names = get_names(type)
     results = []
     for name in names:
-        module = import_module(f"{telechecker}.{sub}.{name}")
+        module = import_module(f"{__name__}.{sub}.{name}")
         for cn, cls in inspect.getmembers(module, inspect.isclass):
             if (name.replace("_", "") + suffix).lower() == cn.lower():
                 results.append(cls)
     return results
 
 
-def extract(clss):
+def extract(clss: List[Type]) -> List[Type]:
     extracted = []
     for cls in clss:
         ncs = [c for c in cls.__dict__.values() if inspect.isclass(c)]
@@ -95,7 +95,7 @@ async def dump_message(client: Client, message: Message, table: Table):
             sender = Text("Me", style="bold red")
             text = Text(text, style="red")
         else:
-            sender = user.first_name.strip()
+            sender = f"{user.first_name} {user.last_name}"
             if user.is_bot:
                 sender_icon = "🤖"
                 sender = Text(sender, style="bold yellow")
@@ -115,7 +115,7 @@ async def dump_message(client: Client, message: Message, table: Table):
     else:
         chat = chat_icon = None
     return table.add_row(
-        client.me.first_name,
+        f"{client.me.first_name} {client.me.last_name}",
         "│",
         chat_icon,
         chat,
@@ -129,17 +129,23 @@ async def dump_message(client: Client, message: Message, table: Table):
     )
 
 
-async def checkin_task(checkiner, sem, wait=0):
+async def checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     await asyncio.sleep(wait)
     async with sem:
         return await checkiner._start()
 
 
+async def gather_task(tasks, username):
+    return username, await asyncio.gather(*tasks)
+
+
 async def checkiner(config: dict, instant=False):
+    asyncio.sleep(10)
     async with ClientsSession.from_config(config) as clients:
         coros = []
         async for tg in clients:
-            log = logger.bind(scheme="telechecker", username=tg.me.first_name)
+            username = f"{tg.me.first_name} {tg.me.last_name}"
+            log = logger.bind(scheme="telechecker", username=username)
             if not await Link(tg).auth("checkiner"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -159,47 +165,68 @@ async def checkiner(config: dict, instant=False):
                 wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
-
-            async def _gather_task():
-                return tg, await asyncio.gather(*tasks)
-
-            coros.append(_gather_task())
-        for f in asyncio.as_completed(coros):
-            tg, results = await f
-            failed = [c for i, c in enumerate(checkiners) if not results[i]]
-            if failed:
-                log.error(f"签到失败 ({len(failed)}/{len(checkiners)}): {','.join([f.name for f in failed])}")
-            else:
-                log.bind(notify=True).info(f"签到成功 ({len(checkiners)}/{len(checkiners)}).")
+            coros.append(gather_task(tasks, username=username))
+        while coros:
+            done, coros = await asyncio.wait(coros, return_when=asyncio.FIRST_COMPLETED)
+            for t in done:
+                username, results = await t
+                log = logger.bind(scheme="telechecker", username=username)
+                failed = []
+                ignored = []
+                successful = []
+                for i, c in enumerate(checkiners):
+                    if results[i] == False:
+                        failed.append(c)
+                    elif results[i] is None:
+                        ignored.append(c)
+                    else:
+                        successful.append(c)
+                spec = f"共{len(checkiners)}个"
+                if successful:
+                    spec += f", {len(successful)}成功"
+                elif failed:
+                    spec += f", {len(failed)}失败"
+                elif ignored:
+                    spec += f", {len(ignored)}跳过"
+                if failed:
+                    log.error(f"签到失败 ({spec}): {','.join([f.name for f in failed])}")
+                else:
+                    log.bind(notify=True).info(f"签到成功 ({spec}).")
 
 
 async def monitorer(config: dict):
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
-            log = logger.bind(scheme="telemonitor", username=tg.me.first_name)
+            username = f"{tg.me.first_name} {tg.me.last_name}"
+            log = logger.bind(scheme="telemonitor", username=username)
             if not await Link(tg).auth("monitorer"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
-            clses = extract(get_cls("monitor"), names=config.get("service", {}).get("monitor", None))
+            clses = extract(get_cls("monitor", names=config.get("service", {}).get("monitor", None)))
+            names = []
             for cls in clses:
                 jobs.append(asyncio.create_task(cls(tg, nofail=config.get("nofail", True))._start()))
+                names.append(cls.name)
+            if names:
+                log.info(f'已启用监控器: {",".join(names)}')
         await asyncio.gather(*jobs)
 
 
 async def messager(config: dict, scheduler):
     async with ClientsSession.from_config(config, send=True) as clients:
         async for tg in clients:
-            log = logger.bind(scheme="telemessager", username=tg.me.first_name)
+            username = f"{tg.me.first_name} {tg.me.last_name}"
+            log = logger.bind(scheme="telemessager", username=username)
             if not await Link(tg).auth("messager"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
-            clses = extract(get_cls("messager"), names=config.get("service", {}).get("messager", None))
+            clses = extract(get_cls("messager", names=config.get("service", {}).get("messager", None)))
             for cls in clses:
                 cls(
                     {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
                     scheduler,
-                    username=tg.me.first_name,
+                    username=username,
                     proxy=config.get("proxy", None),
                     nofail=config.get("nofail", True),
                 ).start()
@@ -222,9 +249,9 @@ async def follower(config: dict):
     async with ClientsSession.from_config(config) as clients:
         table = Table(*columns, header_style="bold magenta", box=box.SIMPLE)
         async for tg in clients:
-            tg.add_handler(MessageHandler(partial(dump_message, table=table)))
+            tg.add_handler(MessageHandler(async_partial(dump_message, table=table)))
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
-            await asyncio.Event().wait()
+            await idle()
 
 
 async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
@@ -252,8 +279,9 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
         start, end = (parser.parse(t).time() for t in timerange)
     async with ClientsSession.from_config(config) as clients:
         async for tg in clients:
-            target = f"{tg.me.first_name}.msgs"
-            logger.info(f'开始分析账号: "{tg.me.first_name}", 结果将写入"{target}".')
+            username = f"{tg.me.first_name} {tg.me.last_name}"
+            target = f"{username}.msgs"
+            logger.info(f'开始分析账号: "{username}", 结果将写入"{target}".')
             pcs = list(Progress.get_default_columns())
             pcs.insert(0, SpinnerColumn())
             pcs.insert(3, MofNCompleteColumn(table_column=Column(justify="center")))
@@ -262,6 +290,7 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
                 updates = 0
                 pchats = p.add_task("[red]会话: ", total=len(chats))
                 for c in chats:
+                    c = c.rsplit("/", 1)[-1]
                     pmsgs = p.add_task("[red]记录: ", total=limit)
                     async for m in tg.get_chat_history(c, limit=limit):
                         if m.text:
@@ -319,8 +348,8 @@ async def notifier(config: dict):
         except IndexError:
             notifier = None
     if notifier:
-        async with ClientsSession([notifier], proxy=config.get("proxy", None), quiet=True) as clients:
+        async with ClientsSession([notifier], proxy=config.get("proxy", None)) as clients:
             async for tg in clients:
                 logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{tg.phone_number}" 账号.')
                 logger.add(StreamHandler(TelegramStream(link=Link(tg))), format=_formatter, filter=_filter)
-            await asyncio.Event().wait()
+            await idle()
