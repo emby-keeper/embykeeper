@@ -19,6 +19,7 @@ class NebulaCheckin(BaseBotCheckin):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.failed = False
+        self.timeout *= 3
 
     async def fail(self):
         self.failed = True
