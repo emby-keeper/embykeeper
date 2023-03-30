@@ -55,7 +55,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 Embykeeper 需要 Python 环境以运行, 您可以通过 [conda](https://github.com/conda/conda) 或 [virtualvenv](https://virtualenv.pypa.io/) 等工具进行环境的管理.
 
-您可以通过 `pip` 安装 `embykeeper` (需要 `python >= 3.6`):
+您可以通过 `pip` 安装 `embykeeper` (需要 `python >= 3.7`):
 
 ```bash
 pip install embykeeper
