@@ -50,15 +50,16 @@ class Link:
             await asyncio.wait_for(ok.wait(), timeout=timeout)
         except asyncio.CancelledError:
             try:
-                await asyncio.wait_for(self.delete_messages(messages), 0.5)
+                await asyncio.wait_for(self.delete_messages(messages), 1.0)
             except asyncio.TimeoutError:
                 pass
             finally:
                 raise
         else:
-            self.client.remove_handler(handler)
             await self.delete_messages(messages)
             return results
+        finally:
+            self.client.remove_handler(handler)
 
     async def preprocess(self, post, name):
         try:

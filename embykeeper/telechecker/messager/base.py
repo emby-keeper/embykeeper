@@ -7,6 +7,7 @@ from typing import Iterable, List, Union
 from dateutil import parser
 from loguru import logger
 from schedule import CancelJob, Scheduler
+from pyrogram.errors import BadRequest
 
 from ...utils import to_iterable
 from ..tele import ClientsSession
@@ -68,7 +69,10 @@ class Messager:
                 chat = await tg.get_chat(self.chat_name)
                 username = f"{tg.me.first_name} {tg.me.last_name}"
                 self.log.bind(username=username).info(f'向聊天 "{chat.title or chat.first_name}" 发送: {message}')
-                await tg.send_message(self.chat_name, message)
+                try:
+                    await tg.send_message(self.chat_name, message)
+                except BadRequest as e:
+                    self.log.warning(f'发送失败: {e}')
             reschedule()
             self.next_info()
             return CancelJob
