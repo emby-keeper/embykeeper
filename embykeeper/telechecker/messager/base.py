@@ -72,10 +72,11 @@ class Messager:
                 try:
                     await tg.send_message(self.chat_name, message)
                 except BadRequest as e:
-                    self.log.warning(f"发送失败: {e}")
+                    self.log.warning(f"发送失败: {e}.")
+                except KeyError as e:
+                    self.log.warning(f"发送失败, 您可能已被封禁: {e}.")
             reschedule()
             self.next_info()
-        return CancelJob
 
     def next_info(self):
         self.log.info(f"下一次发送将在 [blue]{self.scheduler.next_run.strftime('%m-%d %H:%M:%S %p')}[/] 进行.")
@@ -92,6 +93,12 @@ class Messager:
         return random_time
 
     def schedule(self, message, at, every, possibility, only):
+        def once(*args):
+            try:
+                asyncio.create_task(self._send(*args))
+            finally:
+                return CancelJob
+            
         def reschedule():
             if not at:
                 return
@@ -111,8 +118,6 @@ class Messager:
                 n, *_every = _every
             else:
                 n = 1
-            getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(
-                asyncio.create_task, self._send(m, reschedule, possibility, only)
-            )
+            getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(once, m, reschedule, possibility, only)
 
         reschedule()

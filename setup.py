@@ -30,6 +30,6 @@ setup(
     name="embykeeper",
     packages=find_packages(include=["embykeeper", "embykeeper.*"]),
     url="https://github.com/embykeeper/embykeeper",
-    version="2.0.6",
+    version="2.0.7",
     zip_safe=False,
 )
