@@ -21,7 +21,7 @@ class Client(_Client):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.cache = Cache()
-    
+
     async def authorize(self):
         if self.bot_token:
             return await self.sign_in_bot(self.bot_token)
@@ -68,20 +68,24 @@ class Client(_Client):
         else:
             raise BadRequest("该账户尚未注册")
 
-    async def get_dialogs(self, limit: int = 0, exclude_pinned=None, folder_id=None) -> Optional[AsyncGenerator["types.Dialog", None]]:
-        cache_id = f'dialogs_{self.phone_number}_{folder_id}_{1 if exclude_pinned else 0}'
-        (offset_id, offset_date, offset_peer), cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
-        
+    async def get_dialogs(
+        self, limit: int = 0, exclude_pinned=None, folder_id=None
+    ) -> Optional[AsyncGenerator["types.Dialog", None]]:
+        cache_id = f"dialogs_{self.phone_number}_{folder_id}_{1 if exclude_pinned else 0}"
+        (offset_id, offset_date, offset_peer), cache = await self.cache.get(
+            cache_id, ((0, 0, raw.types.InputPeerEmpty()), [])
+        )
+
         current = 0
         total = limit or (1 << 31) - 1
         limit = min(100, total)
-        
+
         for c in cache:
             yield c
             current += 1
             if current >= total:
                 return
-        
+
         while True:
             r = await self.invoke(
                 raw.functions.messages.GetDialogs(

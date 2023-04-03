@@ -60,10 +60,10 @@ class BaseBotCheckin(ABC):
 
 
 class BotCheckin(BaseBotCheckin):
-    '''签到类, 用于回复模式签到.'''
-    
+    """签到类, 用于回复模式签到."""
+
     group_pool = AsyncCountPool(base=2000)
-    
+
     name: str = None  # 签到器的名称
     bot_id: int = None  # Bot 的 UserID
     bot_username: str = None  # Bot 的 用户名
@@ -87,12 +87,12 @@ class BotCheckin(BaseBotCheckin):
         filter = filters.user(self.bot_id or self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
-        
+
         handlers = [
             MessageHandler(self._message_handler, filter),
             EditedMessageHandler(self._message_handler, filter),
         ]
-        
+
         group = await self.group_pool.append(self)
         for h in handlers:
             self.client.add_handler(h, group=group)
@@ -218,14 +218,20 @@ class BotCheckin(BaseBotCheckin):
     async def on_photo(self, message: Message):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
-        captcha = ocr.classification(image).translate(str.maketrans('', '', string.punctuation)).replace(" ", "")
-        self.log.info(f"[gray50]接收验证码: {captcha}.[/]")
-        if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
-            self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
-            await self.retry()
+        captcha = (
+            ocr.classification(image).translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
+        )
+        if captcha:
+            self.log.info(f"[gray50]接收验证码: {captcha}.[/]")
+            if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
+                self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
+                await self.retry()
+            else:
+                await asyncio.sleep(1)
+                await self.on_captcha(message, captcha)
         else:
-            await asyncio.sleep(1)
-            await self.on_captcha(message, captcha)
+            self.log.info(f"签到失败: 接收到空验证码, 正在重试.")
+            await self.retry()
 
     async def on_captcha(self, message: Message, captcha: str):
         await message.reply(captcha)
@@ -264,8 +270,8 @@ class BotCheckin(BaseBotCheckin):
 
 
 class AnswerBotCheckin(BotCheckin):
-    '''签到类, 用于按钮模式签到.'''
-    
+    """签到类, 用于按钮模式签到."""
+
     bot_checkin_button_pat: str = None  # 所有按键需要满足的 regex 条件
 
     def __init__(self, *args, **kw):

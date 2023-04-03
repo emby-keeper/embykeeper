@@ -180,6 +180,7 @@ async def watch(emby, time, progress, logger, retries=5):
             logger.opt(exception=e).warning("发生错误:")
             return False
 
+
 async def watcher(config):
     async def wrapper(emby, time, progress, logger):
         try:
@@ -187,7 +188,7 @@ async def watcher(config):
         except asyncio.TimeoutError:
             logger.warning(f"一定时间内未完成播放, 保活失败.")
             return False
-    
+
     tasks = []
     async for emby, time, progress, logger in login(config):
         tasks.append(wrapper(emby, time, progress, logger))

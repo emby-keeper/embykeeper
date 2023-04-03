@@ -32,6 +32,7 @@ def version(version):
         print(__version__)
         raise typer.Exit()
 
+
 @app.async_command(
     cls=FlagValueCommand, help=f"欢迎使用 [orange3]{__name__.capitalize()}[/] {__version__} :cinema: 无参数默认开启全部功能."
 )
@@ -139,16 +140,16 @@ async def main(
 
     if not once:
         pool = AsyncTaskPool()
-        
+
         pool.add(notifier(config))
-        
+
         debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
             schedule_emby = Scheduler()
             pool.add(run_pending(schedule_emby))
-            schedule_emby.every(1 if debug_cron else emby).days.at((debug_time or datetime.now()).strftime("%H:%M:%S")).do(
-                lambda: pool.add(watcher(config))
-            )
+            schedule_emby.every(1 if debug_cron else emby).days.at(
+                (debug_time or datetime.now()).strftime("%H:%M:%S")
+            ).do(lambda: pool.add(watcher(config)))
             logger.bind(scheme="embywatcher").info(
                 f"下一次保活将在 {schedule_emby.next_run.strftime('%m-%d %H:%M %p')} 进行."
             )
@@ -168,7 +169,7 @@ async def main(
             pool.add(messager(config, schedule_send))
         if monitor:
             pool.add(monitorer(config))
-        
+
         async for t in pool.as_completed():
             try:
                 await t
@@ -177,7 +178,7 @@ async def main(
                     raise
                 else:
                     logger.opt(exception=e).error("出现错误, 模块可能停止运行:")
-        
+
 
 if __name__ == "__main__":
     app()

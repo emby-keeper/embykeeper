@@ -65,7 +65,7 @@ class Session:
 
 class Monitor:
     group_pool = AsyncCountPool(base=1000)
-    
+
     name: str = None  # 监控器名称
     chat_name: str = None  # 群聊名称
     chat_allow_outgoing: bool = False  # 是否支持自己发言触发
@@ -91,12 +91,12 @@ class Monitor:
             filter = filter & filters.chat(self.chat_name)
         if not self.chat_allow_outgoing:
             filter = filter & (~filters.outgoing)
-        
+
         handlers = [
             MessageHandler(self._message_handler, filter),
             EditedMessageHandler(self._message_handler, filter),
         ]
-        
+
         group = await self.group_pool.append(self)
         for h in handlers:
             self.client.add_handler(h, group=group)
@@ -143,7 +143,11 @@ class Monitor:
 
     def get_key(self, message: Message):
         sender = message.from_user
-        if self.chat_user and not any(i in to_iterable(self.chat_user) for i in (sender.id, sender.username)):
+        if (
+            sender
+            and self.chat_user
+            and not any(i in to_iterable(self.chat_user) for i in (sender.id, sender.username))
+        ):
             return False
         text = message.text or message.caption
         if self.chat_keyword:

@@ -72,10 +72,10 @@ class Messager:
                 try:
                     await tg.send_message(self.chat_name, message)
                 except BadRequest as e:
-                    self.log.warning(f'发送失败: {e}')
+                    self.log.warning(f"发送失败: {e}")
             reschedule()
             self.next_info()
-            return CancelJob
+        return CancelJob
 
     def next_info(self):
         self.log.info(f"下一次发送将在 [blue]{self.scheduler.next_run.strftime('%m-%d %H:%M:%S %p')}[/] 进行.")

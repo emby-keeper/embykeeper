@@ -2,6 +2,7 @@ from .base import AnswerBotCheckin
 
 from pyrogram.errors import BadRequest
 
+
 class LJYYCheckin(AnswerBotCheckin):
     name = "垃圾影音"
     bot_username = "zckllflbot"

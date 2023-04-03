@@ -45,9 +45,9 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-- Telegram 自动水群 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
+- Telegram 自动水群 (默认使用内建话术列表, 请谨慎使用)
   - NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)
-- Telegram 自动监控信息 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
+- Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
   - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
 

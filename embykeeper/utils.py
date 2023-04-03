@@ -78,7 +78,7 @@ class AsyncTaskPool:
     def __init__(self):
         self.waiter = asyncio.Condition()
         self.tasks = []
-    
+
     def add(self, coro):
         async def wrapper():
             task = asyncio.ensure_future(coro)
@@ -89,7 +89,7 @@ class AsyncTaskPool:
 
         t = asyncio.create_task(wrapper())
         self.tasks.append(t)
-    
+
     async def as_completed(self):
         while True:
             async with self.waiter:
@@ -112,6 +112,7 @@ class AsyncCountPool(dict):
             self[key] = value
             self.next += 1
             return key
+
 
 def to_iterable(var: Union[Iterable, Any]):
     if var is None:
