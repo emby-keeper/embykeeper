@@ -1,5 +1,5 @@
 import asyncio
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional, Union
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
@@ -9,12 +9,26 @@ from pyrogram import raw, types, utils
 from pyrogram.enums import SentCodeType
 from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded
 from aiocache import Cache
-from aiocache.serializers import PickleSerializer
 
 from .. import __name__, __version__
 from ..utils import to_iterable
 
 logger = logger.bind(scheme="telegram")
+
+
+def _name(self: Union[types.User, types.Chat]):
+    return " ".join([n for n in (self.first_name, self.last_name) if n])
+
+
+def _chat_name(self: types.Chat):
+    if self.title:
+        return self.title
+    else:
+        return _name(self)
+
+
+setattr(types.User, "name", property(_name))
+setattr(types.Chat, "name", property(_chat_name))
 
 
 class Client(_Client):

@@ -31,13 +31,17 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 支持群组
     - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
     - 卷毛鼠: [频道]() [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
-    - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
-    - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
-    - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
-    - BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)
-    - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
-    - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
     - Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
+    - BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)
+    - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
+    - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
+    - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
+    - Pornemby (_测试中_): [频道](https://t.me/pornembyservice) [活动频道](https://t.me/PornembyFun) [账号频道](https://t.me/pornembyservice) [开号机器人](https://t.me/pornemby_bot) [签到机器人](https://t.me/PronembyTGBot2_bot)
+    - 默认禁用:
+      - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
+      - ~~垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)~~ (无响应)
+    - 其他非 Emby 相关:
+      - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加) (_测试中_)
   - 高级特性
     - 验证码识别与自动重试
     - 多账户签到
@@ -45,7 +49,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-- Telegram 自动水群 (默认使用内建话术列表, 请谨慎使用)
+- Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
   - NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)
 - Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
@@ -222,6 +226,17 @@ $ embykeeper config.toml -a
 | `messager`  | `list` | 启用的水群会话 | (当前所有支持的会话) |
 
 注意, 当您未曾与站点机器人对话, 该站点签到将不会运行.
+若您需要禁用部分签到站点，您可以在列表中删除对应的名称.
+若您需要使用默认禁用的签到站点，您可以在列表中增加对应的名称.
+当前支持的名称包括:
+| 站点 | 名称 | | 站点 | 名称 |
+| --- | --- | --- |--- | --- |
+| 垃圾影音 | `ljyy` | | 搜书神器 | `sosdbot` |
+| 卷毛鼠 IPTV | `jms_iptv` | | 终点站 | `terminus` |
+| Pornemby | `pornemby` | | Singularity | `singularity` |
+| Peach | `peach` | | Nebula | `nebula` |
+| Bluesea | `bluesea` | | Embyhub | `embyhub` |
+| 卷毛鼠 | `jms` | | | |
 
 `proxy` 设置可以为:
 

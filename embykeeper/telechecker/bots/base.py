@@ -39,8 +39,7 @@ class BaseBotCheckin(ABC):
         self.timeout = timeout
         self.nofail = nofail
         self.finished = asyncio.Event()
-        username = f"{self.client.me.first_name} {self.client.me.last_name}"
-        self.log = logger.bind(scheme="telechecker", name=self.name, username=username)
+        self.log = logger.bind(scheme="telechecker", name=self.name, username=client.me.name)
 
     async def _start(self):
         try:
@@ -82,18 +81,22 @@ class BotCheckin(BaseBotCheckin):
         self._is_archived = False
         self._retries = 0
 
-    @asynccontextmanager
-    async def listener(self):
+    def get_filter(self):
         filter = filters.user(self.bot_id or self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
+        return filter
 
-        handlers = [
-            MessageHandler(self._message_handler, filter),
-            EditedMessageHandler(self._message_handler, filter),
+    def get_handlers(self):
+        return [
+            MessageHandler(self._message_handler, self.get_filter()),
+            EditedMessageHandler(self._message_handler, self.get_filter()),
         ]
 
+    @asynccontextmanager
+    async def listener(self):
         group = await self.group_pool.append(self)
+        handlers = self.get_handlers()
         for h in handlers:
             self.client.add_handler(h, group=group)
         yield
@@ -123,7 +126,7 @@ class BotCheckin(BaseBotCheckin):
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
                     return None
         bot = await self.client.get_users(self.bot_id or self.bot_username)
-        msg = f"开始执行签到: [green]{bot.first_name}[/] [gray50](@{bot.username})[/]"
+        msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
         if chat.title:
             msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
         self.log.info(msg + ".")
@@ -183,10 +186,11 @@ class BotCheckin(BaseBotCheckin):
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            self.finished.set()
             if self.nofail:
                 self.log.opt(exception=e).warning(f"发生错误:")
+                await self.fail()
             else:
+                await self.fail()
                 raise
         finally:
             message.continue_propagation()
@@ -239,7 +243,7 @@ class BotCheckin(BaseBotCheckin):
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in ("失败", "错误", "超时")):
+        elif any(s in text for s in ("失败", "错误", "超时", "拉黑", "黑名单", "冻结")):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
         elif any(s in text for s in ("成功", "通过", "完成")):
@@ -253,7 +257,7 @@ class BotCheckin(BaseBotCheckin):
                 else:
                     self.log.info(f"[yellow]签到成功[/].")
             self.finished.set()
-        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过")):
+        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过", "明日再来")):
             self.log.info(f"今日已经签到过了.")
             self.finished.set()
         else:
@@ -267,6 +271,10 @@ class BotCheckin(BaseBotCheckin):
         else:
             self.log.warning("超过最大重试次数.")
             self.finished.set()
+
+    async def fail(self, message=None):
+        self.finished.set()
+        self._retries = float("inf")
 
 
 class AnswerBotCheckin(BotCheckin):
@@ -323,8 +331,8 @@ class AnswerBotCheckin(BotCheckin):
         else:
             return super().message_type(message)
 
-    async def message_handler(self, client: Client, message: Message):
-        type = self.message_type(message)
+    async def message_handler(self, client: Client, message: Message, type=None):
+        type = type or self.message_type(message)
         if MessageType.ANSWER in type:
             await self.on_answer(message)
         await super().message_handler(client, message, type=type)

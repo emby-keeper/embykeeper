@@ -42,7 +42,7 @@ class NebulaCheckin(BaseBotCheckin):
 
     async def _checkin(self):
         bot = await self.client.get_users(self.bot_username)
-        self.log.info(f"开始执行签到: [green]{bot.first_name}[/] [gray50](@{bot.username})[/].")
+        self.log.info(f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/].")
         bot_peer = await self.client.resolve_peer(self.bot_username)
         user_full = await self.client.invoke(GetFullUser(id=bot_peer))
         url = user_full.full_user.bot_info.menu_button.url

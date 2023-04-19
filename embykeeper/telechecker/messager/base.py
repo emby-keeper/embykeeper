@@ -67,8 +67,7 @@ class Messager:
         async with ClientsSession([self.account], proxy=self.proxy) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
-                username = f"{tg.me.first_name} {tg.me.last_name}"
-                self.log.bind(username=username).info(f'向聊天 "{chat.title or chat.first_name}" 发送: {message}')
+                self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: {message}')
                 try:
                     await tg.send_message(self.chat_name, message)
                 except BadRequest as e:
@@ -98,7 +97,7 @@ class Messager:
                 asyncio.create_task(self._send(*args))
             finally:
                 return CancelJob
-            
+
         def reschedule():
             if not at:
                 return
@@ -118,6 +117,8 @@ class Messager:
                 n, *_every = _every
             else:
                 n = 1
-            getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(once, m, reschedule, possibility, only)
+            getattr(self.scheduler.every(int(n)), _every[0]).at(t.strftime("%H:%M:%S")).do(
+                once, m, reschedule, possibility, only
+            )
 
         reschedule()

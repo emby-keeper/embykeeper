@@ -4,6 +4,7 @@ import asyncio
 import random
 import re
 from contextlib import asynccontextmanager
+import string
 from typing import List, Sized, Union
 
 from loguru import logger
@@ -11,7 +12,7 @@ from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import UsernameNotOccupied, UserNotParticipant
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
-from pyrogram.types import Message
+from pyrogram.types import Message, User
 
 from ...utils import to_iterable, truncate_str, AsyncCountPool
 from ..tele import Client
@@ -63,8 +64,31 @@ class Session:
         self.followed.set()
 
 
+class UniqueUsername(dict):
+    def __getitem__(self, user: User):
+        if not user.id in self:
+            self[user.id] = self.get_unique(user)
+        return dict.__getitem__(self, user.id)
+
+    @staticmethod
+    def get_unique(user: User):
+        log = logger.bind(scheme="telemonitor", username=user.name)
+        if user.username:
+            unique = user.username
+        else:
+            unique: str = user.name.lower()
+        unique = re.sub(r"[^A-Za-z0-9]", "", unique)
+        random_bits = 10 - len(unique)
+        if random_bits:
+            random_bits = "".join(random.choice(string.digits) for _ in range(random_bits))
+            unique = unique + random_bits
+        log.info(f'当监控到开注时, 将以用户名 "{unique}" 注册, 请[yellow]保证[/]具有一定独特性以避免注册失败.')
+        return unique
+
+
 class Monitor:
     group_pool = AsyncCountPool(base=1000)
+    unique_cache = UniqueUsername()
 
     name: str = None  # 监控器名称
     chat_name: str = None  # 群聊名称
@@ -75,29 +99,33 @@ class Monitor:
     chat_delay: int = 0  # 发信延迟
     chat_follow_user: int = 0  # 需要等待 N 个用户发送 {chat_reply} 方可回复
     chat_reply: str = None  # 回复的内容, 可以通过 @property 类属性重写.
+    notify_create_name: bool = False  # 启动时生成 unique name 并提示
 
     def __init__(self, client: Client, nofail=True):
         self.client = client
         self.nofail = nofail
-        username = f"{self.client.me.first_name} {self.client.me.last_name}"
-        self.log = logger.bind(scheme="telemonitor", name=self.name, username=username)
+        self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None
         self.failed = asyncio.Event()
 
-    @asynccontextmanager
-    async def listener(self):
+    def get_filter(self):
         filter = filters.caption | filters.text
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
         if not self.chat_allow_outgoing:
             filter = filter & (~filters.outgoing)
+        return filter
 
-        handlers = [
-            MessageHandler(self._message_handler, filter),
-            EditedMessageHandler(self._message_handler, filter),
+    def get_handlers(self):
+        return [
+            MessageHandler(self._message_handler, self.get_filter()),
+            EditedMessageHandler(self._message_handler, self.get_filter()),
         ]
 
+    @asynccontextmanager
+    async def listener(self):
         group = await self.group_pool.append(self)
+        handlers = self.get_handlers()
         for h in handlers:
             self.client.add_handler(h, group=group)
         yield
@@ -134,6 +162,8 @@ class Monitor:
         if me.status in (ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED):
             self.log.warning(f'初始化错误: 被群组 "{chat.title}" 禁言.')
             return False
+        if self.notify_create_name:
+            self.unique_name = self.get_unique_name()
         spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"
         self.log.info(f"开始监视: {spec}.")
         async with self.listener():
@@ -217,9 +247,12 @@ class Monitor:
                 if self.session.reply == text:
                     now = await self.session.follow()
                     self.log.info(
-                        f'从众计数 ({self.chat_follow_user - now}/{self.chat_follow_user}): "{message.from_user.first_name}"'
+                        f'从众计数 ({self.chat_follow_user - now}/{self.chat_follow_user}): "{message.from_user.name}"'
                     )
 
     async def on_trigger(self, message: Message, keys: Union[List[str], str], reply: str):
         if reply:
             return await self.client.send_message(message.chat.id, reply)
+
+    def get_unique_name(self):
+        return Monitor.unique_cache[self.client.me]

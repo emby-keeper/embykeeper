@@ -11,13 +11,14 @@ from importlib import import_module
 from dateutil import parser
 from pyrogram.enums import ChatType
 from pyrogram.handlers import MessageHandler
-from pyrogram.types import Message
+from pyrogram.types import Message, Update
 from rich import box
 from rich.live import Live
 from rich.panel import Panel
 from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
 from rich.table import Column, Table
 from rich.text import Text
+from rich.pretty import pprint
 
 from ..utils import batch, flatten, idle, time_in_range, async_partial
 from ..log import logger, formatter
@@ -95,7 +96,7 @@ async def dump_message(client: Client, message: Message, table: Table):
             sender = Text("Me", style="bold red")
             text = Text(text, style="red")
         else:
-            sender = f"{user.first_name} {user.last_name}"
+            sender = user.name
             if user.is_bot:
                 sender_icon = "🤖"
                 sender = Text(sender, style="bold yellow")
@@ -115,7 +116,7 @@ async def dump_message(client: Client, message: Message, table: Table):
     else:
         chat = chat_icon = None
     return table.add_row(
-        f"{client.me.first_name} {client.me.last_name}",
+        f"{client.me.name}",
         "│",
         chat_icon,
         chat,
@@ -140,12 +141,10 @@ async def gather_task(tasks, username):
 
 
 async def checkiner(config: dict, instant=False):
-    asyncio.sleep(10)
     async with ClientsSession.from_config(config) as clients:
         coros = []
         async for tg in clients:
-            username = f"{tg.me.first_name} {tg.me.last_name}"
-            log = logger.bind(scheme="telechecker", username=username)
+            log = logger.bind(scheme="telechecker", username=tg.me.name)
             if not await Link(tg).auth("checkiner"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -165,7 +164,7 @@ async def checkiner(config: dict, instant=False):
                 wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
-            coros.append(gather_task(tasks, username=username))
+            coros.append(gather_task(tasks, username=tg.me.name))
         while coros:
             done, coros = await asyncio.wait(coros, return_when=asyncio.FIRST_COMPLETED)
             for t in done:
@@ -198,8 +197,7 @@ async def monitorer(config: dict):
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
-            username = f"{tg.me.first_name} {tg.me.last_name}"
-            log = logger.bind(scheme="telemonitor", username=username)
+            log = logger.bind(scheme="telemonitor", username=tg.me.name)
             if not await Link(tg).auth("monitorer"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -216,8 +214,7 @@ async def monitorer(config: dict):
 async def messager(config: dict, scheduler):
     async with ClientsSession.from_config(config, send=True) as clients:
         async for tg in clients:
-            username = f"{tg.me.first_name} {tg.me.last_name}"
-            log = logger.bind(scheme="telemessager", username=username)
+            log = logger.bind(scheme="telemessager", username=tg.me.name)
             if not await Link(tg).auth("messager"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -226,7 +223,7 @@ async def messager(config: dict, scheduler):
                 cls(
                     {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
                     scheduler,
-                    username=username,
+                    username=tg.me.name,
                     proxy=config.get("proxy", None),
                     nofail=config.get("nofail", True),
                 ).start()
@@ -279,9 +276,8 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
         start, end = (parser.parse(t).time() for t in timerange)
     async with ClientsSession.from_config(config) as clients:
         async for tg in clients:
-            username = f"{tg.me.first_name} {tg.me.last_name}"
-            target = f"{username}.msgs"
-            logger.info(f'开始分析账号: "{username}", 结果将写入"{target}".')
+            target = f"{tg.me.name}.msgs"
+            logger.info(f'开始分析账号: "{tg.me.name}", 结果将写入"{target}".')
             pcs = list(Progress.get_default_columns())
             pcs.insert(0, SpinnerColumn())
             pcs.insert(3, MofNCompleteColumn(table_column=Column(justify="center")))
