@@ -60,7 +60,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ### 从 Docker 安装
 
-Embykeeper 可以通过 `docker` 运行, 您需[安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
+Embykeeper 可以通过 `docker` 运行, 您需 [安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
 
 ```bash
 touch config.toml
@@ -127,7 +127,7 @@ services:
 
 如果您需要使用主机上的代理服务器 (例如 `https://localhost:1080`), 您可能需要使用 `--net=host` 参数以使用主机网络模式.
 
-### 从 Pypi 安装
+### 从 PyPi 安装
 
 Embykeeper 需要 Python 环境以运行, 您可以通过 [conda](https://github.com/conda/conda) 或 [virtualvenv](https://virtualenv.pypa.io/) 等工具进行环境的管理.
 
@@ -143,7 +143,7 @@ pip install embykeeper
 embykeeper
 ```
 
-命令将会在当前目录生成模板 `config.toml` 文件, 您需要修改您的账号配置 (详见[从 Docker 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E%20Docker%20%E5%AE%89%E8%A3%85)).
+命令将会在当前目录生成模板 `config.toml` 文件, 您需要修改您的账号配置 (详见[从 Docker 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-docker-%E5%AE%89%E8%A3%85)).
 
 随后, 您需要再次执行:
 
@@ -179,7 +179,7 @@ pip install -U embykeeper
 
 ### 从源码构建
 
-首先拉取 Github 并安装:
+和从 PyPi 安装类似，您需要一个先设置 Python 环境, 然后拉取 Github 并安装:
 
 ```bash
 git clone https://github.com/embykeeper/embykeeper.git
@@ -193,7 +193,7 @@ make develop
 embykeeper
 ```
 
-详细配置方法详见 [从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E%20Pypi%20%E5%AE%89%E8%A3%85).
+详细配置方法详见 [从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-pypi-%E5%AE%89%E8%A3%85).
 
 当版本更新时, 您需要执行:
 
