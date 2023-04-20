@@ -10,7 +10,7 @@ from schedule import Scheduler
 from dateutil import parser
 
 from . import __author__, __name__, __url__, __version__
-from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool, fail_message
+from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool
 from .settings import prepare_config
 
 app = AsyncTyper(
