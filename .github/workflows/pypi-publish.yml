@@ -1,8 +1,10 @@
-name: Pypi Publish
+name: PyPi Publish
 
 on:
   push:
     tags: v*
+    branches:
+      - main
 
 permissions:
   contents: read
