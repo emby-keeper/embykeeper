@@ -30,6 +30,5 @@ develop: clean ## install the package at current location, keeping it editable
 install: clean ## install the package to the active Python's site-packages
 	pip install .
 
-release: clean ## release a new version
-    twine upload dist/*
-	docker build .
+release: ## release a new version
+	bump2version patch

@@ -3,6 +3,7 @@
 *.msgs
 /test.py
 /test.ipynb
+images
 
 # Vscode
 .vscode/*

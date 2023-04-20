@@ -76,6 +76,9 @@ def write_faked_config(path):
     from .telechecker.main import get_names
     from . import __name__, __version__
 
+    logger.warning("需要输入一个toml格式的config文件.")
+    logger.warning(f'您可以根据生成的参考配置文件 "{path}" 进行配置')
+
     fake = Faker()
     fake.add_provider(internet)
     fake.add_provider(profile)
@@ -134,7 +137,7 @@ def write_faked_config(path):
         telegram.append(t)
     doc["telegram"] = telegram
     for t in doc["telegram"]:
-        t.value.item("send").comment("启用该账号的自动水群功能 (需要高级账号)")
+        t.value.item("send").comment("启用该账号的自动水群功能 (谨慎使用)")
         t.value.item("monitor").comment("启用该账号的自动监控功能 (需要高级账号)")
     doc.add(nl())
     doc.add(comment("Emby 账号设置, 您可以重复该片段多次以增加多个账号."))
@@ -158,15 +161,14 @@ def write_faked_config(path):
 
 
 def prepare_config(config=None):
+    default_config = "config.toml"
     if not config:
-        logger.warning("需要输入一个toml格式的config文件.")
-        default_config = "config.toml"
         if not Path(default_config).exists():
-            write_faked_config(default_config)
-            logger.warning(f'您可以根据生成的参考配置文件 "{default_config}" 进行配置')
-        return
+            return write_faked_config(default_config)
     with open(config, "rb") as f:
         config = tomllib.load(f)
+    if not config:
+        return write_faked_config(default_config)
     if not check_config(config):
         return
     proxy = config.get("proxy", None)

@@ -11,19 +11,19 @@
 
 ---
 
-Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到和保号的自动执行工具, 基于 Pyrogram 编写并具有可拓展性。
+Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到和保号的自动执行工具, 基于 Pyrogram 编写并具有可拓展性.
 
 ## 声明
 
-本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关，在使用 Embykeeper 时造成的一切损失（包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁）与开发团队无关。
+本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关. 
 
-本项目设计初衷是在中文 Emby 社群规则下，保号要求逐渐苛刻（部分要求每月登录或每日签到），这使得休闲时间紧张的人士难以安心使用。本项目仅旨在帮助该类人群保号，不鼓励持有大量 Emby 账号而不使用，导致真正需要的人、为中文影视资源分享和翻译有贡献的人难以获得账号的行为，开发团队也呼吁仅保留 1-2 个较全面质量较高的 Emby 服务器。本项目仅提供工具，具体使用形式及造成的影响和后果与开发团队无关。
+本项目设计初衷是在中文 Emby 社群规则下, 保号要求逐渐苛刻 (部分要求每月登录或每日签到), 这使得休闲时间紧张的人士难以安心使用. 本项目仅旨在帮助该类人群保号, 不鼓励持有大量 Emby 账号而不使用, 导致真正需要的人、为中文影视资源分享和翻译有贡献的人难以获得账号的行为, 开发团队也呼吁仅保留 1-2 个较全面质量较高的 Emby 服务器. 本项目仅提供工具, 具体使用形式及造成的影响和后果与开发团队无关. 
 
-本项目欢迎友善讨论与建议, 您可以通过 [Github Issue](https://github.com/embykeeper/embykeeper) 途径反馈, 并认可开发团队可以删除或关闭与项目开发不直接相关的不友善讨论。
+本项目欢迎友善讨论与建议, 您可以通过 [Github Issue](https://github.com/embykeeper/embykeeper) 途径反馈, 并认可开发团队可以关闭与项目开发不直接相关的不友善讨论. 您也可以通过 [Telegram 讨论组](https://t.me/embykeeper_chat) 与开发团队进行交流.
 
-当您使用 "消息提示" 功能，该工具时候将自动向 "[Embykeeper Bot](https://t.me/embykeeper_bot)" 发送关键的成功/失败日志以供向您推送, 日志内容不含任何密码或密钥信息, 您认可该命令不会给您带来隐私与安全问题。
+当您使用 "消息提示" 功能, 该工具时候将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)" 发送关键的成功/失败日志以供从 "[Embykeeper Bot](https://t.me/embykeeper_bot)" 向您推送, 日志内容不含任何密码或密钥信息, 您认可该命令不会给您带来隐私与安全问题. 
 
-当您安装并使用该工具，默认您已经阅读并同意上述声明，并确认自己并非出于"集邮"目的而安装。
+当您安装并使用该工具, 默认您已经阅读并同意上述声明, 并确认自己并非出于"集邮"目的而安装. 
 
 ## 功能
 
@@ -36,13 +36,14 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
     - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
     - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
     - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
-    - Pornemby (_测试中_): [频道](https://t.me/pornembyservice) [活动频道](https://t.me/PornembyFun) [账号频道](https://t.me/pornembyservice) [开号机器人](https://t.me/pornemby_bot) [签到机器人](https://t.me/PronembyTGBot2_bot)
-    - 默认禁用:
-      - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
-      - ~~垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)~~ (无响应)
+    - Pornemby (_测试中_): [频道](https://t.me/pornembyservice) [机器人](https://t.me/PronembyTGBot2_bot)
     - 其他非 Emby 相关:
       - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加) (_测试中_)
-  - 高级特性
+    - 默认禁用:
+      - Pornemby 科举考试 (_测试中_): [活动频道](https://t.me/PornembyFun)
+      - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
+      - ~~垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)~~ (无响应)
+  - 特性
     - 验证码识别与自动重试
     - 多账户签到
     - 网页类型签到
@@ -57,29 +58,16 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ## 安装与使用
 
-Embykeeper 需要 Python 环境以运行, 您可以通过 [conda](https://github.com/conda/conda) 或 [virtualvenv](https://virtualenv.pypa.io/) 等工具进行环境的管理.
+### 从 Docker 安装
 
-您可以通过 `pip` 安装 `embykeeper` (需要 `python >= 3.7`):
-
-```bash
-pip install embykeeper
-```
-
-或者您也可以通过源码构建:
+Embykeeper 可以通过 `docker` 运行, 您需[安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
 
 ```bash
-git clone https://github.com/embykeeper/embykeeper.git
-cd embykeeper
-make develop
+touch config.toml
+docker run -v $(pwd)/config.toml:/app/config.toml --rm -it embykeeper/embykeeper
 ```
 
-随后，您需要执行:
-
-```bash
-embykeeper
-```
-
-命令将会在当前目录生成模板 `config.toml` 文件，您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
+命令将会在当前目录生成模板 `config.toml` 文件, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
 
 ```toml
 [proxy]
@@ -98,23 +86,80 @@ username = "carrie19"
 password = "s*D7MMCpS$"
 ```
 
-对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 API development tools, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要更换应用名称/短名称/代理/清除浏览器记录并重试.
+对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要更换应用名称/短名称/代理/清除浏览器记录并重试.
 
-然后, 运行:
+随后, 您需要再次执行:
 
 ```bash
-embykeeper config.toml
+docker run -v $(pwd)/config.toml:/app/config.toml --rm -it embykeeper/embykeeper
 ```
 
-您将被询问设备验证码以登录，登录成功后，Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
+您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
 
-恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以运行:
+恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以通过`Ctrl+C`停止, 然后运行:
+
+```bash
+docker run -d -v $(pwd)/config.toml:/app/config.toml embykeeper/embykeeper
+```
+
+或者使用 [docker-compose](https://docs.docker.com/compose/) ([watchtower](https://github.com/containrrr/watchtower) 被用于自动更新容器服务):
+
+```yaml
+version: '3'
+services:
+  embykeeper:
+    container_name: embykeeper
+    image: cembykeeper/embykeeper
+    restart: unless-stopped
+    volumes:
+      - ./config.toml:/app/config.toml
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+```
+
+即可在后台启动 embykeeper.
+
+您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
+
+如果您需要使用主机上的代理服务器 (例如 `https://localhost:1080`), 您可能需要使用 `--net=host` 参数以使用主机网络模式.
+
+### 从 Pypi 安装
+
+Embykeeper 需要 Python 环境以运行, 您可以通过 [conda](https://github.com/conda/conda) 或 [virtualvenv](https://virtualenv.pypa.io/) 等工具进行环境的管理.
+
+您可以通过 `pip` 安装 `embykeeper` (需要 `python >= 3.7, < 3.11`):
+
+```bash
+pip install embykeeper
+```
+
+随后, 您需要执行:
+
+```bash
+embykeeper
+```
+
+命令将会在当前目录生成模板 `config.toml` 文件, 您需要修改您的账号配置 (详见[从 Docker 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E%20Docker%20%E5%AE%89%E8%A3%85)).
+
+随后, 您需要再次执行:
+
+```bash
+embykeeper
+```
+
+您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
+
+恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以通过`Ctrl+C`停止, 然后运行:
 
 ```bash
 tmux
 ```
 
-这将启动一个 `tmux` 终端，您可以在该终端中运行上述命令 (`embykeeper config.toml`), 并按 Ctrl + B, 松开 B 再按 D, 以脱离 `tmux` 终端。
+这将启动一个 `tmux` 终端, 您可以在该终端中运行上述命令 (`embykeeper config.toml`), 并按 Ctrl + B, 松开 B 再按 D, 以脱离 `tmux` 终端. 
 
 您随时可以通过运行:
 
@@ -123,6 +168,40 @@ tmux a
 ```
 
 以重新连接到 `tmux` 终端.
+
+当版本更新时, 您需要执行:
+
+```
+pip install -U embykeeper
+```
+
+然后重新运行应用.
+
+### 从源码构建
+
+首先拉取 Github 并安装:
+
+```bash
+git clone https://github.com/embykeeper/embykeeper.git
+cd embykeeper
+make develop
+```
+
+然后即可执行 Embykeeper:
+
+```bash
+embykeeper
+```
+
+详细配置方法详见 [从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E%20Pypi%20%E5%AE%89%E8%A3%85).
+
+当版本更新时, 您需要执行:
+
+```
+git pull
+```
+
+然后重新运行应用.
 
 ## 命令行帮助
 
@@ -185,7 +264,7 @@ $ embykeeper config.toml -a
 
 您可以通过设置项 "`notifier`" 设置 成功/失败 通知将被发送的 Telegram 账号, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot) 设置消息每日发送的时间.
 
-本项目涉及的需要 Cloudflare 验证码付费跳过的操作（例如 Nebula 签到）、可能会引起竞争的操作（例如自动抢邀请码）将需要高级用户，您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot?start=__prime) 成为高级用户.
+本项目涉及的需要 Cloudflare 验证码付费跳过的操作 (例如 Nebula 签到)、可能会引起竞争的操作 (例如自动抢邀请码)将需要高级用户, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot?start=__prime) 成为高级用户.
 
 目前有三种方式成为高级用户:
 
@@ -226,8 +305,8 @@ $ embykeeper config.toml -a
 | `messager`  | `list` | 启用的水群会话 | (当前所有支持的会话) |
 
 注意, 当您未曾与站点机器人对话, 该站点签到将不会运行.
-若您需要禁用部分签到站点，您可以在列表中删除对应的名称.
-若您需要使用默认禁用的签到站点，您可以在列表中增加对应的名称.
+若您需要禁用部分签到站点, 您可以在列表中删除对应的名称.
+若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
 当前支持的名称包括:
 | 站点 | 名称 | | 站点 | 名称 |
 | --- | --- | --- |--- | --- |
@@ -298,7 +377,7 @@ class DummyCheckin(BotCheckin):
     bot_captcha_len = 4
 ```
 
-您即增加一个名为 "`Dummy`" 的签到器，将会向用户名为 "`dummy`" 的机器人发送 "`/checkin`" 并等候一个 4 位的验证码，识别验证码后将发送.
+您即增加一个名为 "`Dummy`" 的签到器, 将会向用户名为 "`dummy`" 的机器人发送 "`/checkin`" 并等候一个 4 位的验证码, 识别验证码后将发送.
 
 若您希望识别验证码后点击按钮, 您可以使用 `AnswerBotCheckin`, 您也可以重写 `on_captcha` 函数来实现自定义功能:
 
