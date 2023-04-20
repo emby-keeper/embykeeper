@@ -2,3 +2,4 @@ recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
 recursive-include *.md Makefile
+recursive-include . requirements.txt
