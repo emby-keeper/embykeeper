@@ -85,13 +85,7 @@ async def main(
 
     initialize(level="DEBUG" if debug else "INFO")
 
-    try:
-        config = prepare_config(config)
-    except tomllib.TOMLDecodeError as e:
-        logger.error(f"TOML 配置文件错误: {e}.")
-        sys.exit(1)
-    if not config:
-        sys.exit(1)
+    config: dict = prepare_config(config)
 
     if debug:
         config.setdefault("nofail", False)
