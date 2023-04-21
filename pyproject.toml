@@ -69,18 +69,5 @@ zip-safe = false
 [tool.setuptools.packages]
 find = {}
 
-[tool.bumpversion]
-current_version = "2.0.9"
-commit = "True"
-tag = "True"
-
-[tool.bumpversion.file.pyproject.toml]
-search = 'version = "{current_version}"'
-replace = 'version = "{new_version}"'
-
-[tool.bumpversion.file."embykeeper/__init__".py]
-search = '__version__ = "{current_version}"'
-replace = '__version__ = "{new_version}"'
-
 [tool.black]
 line-length = 110
