@@ -26,7 +26,7 @@ jobs:
       -
         name: Set version tag
         run:
-          echo "GIT_TAG=$(git describe --candidates=0 --tags 2> /dev/null)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --candidates=0 --tags 2> /dev/null || echo prerelease)" >> $GITHUB_ENV
       -
         name: Build and push
         uses: docker/build-push-action@v4
