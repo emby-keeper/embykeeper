@@ -67,7 +67,7 @@ embykeeper = "embykeeper.cli:app"
 zip-safe = false
 
 [tool.setuptools.packages]
-find = {}
+find = {namespaces = false}
 
 [tool.black]
 line-length = 110
