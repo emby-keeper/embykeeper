@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   main:
+    if: github.repository == 'embykeeper/embykeeper'
     runs-on: ubuntu-latest
     steps:
       -
