@@ -1,7 +1,5 @@
 FROM python:3.8-slim AS builder
 
-VOLUME ["/root/.local/share/embykeeper"]
-
 WORKDIR /src
 COPY . .
 
@@ -12,6 +10,8 @@ RUN python -m venv /opt/venv \
 
 FROM python:3.8-slim
 COPY --from=builder /opt/venv /opt/venv
+
+VOLUME ["/root/.local/share/embykeeper"]
 
 WORKDIR /app
 RUN touch config.toml
