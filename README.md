@@ -40,7 +40,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
     - 其他非 Emby 相关:
       - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加) (_测试中_): [机器人](https://t.me/sosdbot)
     - 默认禁用:
-      - Pornemby 科举考试 (_测试中_): [活动频道](https://t.me/PornembyFun)
+      - Pornemby 科举考试 (_测试中_): [活动频道](https://t.me/PornembyFun) (感谢 **西门主任** 赞助)
       - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
       - ~~垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)~~ (无响应)
   - 特性
