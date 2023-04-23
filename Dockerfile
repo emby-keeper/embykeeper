@@ -11,11 +11,8 @@ RUN python -m venv /opt/venv \
 FROM python:3.8-slim
 COPY --from=builder /opt/venv /opt/venv
 
-VOLUME ["/root/.local/share/embykeeper"]
-
 WORKDIR /app
 RUN touch config.toml
 ENV PATH="/opt/venv/bin:$PATH"
 
-ENTRYPOINT ["embykeeper"]
-CMD ["config.toml"]
+ENTRYPOINT ["embykeeper", "--session-dir", "/app"]

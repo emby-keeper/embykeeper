@@ -29,11 +29,12 @@ class Messager:
     chat_name: str = None  # 群聊的名称
     messages: List[str] = []  # 可用的话术列表
 
-    def __init__(self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None):
+    def __init__(self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None, sessiondir=None):
         self.account = account
         self.scheduler = scheduler
         self.nofail = nofail
         self.proxy = proxy
+        self.sessiondir = sessiondir
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
 
     def start(self):
@@ -64,7 +65,7 @@ class Messager:
                 return self.log.info(f"由于非周末, 本次发送被跳过.")
             if only.startswith("weekend") and today.weekday() < 5:
                 return self.log.info(f"由于非工作日, 本次发送被跳过.")
-        async with ClientsSession([self.account], proxy=self.proxy) as clients:
+        async with ClientsSession([self.account], proxy=self.proxy, sessiondir=self.sessiondir) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
                 self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: {message}')

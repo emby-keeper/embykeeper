@@ -74,7 +74,26 @@ pip install embykeeper
 embykeeper
 ```
 
-命令将会在当前目录生成模板 `config.toml` 文件, 您需要修改您的账号配置 (详见[从 Docker 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-docker-%E5%AE%89%E8%A3%85)).
+命令将会在当前目录生成模板 `config.toml` 文件, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
+
+```toml
+[proxy]
+hostname = "127.0.0.1"
+port = "1080"
+scheme = "socks5"
+
+[[telegram]]
+api_id = "27894236"
+api_hash = "622159182fdd4b15b627eeb3ac695271"
+phone = "+8612109347899"
+
+[[emby]]
+url = "https://weiss-griffin.com/"
+username = "carrie19"
+password = "s*D7MMCpS$"
+```
+
+对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试.
 
 随后, 您需要再次执行:
 
@@ -108,75 +127,6 @@ pip install -U embykeeper
 
 然后重新运行应用.
 
-### 从 Docker 安装
-
-Embykeeper 可以通过 `docker` 运行, 您需 [安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
-
-```bash
-touch config.toml
-docker run -v $(pwd)/config.toml:/app/config.toml --rm -it embykeeper/embykeeper
-```
-
-命令将会在当前目录生成模板 `config.toml` 文件, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
-
-```toml
-[proxy]
-hostname = "127.0.0.1"
-port = "1080"
-scheme = "socks5"
-
-[[telegram]]
-api_id = "27894236"
-api_hash = "622159182fdd4b15b627eeb3ac695271"
-phone = "+8612109347899"
-
-[[emby]]
-url = "https://weiss-griffin.com/"
-username = "carrie19"
-password = "s*D7MMCpS$"
-```
-
-对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试.
-
-随后, 您需要再次执行:
-
-```bash
-docker run -v $(pwd)/config.toml:/app/config.toml --rm -it embykeeper/embykeeper
-```
-
-您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
-
-恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以通过`Ctrl+C`停止, 然后运行:
-
-```bash
-docker run -d -v $(pwd)/config.toml:/app/config.toml embykeeper/embykeeper
-```
-
-或者使用 [docker-compose](https://docs.docker.com/compose/) ([watchtower](https://github.com/containrrr/watchtower) 被用于自动更新容器服务):
-
-```yaml
-version: '3'
-services:
-  embykeeper:
-    container_name: embykeeper
-    image: cembykeeper/embykeeper
-    restart: unless-stopped
-    volumes:
-      - ./config.toml:/app/config.toml
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:rw
-```
-
-即可在后台启动 embykeeper.
-
-您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
-
-如果您需要使用主机上的代理服务器 (例如 `https://localhost:1080`), 您可能需要使用 `--net=host` 参数以使用主机网络模式.
-
 ### 从源码构建
 
 和从 PyPi 安装类似，您需要一个先设置 Python 环境, 然后拉取 Github 并安装:
@@ -202,6 +152,64 @@ git pull
 ```
 
 然后重新运行应用.
+
+### 从 Docker 部署
+
+Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
+
+```bash
+docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
+```
+
+命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息 (详见[从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-pypi-%E5%AE%89%E8%A3%85)).
+
+随后, 您需要再次执行:
+
+```bash
+docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
+```
+
+您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
+
+恭喜您！您已经成功部署了 Embykeeper.
+
+### 通过 Docker Compose 部署
+
+您可以使用 [docker-compose](https://docs.docker.com/compose/) 部署 Embykeeper.
+
+**注意**: 您需要先进行过 [从 Docker 部署](https://github.com/embykeeper/embykeeper#%E4%BB%8E-Docker-%E9%83%A8%E7%BD%B2) 才能通过 `docker-compose` 部署, 这是由于首次登录会命令行请求两步验证码, 登录成功后会生成 `.session` 文件, 随后才能部署为 `docker-compose` 服务.
+
+您需要新建一个文件 `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+  embykeeper:
+    container_name: embykeeper
+    image: embykeeper/embykeeper
+    restart: unless-stopped
+    volumes:
+      - ./embykeeper:/app
+    network_mode: host
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+```
+
+其中, [watchtower](https://github.com/containrrr/watchtower) 被用于自动更新容器服务.
+
+然后运行以下命令以启动:
+
+```bash
+docker-compose up -d
+```
+
+即可在后台启动 embykeeper.
+
+您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
 
 ## 命令行帮助
 
