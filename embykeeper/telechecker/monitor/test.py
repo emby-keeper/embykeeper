@@ -6,6 +6,7 @@ from .base import Monitor
 
 __ignore__ = True
 
+
 class TestMonitor:
     class TestReplyMonitor(Monitor):
         name = "回复测试"

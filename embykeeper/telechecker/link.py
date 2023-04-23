@@ -11,6 +11,7 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from rich.text import Text
 
+
 class Link:
     bot = "embykeeper_auth_bot"
 

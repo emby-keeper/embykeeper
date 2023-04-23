@@ -32,7 +32,7 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-  
+
   update-stable-branch:
     needs: [main]
     runs-on: ubuntu-latest

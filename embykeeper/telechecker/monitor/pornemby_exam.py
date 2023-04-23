@@ -11,18 +11,18 @@ class PornembyExamMonitor(Monitor):
     chat_keyword = r"问题\d+：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
 
     key_map = {
-        'A': '🅰',
-        'B': '🅱',
-        'C': '🅲',
-        'D': '🅳',
+        "A": "🅰",
+        "B": "🅱",
+        "C": "🅲",
+        "D": "🅳",
     }
 
     async def on_trigger(self, message: Message, keys, reply):
         result = await Link(self.client).answer(keys[0] + "\n" + keys[1])
         if result:
-            self.log.info(f'问题回答: {result}.')
+            self.log.info(f"问题回答: {result}.")
         else:
-            self.log.info(f'回答失败.')
+            self.log.info(f"回答失败.")
             return
         try:
             await message.click(self.key_map[result])

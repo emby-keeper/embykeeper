@@ -238,7 +238,7 @@ class Monitor:
             self.session = Session(reply, follows=self.chat_follow_user, delays=self.chat_delay)
             if await self.session.wait():
                 self.session = None
-                self.log.debug(f'正在执行监听响应: .')
+                self.log.debug(f"正在执行监听响应: .")
                 await self.on_trigger(message, keys, reply)
         else:
             if self.session and not self.session.followed.is_set():
