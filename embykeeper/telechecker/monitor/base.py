@@ -5,7 +5,7 @@ import random
 import re
 from contextlib import asynccontextmanager
 import string
-from typing import List, Sized, Union
+from typing import Iterable, List, Sized, Union
 
 from loguru import logger
 from pyrogram import filters
@@ -202,10 +202,9 @@ class Monitor:
 
     @staticmethod
     def get_spec(keys):
-        if isinstance(keys, str):
-            return truncate_str(keys.replace("\n", " "), 30)
-        else:
-            return ", ".join(keys)
+        if isinstance(keys, Iterable):
+            keys = " ".join([str(k).strip() for k in keys])
+        return truncate_str(keys.replace("\n", " ").strip(), 30)
 
     async def _message_handler(self, client: Client, message: Message):
         try:
@@ -239,7 +238,7 @@ class Monitor:
             self.session = Session(reply, follows=self.chat_follow_user, delays=self.chat_delay)
             if await self.session.wait():
                 self.session = None
-                self.log.info(f'执行监听响应: "{spec}".')
+                self.log.debug(f'正在执行监听响应: .')
                 await self.on_trigger(message, keys, reply)
         else:
             if self.session and not self.session.followed.is_set():

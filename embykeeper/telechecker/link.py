@@ -11,7 +11,6 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from rich.text import Text
 
-
 class Link:
     bot = "embykeeper_auth_bot"
 
@@ -42,7 +41,11 @@ class Link:
         ok = asyncio.Event()
         handler = self.get_handler(cmd, results, ok, condition)
         handler = MessageHandler(handler, filters.text & filters.bot & filters.user(self.bot))
-        self.client.add_handler(handler)
+        groups = self.client.dispatcher.groups
+        if 1 not in groups:
+            groups[1] = [handler]
+        else:
+            groups[1].append(handler)
         messages = []
         messages.append(await self.client.send_message(self.bot, f"/start quiet"))
         await asyncio.sleep(0.5)
@@ -72,7 +75,7 @@ class Link:
                 self.log.warning(f"{name}出现未知错误.")
                 return None
         finally:
-            self.client.remove_handler(handler)
+            groups[1].remove(handler)
 
     @staticmethod
     def get_handler(cmd, results, ok, condition=None):
@@ -80,8 +83,7 @@ class Link:
             try:
                 toml = tomli.loads(message.text)
             except tomli.TOMLDecodeError:
-                await message.delete(revoke=False)
-                return
+                message.delete(revoke=False)
             else:
                 try:
                     if toml.get("command", None) == cmd:
@@ -121,7 +123,7 @@ class Link:
             return None, None, None
 
     async def answer(self, question: str):
-        results = await self.post(f"/answer {self.instance} {question}", timeout=60, name="请求问题回答")
+        results = await self.post(f"/answer {self.instance} {question}", timeout=10, name="请求问题回答")
         if results:
             return results.get("answer", None)
 
