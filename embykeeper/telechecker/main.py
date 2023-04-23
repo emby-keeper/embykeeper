@@ -345,7 +345,9 @@ async def notifier(config: dict):
         except IndexError:
             notifier = None
     if notifier:
-        async with ClientsSession([notifier], proxy=config.get("proxy", None), sessiondir=config.get("sessiondir", None)) as clients:
+        async with ClientsSession(
+            [notifier], proxy=config.get("proxy", None), sessiondir=config.get("sessiondir", None)
+        ) as clients:
             async for tg in clients:
                 logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{tg.phone_number}" 账号.')
                 logger.add(StreamHandler(TelegramStream(link=Link(tg))), format=_formatter, filter=_filter)
