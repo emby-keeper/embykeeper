@@ -29,7 +29,9 @@ class Messager:
     chat_name: str = None  # 群聊的名称
     messages: List[str] = []  # 可用的话术列表
 
-    def __init__(self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None, sessiondir=None):
+    def __init__(
+        self, account, scheduler: Scheduler, username=None, nofail=True, proxy=None, sessiondir=None
+    ):
         self.account = account
         self.scheduler = scheduler
         self.nofail = nofail
