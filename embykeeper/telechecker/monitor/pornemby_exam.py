@@ -9,6 +9,7 @@ class PornembyExamMonitor(Monitor):
     chat_name = "PornembyFun"
     chat_user = "pornemby_question_bot"
     chat_keyword = r"问题\d+：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
+    chat_delay = 3
 
     key_map = {
         "A": "🅰",
