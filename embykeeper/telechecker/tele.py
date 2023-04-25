@@ -233,7 +233,7 @@ class ClientsSession:
     def __init__(self, accounts, proxy=None, sessiondir=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
-        self.sessiondir = sessiondir
+        self.sessiondir = sessiondir or user_data_dir(__name__)
         self.phones = []
         self.done = asyncio.Queue()
         self.quiet = quiet
@@ -288,6 +288,8 @@ class ClientsSession:
                         self.lock.release()
                         await self.pool[phone]
                         await self.lock.acquire()
+                    if isinstance(self.pool[phone], asyncio.Task):
+                        continue
                     client, ref = self.pool[phone]
                     ref += 1
                     self.pool[phone] = (client, ref)

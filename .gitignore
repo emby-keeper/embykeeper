@@ -1,6 +1,7 @@
 # Configs and outputs
 *.toml
 !/pyproject.toml
+*.session
 *.msgs
 
 /test.py
