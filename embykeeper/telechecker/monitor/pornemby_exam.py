@@ -19,10 +19,10 @@ class PornembyExamMonitor(Monitor):
     }
 
     async def on_trigger(self, message: Message, keys, reply):
-        spec = f'[gray50]({truncate_str(keys[0], 10)})[/]'
+        spec = f"[gray50]({truncate_str(keys[0], 10)})[/]"
         for retries in range(3):
             result = await Link(self.client).answer(keys[0] + "\n" + keys[1])
-            
+
             if result:
                 self.log.info(f"问题回答: {result} {spec}.")
                 break

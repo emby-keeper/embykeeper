@@ -34,17 +34,17 @@ class TestMonitor:
         chat_keyword = r"问题\d+：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
 
         key_map = {
-            'A': '🅰',
-            'B': '🅱',
-            'C': '🅲',
-            'D': '🅳',
+            "A": "🅰",
+            "B": "🅱",
+            "C": "🅲",
+            "D": "🅳",
         }
-        
+
         async def on_trigger(self, message: Message, keys, reply):
-            spec = f'[gray50]({truncate_str(keys[0], 10)})[/]'
+            spec = f"[gray50]({truncate_str(keys[0], 10)})[/]"
             for retries in range(3):
                 result = await Link(self.client).answer(keys[0] + "\n" + keys[1])
-                
+
                 if result:
                     self.log.info(f"问题回答: {result} {spec}.")
                     break
