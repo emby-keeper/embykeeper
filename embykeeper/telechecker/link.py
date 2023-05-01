@@ -1,7 +1,7 @@
 import asyncio
 import io
 import random
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Coroutine, List, Optional, Tuple, Union
 import uuid
 
 import tomli
@@ -10,6 +10,8 @@ from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from rich.text import Text
+
+from ..utils import async_partial
 
 
 class Link:
@@ -38,10 +40,11 @@ class Link:
     async def post(
         self, cmd, condition: Callable = None, timeout: int = 10, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
-        results = {}
-        ok = asyncio.Event()
-        handler = self.get_handler(cmd, results, ok, condition)
-        handler = MessageHandler(handler, filters.text & filters.bot & filters.user(self.bot))
+        future = asyncio.Future()
+        handler = MessageHandler(
+            async_partial(self._handler, cmd=cmd, future=future, condition=condition),
+            filters.text & filters.bot & filters.user(self.bot),
+        )
         groups = self.client.dispatcher.groups
         if 1 not in groups:
             groups[1] = [handler]
@@ -52,7 +55,7 @@ class Link:
         await asyncio.sleep(0.5)
         messages.append(await self.client.send_message(self.bot, cmd))
         try:
-            await asyncio.wait_for(ok.wait(), timeout=timeout)
+            results = await asyncio.wait_for(future, timeout=timeout)
         except asyncio.CancelledError:
             try:
                 await asyncio.wait_for(self.delete_messages(messages), 1.0)
@@ -79,38 +82,40 @@ class Link:
             groups[1].remove(handler)
 
     @staticmethod
-    def get_handler(cmd, results, ok, condition=None):
-        async def _handler(client: Client, message: Message):
+    async def _handler(
+        client: Client,
+        message: Message,
+        cmd: str,
+        future: asyncio.Future,
+        condition: Union[bool, Callable[..., Coroutine], Callable] = None,
+    ):
+        try:
+            toml = tomli.loads(message.text)
+        except tomli.TOMLDecodeError:
+            message.delete(revoke=False)
+        else:
             try:
-                toml = tomli.loads(message.text)
-            except tomli.TOMLDecodeError:
-                message.delete(revoke=False)
-            else:
+                if toml.get("command", None) == cmd:
+                    if condition is None:
+                        cond = True
+                    elif asyncio.iscoroutinefunction(condition):
+                        cond = await condition(toml)
+                    elif callable(condition):
+                        cond = condition(toml)
+                    if cond:
+                        future.set_result(toml)
+                        await asyncio.sleep(0.5)
+                        await message.delete(revoke=False)
+                        return
+            except asyncio.CancelledError as e:
                 try:
-                    if toml.get("command", None) == cmd:
-                        if condition is None:
-                            cond = True
-                        elif asyncio.iscoroutinefunction(condition):
-                            cond = await condition(toml)
-                        elif callable(condition):
-                            cond = condition(toml)
-                        if cond:
-                            results.update(toml)
-                            ok.set()
-                            await asyncio.sleep(0.5)
-                            await message.delete(revoke=False)
-                            return
-                except asyncio.CancelledError:
-                    try:
-                        await asyncio.wait_for(message.delete(revoke=False), 1.0)
-                    except asyncio.TimeoutError:
-                        pass
-                    finally:
-                        raise
-                else:
-                    message.continue_propagation()
-
-        return _handler
+                    await asyncio.wait_for(message.delete(revoke=False), 1.0)
+                except asyncio.TimeoutError:
+                    pass
+                finally:
+                    future.set_exception(e)
+            finally:
+                message.continue_propagation()
 
     async def auth(self, service: str):
         results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.capitalize()} 认证")
