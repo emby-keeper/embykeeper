@@ -183,9 +183,9 @@ async def checkiner(config: dict, instant=False):
                 spec = f"共{len(checkiners)}个"
                 if successful:
                     spec += f", {len(successful)}成功"
-                elif failed:
+                if failed:
                     spec += f", {len(failed)}失败"
-                elif ignored:
+                if ignored:
                     spec += f", {len(ignored)}跳过"
                 if failed:
                     log.error(f"签到失败 ({spec}): {','.join([f.name for f in failed])}")
