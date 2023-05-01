@@ -1,6 +1,3 @@
-import random
-import string
-
 from pyrogram.types import Message
 
 from .base import Monitor

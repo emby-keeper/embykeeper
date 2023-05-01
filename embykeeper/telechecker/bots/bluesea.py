@@ -1,5 +1,3 @@
-from pyrogram.types import Message
-
 from .base import BotCheckin
 
 
