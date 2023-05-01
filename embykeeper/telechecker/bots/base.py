@@ -67,6 +67,7 @@ class BotCheckin(BaseBotCheckin):
     bot_id: int = None  # Bot 的 UserID
     bot_username: str = None  # Bot 的 用户名
     bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
+    bot_send_interval: int = 1 # 签到命令间等待的秒数
     bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码
     bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息
     bot_captcha_len: Iterable = None  # 验证码的可能范围
@@ -80,6 +81,7 @@ class BotCheckin(BaseBotCheckin):
         super().__init__(*args, **kw)
         self._is_archived = False
         self._retries = 0
+        self._waiting = {}
 
     def get_filter(self):
         filter = filters.user(self.bot_id or self.bot_username)
@@ -171,10 +173,13 @@ class BotCheckin(BaseBotCheckin):
         else:
             await self.client.send_message(self.bot_id or self.bot_username, cmd)
 
-    async def send_checkin(self):
-        for i, cmd in enumerate(to_iterable(self.bot_checkin_cmd)):
-            if not i:
+    async def send_checkin(self, retry=False):
+        cmds = to_iterable(self.bot_checkin_cmd)
+        for i, cmd in enumerate(cmds):
+            if retry and not i:
                 await asyncio.sleep(self.bot_retry_wait)
+            if i < len(cmds):
+                await asyncio.sleep(self.bot_send_interval)
             await self.send(cmd)
 
     async def _message_handler(self, client: Client, message: Message):
@@ -196,6 +201,11 @@ class BotCheckin(BaseBotCheckin):
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message, type=None):
+        text = message.text or message.caption
+        if text:
+            for p, k in self._waiting.items():
+                if re.search(p,text):
+                    k.set()
         type = type or self.message_type(message)
         if MessageType.TEXT in type:
             await self.on_text(message, message.text)
@@ -270,7 +280,7 @@ class BotCheckin(BaseBotCheckin):
         self._retries += 1
         if self._retries <= self.retries:
             await asyncio.sleep(self.bot_retry_wait)
-            await self.send_checkin()
+            await self.send_checkin(retry=True)
         else:
             self.log.warning("超过最大重试次数.")
             self.finished.set()
@@ -278,7 +288,15 @@ class BotCheckin(BaseBotCheckin):
     async def fail(self, message=None):
         self.finished.set()
         self._retries = float("inf")
-
+        
+    async def wait_until(self, pattern: str, timeout: float=None):
+        self._waiting[pattern] = e = asyncio.Event()
+        try:
+            await asyncio.wait_for(e.wait(), timeout)
+        except asyncio.TimeoutError:
+            return False
+        else:
+            return True
 
 class AnswerBotCheckin(BotCheckin):
     """签到类, 用于按钮模式签到."""

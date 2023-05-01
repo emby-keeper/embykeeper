@@ -323,7 +323,7 @@ $ embykeeper config.toml -a
 | Pornemby | `pornemby` | | Singularity | `singularity` |
 | Peach | `peach` | | Nebula | `nebula` |
 | Bluesea | `bluesea` | | Embyhub | `embyhub` |
-| 卷毛鼠 | `jms` | | | |
+| 卷毛鼠 | `jms` | | 卡戎 | `charon` |
 
 `proxy` 设置可以为:
 
