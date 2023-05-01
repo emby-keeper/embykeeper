@@ -117,10 +117,9 @@ async def login(config):
         )
         try:
             info = await emby.info()
-        except ConnectionError:
+        except (ConnectionError, RuntimeError):
             logger.error(f'Emby ({a["url"]}) 连接错误, 请重新检查配置.')
             continue
-
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
             loggeruser.info(f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).')
