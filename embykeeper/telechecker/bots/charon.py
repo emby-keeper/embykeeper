@@ -9,6 +9,7 @@ class CharonCheckin(BotCheckin):
     bot_checkin_cmd = ["/checkin", "/cancel"]
     bot_send_interval = 3
     bot_captcha_len = 6
+    bot_success_pat = r".*(\d+)"
     bot_text_ignore = ["已结束当前对话"]
 
     async def send_checkin(self, retry=False):
