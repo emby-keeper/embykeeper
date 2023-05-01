@@ -17,5 +17,7 @@ class CharonCheckin(BotCheckin):
             await asyncio.sleep(self.bot_send_interval)
         while True:
             await self.send("/checkin")
-            if await self.wait_until("请输入验证码", 3):
+            if await self.wait_until("已结束当前对话", 3):
+                continue
+            else:
                 break
