@@ -1,5 +1,6 @@
 from .base import BotCheckin
 
+__ignore__ = True
 
 class BlueseaCheckin(BotCheckin):
     name = "Bluesea"
