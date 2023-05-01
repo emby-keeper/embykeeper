@@ -258,7 +258,7 @@ class Monitor:
     def get_unique_name(self):
         return Monitor.unique_cache[self.client.me]
 
-    async def wait_until(self, pattern: str, timeout: float=None):
+    async def wait_until(self, pattern: str, timeout: float = None):
         self.waiting[pattern] = e = asyncio.Event()
         try:
             await asyncio.wait_for(e.wait(), timeout)

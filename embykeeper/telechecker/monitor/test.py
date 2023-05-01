@@ -17,7 +17,7 @@ class TestMonitor:
 
         def chat_reply(self, message: Message, keys):
             return f'接收到: "{keys[0]}"'
-        
+
     class TestGroupMonitor(Monitor):
         name = "多组测试"
         chat_name = "api_group"
