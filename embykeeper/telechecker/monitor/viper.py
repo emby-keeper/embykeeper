@@ -7,6 +7,7 @@ class ViperMonitor(Monitor):
     name = "Viper"
     chat_keyword = r"register-[-\w]{36}"
     bot_username = "viper_emby_bot"
+    chat_name = "Viper_Emby_Chat"
     notify_create_name = True
 
     async def on_trigger(self, message: Message, keys, reply):
