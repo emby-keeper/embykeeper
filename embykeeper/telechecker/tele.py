@@ -5,13 +5,14 @@ from rich.prompt import Prompt
 from appdirs import user_data_dir
 from loguru import logger
 from pyrogram import Client as _Client
-from pyrogram import raw, types, utils
+from pyrogram import raw, types, utils, filters
 from pyrogram.enums import SentCodeType
 from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded
+from pyrogram.handlers import MessageHandler
 from aiocache import Cache
 
 from .. import __name__, __version__
-from ..utils import to_iterable
+from ..utils import async_partial, to_iterable
 
 logger = logger.bind(scheme="telegram")
 
@@ -152,6 +153,25 @@ class Client(_Client):
 
                 if current >= total:
                     return
+
+    async def wait_reply(self, chat_id: Union[int, str], text: str = None, timeout: float = 3):
+        async def handler_func(client, message, future: asyncio.Future):
+            future.set_result(message)
+
+        future = asyncio.Future()
+        handler = MessageHandler(async_partial(handler_func, future=future), filters.chat(chat_id))
+        groups = self.dispatcher.groups
+        if 0 not in groups:
+            groups[0] = [handler]
+        else:
+            groups[0].append(handler)
+        try:
+            if text:
+                await self.send_message(chat_id, text)
+            msg: types.Message = await asyncio.wait_for(future, timeout)
+            return msg
+        finally:
+            groups[0].remove(handler)
 
 
 class ClientsSession:

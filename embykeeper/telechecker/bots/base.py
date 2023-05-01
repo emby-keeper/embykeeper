@@ -118,7 +118,7 @@ class BotCheckin(BaseBotCheckin):
                 return False
             except FloodWait as e:
                 self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                await asyncio.sleep(3)
+                await asyncio.sleep(e.value)
             else:
                 break
         async for d in self.client.get_dialogs(folder_id=1):

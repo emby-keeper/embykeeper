@@ -14,7 +14,7 @@ from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message, User
 
-from ...utils import async_partial, to_iterable, truncate_str, AsyncCountPool
+from ...utils import to_iterable, truncate_str, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
@@ -157,7 +157,7 @@ class Monitor:
                 return False
             except FloodWait as e:
                 self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                await asyncio.sleep(3)
+                await asyncio.sleep(e.value)
             else:
                 break
         try:
@@ -257,25 +257,3 @@ class Monitor:
 
     def get_unique_name(self):
         return Monitor.unique_cache[self.client.me]
-
-    async def wait_reply(self, chat_id: Union[int, str], text: str, timeout: float = 10):
-        async def handler_func(client: Client, message: Message, future: asyncio.Future):
-            future.set_result(message)
-
-        future = asyncio.Future()
-        handler = MessageHandler(
-            async_partial(handler_func, future=future), filters.text & filters.user(chat_id)
-        )
-        groups = self.client.dispatcher.groups
-        if 0 not in groups:
-            groups[0] = [handler]
-        else:
-            groups[0].append(handler)
-        try:
-            await self.client.send_message(chat_id, text)
-            try:
-                return await asyncio.wait_for(future, timeout)
-            except asyncio.TimeoutError:
-                return None
-        finally:
-            groups[0].remove(handler)
