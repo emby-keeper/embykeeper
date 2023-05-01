@@ -12,6 +12,7 @@ ocr = DdddOcr(show_ad=False)
 
 __ignore__ = True
 
+
 class MistyMonitor(Monitor):
     name = "Misty"
     chat_name = "FreeEmbyGroup"
@@ -42,11 +43,15 @@ class MistyMonitor(Monitor):
                             .translate(str.maketrans("", "", string.punctuation))
                             .replace(" ", "")
                         )
-                        self.log.debug(f'接收到验证码: {self.captcha}')
+                        self.log.debug(f"接收到验证码: {self.captcha}")
             except asyncio.TimeoutError:
                 continue
             else:
-                if self.captcha and len(self.captcha) == 5 and (all(i not in self.captcha for i in ('1', '7', '0')) or not initial):
+                if (
+                    self.captcha
+                    and len(self.captcha) == 5
+                    and (all(i not in self.captcha for i in ("1", "7", "0")) or not initial)
+                ):
                     self.log.info(f"机器人状态初始化完成, 当接收到验证码时将输入验证码 {self.captcha}, 请勿操作 @EmbyMistyBot.")
                     return True
                 else:

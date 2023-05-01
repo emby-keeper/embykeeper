@@ -8,7 +8,8 @@ from embykeeper.utils import AsyncTyper, async_partial
 
 app = AsyncTyper()
 
-chat = 'api_group'
+chat = "api_group"
+
 
 @app.async_command()
 async def generate(config: Path, num: int = 200):
@@ -31,7 +32,7 @@ async def generate(config: Path, num: int = 200):
                     break
             photos = []
             try:
-                for _ in trange(num, desc='获取验证码'):
+                for _ in trange(num, desc="获取验证码"):
                     while True:
                         msg = await wr("⚡️注册账号")
                         if msg.text:
@@ -40,8 +41,9 @@ async def generate(config: Path, num: int = 200):
                             photos.append(msg.photo.file_id)
                             break
             finally:
-                with open('captchas.txt', 'w+') as f:
-                    f.writelines(str(photo) + '\n' for photo in photos)
+                with open("captchas.txt", "w+") as f:
+                    f.writelines(str(photo) + "\n" for photo in photos)
+
 
 @app.async_command()
 async def label(config: Path, txt: Path):
@@ -52,14 +54,15 @@ async def label(config: Path, txt: Path):
         proxy = config.get("proxy", None)
         async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
             async for tg in clients:
-                for photo in tqdm(photos, desc='标记验证码'):
+                for photo in tqdm(photos, desc="标记验证码"):
                     await tg.send_photo(chat, photo)
                     labelmsg = await tg.wait_reply(chat, timeout=None)
                     if not len(labelmsg.text) == 5:
                         continue
                     else:
-                        await tg.download_media(photo, f'data/{labelmsg.text.lower()}.png')
+                        await tg.download_media(photo, f"data/{labelmsg.text.lower()}.png")
                         break
+
 
 if __name__ == "__main__":
     app()
