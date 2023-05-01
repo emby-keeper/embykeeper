@@ -6,7 +6,7 @@ from enum import Flag, auto
 import string
 from typing import Iterable, List, Union
 
-import ddddocr
+from ddddocr import DdddOcr
 from loguru import logger
 from PIL import Image
 from pyrogram import filters
@@ -20,7 +20,7 @@ from ..tele import Client
 
 __ignore__ = True
 
-ocr = ddddocr.DdddOcr(beta=True, show_ad=False)
+ocr = DdddOcr(beta=True, show_ad=False)
 
 
 class MessageType(Flag):
@@ -206,6 +206,7 @@ class BotCheckin(BaseBotCheckin):
             for p, k in self._waiting.items():
                 if re.search(p, text):
                     k.set()
+                    self._waiting[p] = message
         type = type or self.message_type(message)
         if MessageType.TEXT in type:
             await self.on_text(message, message.text)
@@ -289,14 +290,15 @@ class BotCheckin(BaseBotCheckin):
         self.finished.set()
         self._retries = float("inf")
 
-    async def wait_until(self, pattern: str, timeout: float = None):
+    async def wait_until(self, pattern: str = ".", timeout: float = None):
         self._waiting[pattern] = e = asyncio.Event()
         try:
             await asyncio.wait_for(e.wait(), timeout)
         except asyncio.TimeoutError:
-            return False
+            return None
         else:
-            return True
+            msg: Message = self._waiting[pattern]
+            return msg
 
 
 class AnswerBotCheckin(BotCheckin):
