@@ -107,6 +107,7 @@ class Monitor:
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None
         self.failed = asyncio.Event()
+        self.waiting = {}
 
     def get_filter(self):
         filter = filters.caption | filters.text
@@ -171,7 +172,7 @@ class Monitor:
             self.log.error(f"发生错误, 不再监视: {spec}.")
             return False
 
-    def get_key(self, message: Message):
+    def get_keylists(self, message: Message):
         sender = message.from_user
         if (
             sender
@@ -182,17 +183,14 @@ class Monitor:
         text = message.text or message.caption
         if self.chat_keyword:
             for k in to_iterable(self.chat_keyword):
-                match = re.search(k, text, re.IGNORECASE)
-                if match:
-                    return match.groups() or match.group(0)
-            else:
-                return False
+                for m in re.findall(k, text, re.IGNORECASE):
+                    yield m
         else:
             return text
 
-    async def get_reply(self, message: Message, keys: str):
+    async def get_reply(self, message: Message, keys: Union[str, List[str]]):
         if callable(self.chat_reply):
-            result = self.chat_reply(message, keys)
+            result = self.chat_reply(message, to_iterable(keys))
             if asyncio.iscoroutinefunction(self.chat_reply):
                 return await result
             else:
@@ -202,7 +200,7 @@ class Monitor:
 
     @staticmethod
     def get_spec(keys):
-        if isinstance(keys, Iterable):
+        if isinstance(keys, Iterable) and not isinstance(keys, str):
             keys = " ".join([str(k).strip() for k in keys])
         return truncate_str(keys.replace("\n", " ").strip(), 30)
 
@@ -223,8 +221,12 @@ class Monitor:
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message):
-        keys = self.get_key(message)
-        if keys:
+        text = message.text or message.caption
+        if text:
+            for p, k in self.waiting.items():
+                if re.search(p, text):
+                    k.set()
+        for keys in self.get_keylists(message):
             spec = self.get_spec(keys)
             self.log.info(f'监听到关键信息: "{spec}".')
             if random.random() >= self.chat_probability:
@@ -255,3 +257,12 @@ class Monitor:
 
     def get_unique_name(self):
         return Monitor.unique_cache[self.client.me]
+
+    async def wait_until(self, pattern: str, timeout: float=None):
+        self.waiting[pattern] = e = asyncio.Event()
+        try:
+            await asyncio.wait_for(e.wait(), timeout)
+        except asyncio.TimeoutError:
+            return False
+        else:
+            return True
