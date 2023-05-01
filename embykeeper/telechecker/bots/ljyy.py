@@ -2,8 +2,6 @@ from .base import AnswerBotCheckin
 
 from pyrogram.errors import BadRequest
 
-__ignore__ = True
-
 
 class LJYYCheckin(AnswerBotCheckin):
     name = "垃圾影音"
