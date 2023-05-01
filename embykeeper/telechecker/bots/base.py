@@ -10,7 +10,7 @@ from ddddocr import DdddOcr
 from loguru import logger
 from PIL import Image
 from pyrogram import filters
-from pyrogram.errors import UsernameNotOccupied
+from pyrogram.errors import UsernameNotOccupied, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
@@ -110,11 +110,17 @@ class BotCheckin(BaseBotCheckin):
 
     async def start(self):
         ident = self.chat_name or self.bot_id or self.bot_username
-        try:
-            chat = await self.client.get_chat(ident)
-        except UsernameNotOccupied:
-            self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
-            return False
+        while True:
+            try:
+                chat = await self.client.get_chat(ident)
+            except UsernameNotOccupied:
+                self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
+                return False
+            except FloodWait as e:
+                self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
+                await asyncio.sleep(3)
+            else:
+                break
         async for d in self.client.get_dialogs(folder_id=1):
             if d.chat.id == chat.id:
                 self._is_archived = True

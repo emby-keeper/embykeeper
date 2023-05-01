@@ -10,11 +10,11 @@ from typing import Iterable, List, Sized, Union
 from loguru import logger
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import UsernameNotOccupied, UserNotParticipant
+from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message, User
 
-from ...utils import to_iterable, truncate_str, AsyncCountPool
+from ...utils import async_partial, to_iterable, truncate_str, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
@@ -107,7 +107,6 @@ class Monitor:
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None
         self.failed = asyncio.Event()
-        self.waiting = {}
 
     def get_filter(self):
         filter = filters.caption | filters.text
@@ -149,12 +148,18 @@ class Monitor:
                 raise
 
     async def start(self):
-        try:
-            chat = await self.client.get_chat(self.chat_name)
-            self.chat_name = chat.id
-        except UsernameNotOccupied:
-            self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
-            return False
+        while True:
+            try:
+                chat = await self.client.get_chat(self.chat_name)
+                self.chat_name = chat.id
+            except UsernameNotOccupied:
+                self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
+                return False
+            except FloodWait as e:
+                self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
+                await asyncio.sleep(3)
+            else:
+                break
         try:
             me = await chat.get_member("me")
         except UserNotParticipant:
@@ -221,11 +226,6 @@ class Monitor:
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message):
-        text = message.text or message.caption
-        if text:
-            for p, k in self.waiting.items():
-                if re.search(p, text):
-                    k.set()
         for keys in self.get_keylists(message):
             spec = self.get_spec(keys)
             self.log.info(f'监听到关键信息: "{spec}".')
@@ -258,11 +258,24 @@ class Monitor:
     def get_unique_name(self):
         return Monitor.unique_cache[self.client.me]
 
-    async def wait_until(self, pattern: str, timeout: float = None):
-        self.waiting[pattern] = e = asyncio.Event()
-        try:
-            await asyncio.wait_for(e.wait(), timeout)
-        except asyncio.TimeoutError:
-            return False
+    async def wait_reply(self, chat_id: Union[int, str], text: str, timeout: float = 10):
+        async def handler_func(client: Client, message: Message, future: asyncio.Future):
+            future.set_result(message)
+
+        future = asyncio.Future()
+        handler = MessageHandler(
+            async_partial(handler_func, future=future), filters.text & filters.user(chat_id)
+        )
+        groups = self.client.dispatcher.groups
+        if 0 not in groups:
+            groups[0] = [handler]
         else:
-            return True
+            groups[0].append(handler)
+        try:
+            await self.client.send_message(chat_id, text)
+            try:
+                return await asyncio.wait_for(future, timeout)
+            except asyncio.TimeoutError:
+                return None
+        finally:
+            groups[0].remove(handler)
