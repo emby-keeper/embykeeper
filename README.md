@@ -289,7 +289,7 @@ $ embykeeper config.toml -a
 
 ##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
 
-![kitty](images/kitty.gif)
+![Kitty](images/kitty.gif)
 
 ## 配置项
 
@@ -408,3 +408,7 @@ class DummyCheckin(AnswerBotCheckin):
 上述代码实现每次按对应一个字符按键的功能.
 
 当您实现一个新的签到器时, 欢迎您提出 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 以帮助更多人使用!
+
+## 趋势
+
+[![Star History Chart](https://api.star-history.com/svg?repos=embykeeper/embykeeper&type=Date)](https://star-history.com/#embykeeper/embykeeper&Date)
