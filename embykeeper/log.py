@@ -1,3 +1,4 @@
+from logging import Formatter
 from loguru import logger
 from rich.logging import Console, RichHandler
 import asyncio
@@ -16,23 +17,28 @@ def formatter(record):
         else:
             return ""
 
+    scheme_names = {
+        'telegram': 'Telegram',
+        'telechecker': '每日签到',
+        'telemonitor': '消息监控',
+        'telemessager': '定时水群',
+        'telelink': '账号服务',
+        'embywatcher': 'Emby 保活'
+    }
+
     if scheme in ("telegram", "telechecker", "telemonitor", "telemessager", "telelink"):
         username = ifextra("username", " ([cyan]{}[/])")
         name = ifextra("name", "([magenta]{}[/]) ")
-        return f"[blue]{scheme.capitalize()}[/]{username}: {name}{{message}}"
+        return f"[blue]{scheme_names[scheme]}[/]{username}: {name}{{message}}"
     elif scheme == "embywatcher":
         ident = ifextra(["server", "username"], " ([cyan]{}:{}[/])")
-        return f"[blue]Embywatcher[/]{ident}: {{message}}"
+        return f"[blue]{scheme_names[scheme]}[/]{ident}: {{message}}"
     else:
         return "{message}"
 
 
 def initialize(level="INFO"):
     logger.remove()
-    logger.add(
-        RichHandler(
-            console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio]
-        ),
-        format=formatter,
-        level=level,
-    )
+    handler = RichHandler(console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio])
+    handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
+    logger.add(handler, format=formatter, level=level)
