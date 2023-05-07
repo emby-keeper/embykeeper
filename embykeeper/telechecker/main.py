@@ -160,11 +160,15 @@ async def checkiner(config: dict, instant=False):
                 for cls in clses
             ]
             tasks = []
+            names = []
             for c in checkiners:
+                names.append(c.name)
                 wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
             coros.append(gather_task(tasks, username=tg.me.name))
+            if names:
+                log.debug(f'已启用签到器: {", ".join(names)}')
         while coros:
             done, coros = await asyncio.wait(coros, return_when=asyncio.FIRST_COMPLETED)
             for t in done:
@@ -204,10 +208,15 @@ async def monitorer(config: dict):
             clses = extract(get_cls("monitor", names=config.get("service", {}).get("monitor", None)))
             names = []
             for cls in clses:
-                jobs.append(asyncio.create_task(cls(tg, nofail=config.get("nofail", True))._start()))
+                cls_config = config.get("monitor", {}).get(cls.__module__.rsplit(".", 1)[-1], {})
+                jobs.append(
+                    asyncio.create_task(
+                        cls(tg, nofail=config.get("nofail", True), config=cls_config)._start()
+                    )
+                )
                 names.append(cls.name)
             if names:
-                log.info(f'已启用监控器: {",".join(names)}')
+                log.debug(f'已启用监控器: {", ".join(names)}')
         await asyncio.gather(*jobs)
 
 

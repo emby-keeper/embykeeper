@@ -354,6 +354,17 @@ $ embykeeper config.toml -a
 | `time`     | `int`  | 模拟观看的时间 (秒)                                       | `800`  |
 | `progress` | `int`  | 观看后模拟进度条保存的时间 (秒)                           | `1000` |
 
+服务可以进行特定配置, 如下所示:
+
+```toml
+
+[monitor.bgk] # 支持 bgk, embyhub, polo
+unique_name = "your_username_for_registeration" # 自动抢注时使用的用户名
+
+[monitor.pornemby]
+only_history = true # 仅当问题历史中找到答案时自动回答
+```
+
 ## 代码重用与开发
 
 代码架构如下:

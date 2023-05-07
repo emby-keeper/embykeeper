@@ -195,9 +195,9 @@ class ClientsSession:
             counter = {}
             while True:
                 await asyncio.sleep(10)
-                for p, v in cls.pool.items():
+                for p in list(cls.pool):
                     try:
-                        if v[1] <= 0:
+                        if cls.pool[p][1] <= 0:
                             if p in counter:
                                 counter[p] += 1
                                 if counter[p] >= timeout / 10:
@@ -206,7 +206,7 @@ class ClientsSession:
                                 counter[p] = 1
                         else:
                             counter.pop(p, None)
-                    except TypeError:
+                    except (TypeError, KeyError):
                         pass
         except asyncio.CancelledError:
             print("\r正在停止... ", end="")
@@ -226,6 +226,11 @@ class ClientsSession:
                 logger.debug(f'登出账号 "{client.phone_number}".')
                 await client.stop()
                 cls.pool.pop(phone, None)
+                
+    @classmethod
+    async def clean_all(cls):
+        for phone in list(cls.pool):
+            await cls.clean(phone)
 
     @classmethod
     async def shutdown(cls):

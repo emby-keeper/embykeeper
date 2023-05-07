@@ -82,7 +82,7 @@ class UniqueUsername(dict):
         if random_bits:
             random_bits = "".join(random.choice(string.digits) for _ in range(random_bits))
             unique = unique + random_bits
-        log.info(f'当监控到开注时, 将以用户名 "{unique}" 注册, 请[yellow]保证[/]具有一定独特性以避免注册失败.')
+        log.info(f'([magenta]默认[/]) 当监控到开注时, 将以用户名 "{unique}" 注册, 请[yellow]保证[/]具有一定独特性以避免注册失败.')
         return unique
 
 
@@ -91,7 +91,7 @@ class Monitor:
     unique_cache = UniqueUsername()
 
     name: str = None  # 监控器名称
-    chat_name: str = None  # 群聊名称
+    chat_name: Union[str, List[str]] = []  # 群聊名称
     chat_allow_outgoing: bool = False  # 是否支持自己发言触发
     chat_user: Union[str, List[str]] = []  # 仅被列表中用户的发言触发
     chat_keyword: Union[str, List[str]] = []  # 仅当消息含有列表中的关键词时触发, 支持 regex
@@ -101,9 +101,10 @@ class Monitor:
     chat_reply: str = None  # 回复的内容, 可以通过 @property 类属性重写.
     notify_create_name: bool = False  # 启动时生成 unique name 并提示
 
-    def __init__(self, client: Client, nofail=True):
+    def __init__(self, client: Client, nofail=True, config: dict={}):
         self.client = client
         self.nofail = nofail
+        self.config = config
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None
         self.failed = asyncio.Event()
@@ -111,7 +112,7 @@ class Monitor:
     def get_filter(self):
         filter = filters.caption | filters.text
         if self.chat_name:
-            filter = filter & filters.chat(self.chat_name)
+            filter = filter & filters.chat(to_iterable(self.chat_name))
         if not self.chat_allow_outgoing:
             filter = filter & (~filters.outgoing)
         return filter
@@ -148,18 +149,21 @@ class Monitor:
                 raise
 
     async def start(self):
-        while True:
-            try:
-                chat = await self.client.get_chat(self.chat_name)
-                self.chat_name = chat.id
-            except UsernameNotOccupied:
-                self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
-                return False
-            except FloodWait as e:
-                self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                await asyncio.sleep(e.value)
-            else:
-                break
+        chat_ids = []
+        for cn in to_iterable(self.chat_name):
+            while True:
+                try:
+                    chat = await self.client.get_chat(cn)
+                    chat_ids.append(chat.id)
+                except UsernameNotOccupied:
+                    self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
+                    return False
+                except FloodWait as e:
+                    self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
+                    await asyncio.sleep(e.value)
+                else:
+                    break
+        self.chat_name = chat_ids
         try:
             me = await chat.get_member("me")
         except UserNotParticipant:
@@ -177,25 +181,26 @@ class Monitor:
             self.log.error(f"发生错误, 不再监视: {spec}.")
             return False
 
-    def get_keylists(self, message: Message):
+    @classmethod
+    def keys(cls, message: Message):
         sender = message.from_user
         if (
             sender
-            and self.chat_user
-            and not any(i in to_iterable(self.chat_user) for i in (sender.id, sender.username))
+            and cls.chat_user
+            and not any(i in to_iterable(cls.chat_user) for i in (sender.id, sender.username))
         ):
             return False
         text = message.text or message.caption
-        if self.chat_keyword:
-            for k in to_iterable(self.chat_keyword):
+        if cls.chat_keyword:
+            for k in to_iterable(cls.chat_keyword):
                 for m in re.findall(k, text, re.IGNORECASE):
                     yield m
         else:
             return text
 
-    async def get_reply(self, message: Message, keys: Union[str, List[str]]):
+    async def get_reply(self, message: Message, key: Union[str, List[str]]):
         if callable(self.chat_reply):
-            result = self.chat_reply(message, to_iterable(keys))
+            result = self.chat_reply(message, key)
             if asyncio.iscoroutinefunction(self.chat_reply):
                 return await result
             else:
@@ -226,13 +231,13 @@ class Monitor:
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message):
-        for keys in self.get_keylists(message):
-            spec = self.get_spec(keys)
-            self.log.info(f'监听到关键信息: "{spec}".')
+        for key in self.keys(message):
+            spec = self.get_spec(key)
+            self.log.info(f'监听到关键信息: {spec}.')
             if random.random() >= self.chat_probability:
-                self.log.info(f'由于概率设置, 不予回应: "{spec}".')
+                self.log.info(f'由于概率设置, 不予回应: {spec}.')
                 return False
-            reply = await self.get_reply(message, keys)
+            reply = await self.get_reply(message, key)
             if self.session:
                 await self.session.cancel()
             if self.chat_follow_user:
@@ -240,8 +245,7 @@ class Monitor:
             self.session = Session(reply, follows=self.chat_follow_user, delays=self.chat_delay)
             if await self.session.wait():
                 self.session = None
-                self.log.debug(f"正在执行监听响应: .")
-                await self.on_trigger(message, keys, reply)
+                await self.on_trigger(message, key, reply)
         else:
             if self.session and not self.session.followed.is_set():
                 text = message.text or message.caption
@@ -256,4 +260,9 @@ class Monitor:
             return await self.client.send_message(message.chat.id, reply)
 
     def get_unique_name(self):
-        return Monitor.unique_cache[self.client.me]
+        unique_name = self.config.get('unique_name', None)
+        if unique_name:
+            self.log.info(f'根据您的设置, 当监控到开注时, 该站点将以用户名 "{unique_name}" 注册.')
+            return unique_name
+        else:
+            return Monitor.unique_cache[self.client.me]

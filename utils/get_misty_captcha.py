@@ -12,7 +12,7 @@ chat = "api_group"
 
 
 @app.async_command()
-async def generate(config: Path, num: int = 200):
+async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
     with open(config, "rb") as f:
         config = tomllib.load(f)
     proxy = config.get("proxy", None)
@@ -41,13 +41,13 @@ async def generate(config: Path, num: int = 200):
                             photos.append(msg.photo.file_id)
                             break
             finally:
-                with open("captchas.txt", "w+") as f:
+                with open(output, "w+") as f:
                     f.writelines(str(photo) + "\n" for photo in photos)
 
 
 @app.async_command()
-async def label(config: Path, txt: Path):
-    with open(txt) as f:
+async def label(config: Path, inp: Path = "captchas.txt"):
+    with open(inp) as f:
         photos = [int(line) for line in f.readlines()]
         with open(config, "rb") as f:
             config = tomllib.load(f)

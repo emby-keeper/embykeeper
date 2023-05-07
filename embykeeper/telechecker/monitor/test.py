@@ -1,7 +1,7 @@
 from pyrogram.types import Message
 
 from .base import Monitor
-from .pornemby_exam import PornembyExamMonitor
+from .pornemby import PornembyMonitor
 from .misty import MistyMonitor
 from .bgk import BGKMonitor
 from .polo import PoloMonitor
@@ -40,7 +40,7 @@ class TestMonitor:
         chat_delay = 1
         chat_reply = "我来"
 
-    class TestPornembyExamMonitor(PornembyExamMonitor):
+    class TestPornembyExamMonitor(PornembyMonitor.PornembyAnswerMonitor):
         name = "Pornemby科举测试"
         chat_name = "api_group"
         chat_user = "embykeeper_test_bot"
@@ -52,12 +52,6 @@ class TestMonitor:
         chat_user = []
 
     class TestBGK(BGKMonitor):
-        name = "不给看测试"
-        chat_name = "api_group"
-        chat_allow_outgoing = True
-        chat_user = []
-
-    class TestViper(BGKMonitor):
         name = "不给看测试"
         chat_name = "api_group"
         chat_allow_outgoing = True

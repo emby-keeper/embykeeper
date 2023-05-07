@@ -56,6 +56,7 @@ def check_config(config):
                     }
                 )
             ],
+            Optional("monitor"): Schema({str: Schema({}, ignore_extra_keys=True)}),
         }
     )
     try:

@@ -44,7 +44,7 @@ class MistyMonitor(Monitor):
                             .replace(" ", "")
                         )
                         self.log.debug(f"接收到验证码: {self.captcha}")
-            except asyncio.TimeoutError:
+            except (asyncio.TimeoutError, TypeError):
                 continue
             else:
                 if (
