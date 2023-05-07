@@ -11,23 +11,19 @@ from ..link import Link
 import embykeeper
 from .base import Monitor
 
+
 class PornembyMonitor:
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_keyword = r"问题\d+：(.*?)\n+A:(.*)\n+B:(.*)\n+C:(.*)\n+D:(.*)\n+答案为：([ABCD])"
-        
-        key_map = {
-            'A': 1,
-            'B': 2,
-            'C': 3,
-            'D': 4
-        }
-        
+
+        key_map = {"A": 1, "B": 2, "C": 3, "D": 4}
+
         async def on_trigger(self, message: Message, key, reply):
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
             self.log.info(f"本题正确答案为 {key[5]} ({key[self.key_map[key[5]]]}): {spec}.")
-            
+
     class PornembyAnswerMonitor(Monitor):
         name = "Pornemby 科举"
         chat_name = ["Pornemby", "PornembyFun"]
@@ -36,7 +32,7 @@ class PornembyMonitor:
         cache_file = Path(user_cache_dir(embykeeper.__name__)) / "pornemby_question.csv"
         cache = {}
         lock = asyncio.Lock()
-        
+
         key_map = {
             "A": "🅰",
             "B": "🅱",
@@ -83,7 +79,7 @@ class PornembyMonitor:
                                 qs += 1
                                 writer.writerow(key)
                     if count and (finished or count % 500 == 0):
-                        self.log.info(f'读取问题答案历史: 已读取 {qs} 问题 / {count} 信息.')
+                        self.log.info(f"读取问题答案历史: 已读取 {qs} 问题 / {count} 信息.")
                         await asyncio.sleep(2)
             self.log.debug(f"已向问题答案历史缓存写入 {qs} 条问题.")
             with open(cache_timestamp, "w+") as f:
@@ -114,7 +110,7 @@ class PornembyMonitor:
                     self.cache = await self.read_cache()
                 finally:
                     self.lock.release()
-        
+
         async def cache_watchdog(self):
             try:
                 while True:
@@ -122,7 +118,7 @@ class PornembyMonitor:
                     await self.update()
             except asyncio.CancelledError:
                 raise
-            
+
         async def start(self):
             await self.update()
             t = asyncio.create_task(self.cache_watchdog())
@@ -133,7 +129,7 @@ class PornembyMonitor:
             result = self.cache.get(key[0], None)
             if result:
                 self.log.info(f"从缓存回答问题为{result}: {spec}.")
-            elif self.config.get('only_history', False):
+            elif self.config.get("only_history", False):
                 self.log.info(f"未从历史缓存找到问题, 请自行回答: {spec}.")
             else:
                 for retries in range(3):
@@ -149,6 +145,6 @@ class PornembyMonitor:
                     return
             try:
                 answer = await message.click(self.key_map[result])
-                self.log.debug(f'回答返回值: {answer.message} {spec}.')
+                self.log.debug(f"回答返回值: {answer.message} {spec}.")
             except KeyError:
                 self.log.info(f"点击失败: {result} 不是可用的答案 {spec}.")

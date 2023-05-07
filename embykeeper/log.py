@@ -18,12 +18,12 @@ def formatter(record):
             return ""
 
     scheme_names = {
-        'telegram': 'Telegram',
-        'telechecker': '每日签到',
-        'telemonitor': '消息监控',
-        'telemessager': '定时水群',
-        'telelink': '账号服务',
-        'embywatcher': 'Emby 保活'
+        "telegram": "Telegram",
+        "telechecker": "每日签到",
+        "telemonitor": "消息监控",
+        "telemessager": "定时水群",
+        "telelink": "账号服务",
+        "embywatcher": "Emby 保活",
     }
 
     if scheme in ("telegram", "telechecker", "telemonitor", "telemessager", "telelink"):
@@ -39,6 +39,8 @@ def formatter(record):
 
 def initialize(level="INFO"):
     logger.remove()
-    handler = RichHandler(console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio])
+    handler = RichHandler(
+        console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio]
+    )
     handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
     logger.add(handler, format=formatter, level=level)

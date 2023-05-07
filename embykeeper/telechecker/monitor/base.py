@@ -101,7 +101,7 @@ class Monitor:
     chat_reply: str = None  # 回复的内容, 可以通过 @property 类属性重写.
     notify_create_name: bool = False  # 启动时生成 unique name 并提示
 
-    def __init__(self, client: Client, nofail=True, config: dict={}):
+    def __init__(self, client: Client, nofail=True, config: dict = {}):
         self.client = client
         self.nofail = nofail
         self.config = config
@@ -233,9 +233,9 @@ class Monitor:
     async def message_handler(self, client: Client, message: Message):
         for key in self.keys(message):
             spec = self.get_spec(key)
-            self.log.info(f'监听到关键信息: {spec}.')
+            self.log.info(f"监听到关键信息: {spec}.")
             if random.random() >= self.chat_probability:
-                self.log.info(f'由于概率设置, 不予回应: {spec}.')
+                self.log.info(f"由于概率设置, 不予回应: {spec}.")
                 return False
             reply = await self.get_reply(message, key)
             if self.session:
@@ -260,7 +260,7 @@ class Monitor:
             return await self.client.send_message(message.chat.id, reply)
 
     def get_unique_name(self):
-        unique_name = self.config.get('unique_name', None)
+        unique_name = self.config.get("unique_name", None)
         if unique_name:
             self.log.info(f'根据您的设置, 当监控到开注时, 该站点将以用户名 "{unique_name}" 注册.')
             return unique_name

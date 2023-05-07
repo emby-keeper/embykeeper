@@ -226,7 +226,7 @@ class ClientsSession:
                 logger.debug(f'登出账号 "{client.phone_number}".')
                 await client.stop()
                 cls.pool.pop(phone, None)
-                
+
     @classmethod
     async def clean_all(cls):
         for phone in list(cls.pool):
