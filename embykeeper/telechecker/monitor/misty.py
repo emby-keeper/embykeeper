@@ -26,16 +26,16 @@ class MistyMonitor(Monitor):
         wr = async_partial(self.client.wait_reply, self.bot_username)
         for _ in range(10 if initial else 3):
             try:
-                msg = await wr("/cancel")
-                if msg.caption and "选择您要使用的功能" in msg.caption:
+                msg: Message = await wr("/cancel")
+                if msg.caption and "选择您要使用的功能" in msg.caption or msg.text:
                     msg = await wr("🌏切换服务器")
-                    if "选择您要使用的服务器" in msg.text:
+                    if "选择您要使用的服务器" in msg.text or msg.caption:
                         msg = await wr("✨Misty")
-                        if "选择您要使用的功能" in msg.caption:
+                        if "选择您要使用的功能" in msg.caption or msg.text:
                             msg = await wr("⚡️账号功能")
-                if msg.text and "请选择功能" in msg.text:
+                if msg.text and "请选择功能" in msg.text or msg.caption:
                     msg = await wr("⚡️注册账号")
-                    if "请输入验证码" in msg.caption:
+                    if "请输入验证码" in msg.caption or msg.text:
                         data = await self.client.download_media(msg, in_memory=True)
                         image = Image.open(data)
                         self.captcha = (

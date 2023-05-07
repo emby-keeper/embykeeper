@@ -11,6 +11,6 @@ class EmbyhubMonitor(Monitor):
     bot_username = "EdHubot"
     notify_create_name = True
 
-    async def on_trigger(self, message: Message, keys, reply):
+    async def on_trigger(self, message: Message, key, reply):
         await self.client.send_message(self.bot_username, f"/create {self.unique_name}")
         self.log.bind(notify=True).info(f'已向Bot发送用户注册申请: "{self.unique_name}", 请检查结果.')

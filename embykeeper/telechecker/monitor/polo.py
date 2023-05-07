@@ -11,8 +11,8 @@ class PoloMonitor(Monitor):
     bot_username = "emby_test_bot"
     notify_create_name = True
 
-    async def on_trigger(self, message: Message, keys, reply):
-        for code in keys[0].split("\n"):
+    async def on_trigger(self, message: Message, key, reply):
+        for code in key.split("\n"):
             await self.client.send_message(self.bot_username, f"/invite {code}")
             await self.client.send_message(self.bot_username, self.unique_name)
             await asyncio.sleep(0.5)
