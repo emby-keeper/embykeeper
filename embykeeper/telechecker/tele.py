@@ -154,12 +154,15 @@ class Client(_Client):
                 if current >= total:
                     return
 
-    async def wait_reply(self, chat_id: Union[int, str], text: str = None, timeout: float = 3):
+    async def wait_reply(self, chat_id: Union[int, str], text: str = None, timeout: float = 3, outgoing=False):
         async def handler_func(client, message, future: asyncio.Future):
             future.set_result(message)
 
         future = asyncio.Future()
-        handler = MessageHandler(async_partial(handler_func, future=future), filters.chat(chat_id))
+        filter = filters.chat(chat_id)
+        if not outgoing:
+            filter = filter & (~filters.outgoing)
+        handler = MessageHandler(async_partial(handler_func, future=future), filter)
         groups = self.dispatcher.groups
         if 0 not in groups:
             groups[0] = [handler]

@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from tqdm import tqdm, trange
 import tomli as tomllib
@@ -48,21 +49,21 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
 @app.async_command()
 async def label(config: Path, inp: Path = "captchas.txt"):
     with open(inp) as f:
-        photos = [int(line) for line in f.readlines()]
-        with open(config, "rb") as f:
-            config = tomllib.load(f)
-        proxy = config.get("proxy", None)
-        async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
-            async for tg in clients:
-                for photo in tqdm(photos, desc="标记验证码"):
-                    await tg.send_photo(chat, photo)
-                    labelmsg = await tg.wait_reply(chat, timeout=None)
-                    if not len(labelmsg.text) == 5:
-                        continue
-                    else:
-                        await tg.download_media(photo, f"data/{labelmsg.text.lower()}.png")
-                        break
-
+        photos = [l.strip() for l in f.readlines()]
+    with open(config, "rb") as f:
+        config = tomllib.load(f)
+    proxy = config.get("proxy", None)
+    tasks = []
+    async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
+        async for tg in clients:
+            for photo in tqdm(photos, desc="标记验证码"):
+                await tg.send_photo(chat, photo)
+                labelmsg = await tg.wait_reply(chat, timeout=None, outgoing=True)
+                if not len(labelmsg.text) == 5:
+                    continue
+                else:
+                    tasks.append(asyncio.create_task(tg.download_media(photo, f"data/{labelmsg.text.lower()}.png")))
+        await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     app()

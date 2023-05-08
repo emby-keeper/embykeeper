@@ -1,19 +1,23 @@
 import asyncio
 import string
+from importlib import resources
+
 from pyrogram.types import Message
 from PIL import Image
 from ddddocr import DdddOcr
 
+from embykeeper.data import ocr as ocr_models
 from ...utils import async_partial
-
 from .base import Monitor
-
-ocr = DdddOcr(show_ad=False)
 
 __ignore__ = True
 
 
 class MistyMonitor(Monitor):
+    with resources.path(ocr_models, "digit5-teko.onnx") as onnx:
+        with resources.path(ocr_models, "digit5-teko.json") as charsets:
+            ocr = DdddOcr(show_ad=False, import_onnx_path=str(onnx), charsets_path=str(charsets))
+
     name = "Misty"
     chat_name = "FreeEmbyGroup"
     chat_user = "MistyNoiceBot"
@@ -40,7 +44,7 @@ class MistyMonitor(Monitor):
                         data = await self.client.download_media(msg, in_memory=True)
                         image = Image.open(data)
                         self.captcha = (
-                            ocr.classification(image)
+                            self.ocr.classification(image)
                             .translate(str.maketrans("", "", string.punctuation))
                             .replace(" ", "")
                         )

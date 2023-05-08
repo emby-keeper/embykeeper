@@ -51,19 +51,19 @@ class TestMonitor:
         chat_allow_outgoing = True
         chat_user = []
 
-    class TestBGK(BGKMonitor):
+    class TestBGKMonitor(BGKMonitor):
         name = "不给看测试"
         chat_name = "api_group"
         chat_allow_outgoing = True
         chat_user = []
 
-    class TestViper(ViperMonitor):
+    class TestViperMonitor(ViperMonitor):
         name = "Viper测试"
         chat_name = "api_group"
         chat_allow_outgoing = True
         chat_user = []
 
-    class TestPolo(PoloMonitor):
+    class TestPoloMonitor(PoloMonitor):
         name = "Polo测试"
         chat_name = "api_group"
         chat_allow_outgoing = True

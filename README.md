@@ -35,8 +35,9 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
     - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
     - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
     - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
-    - Pornemby (_测试中_): [频道](https://t.me/pornembyservice) [机器人](https://t.me/PronembyTGBot2_bot)
+    - Pornemby: [频道](https://t.me/pornembyservice) [机器人](https://t.me/PronembyTGBot2_bot)
     - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
+    - 卡戎: [频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)
     - 其他非 Emby 相关:
       - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
     - 默认禁用:
@@ -55,7 +56,9 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - Pornemby 科举考试: [活动频道](https://t.me/PornembyFun) (由于需要使用 OpenAI API 进行回答, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 回答准确率一般请谨慎使用)
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
   - Viper 抢邀请码: [频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)
+  - Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)
   - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
+  - Misty 开注自动注册: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)
 
 ## 安装与使用
 

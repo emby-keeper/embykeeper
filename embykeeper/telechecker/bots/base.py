@@ -20,7 +20,7 @@ from ..tele import Client
 
 __ignore__ = True
 
-ocr = DdddOcr(beta=True, show_ad=False)
+default_ocr = DdddOcr(beta=True, show_ad=False)
 
 
 class MessageType(Flag):
@@ -62,6 +62,7 @@ class BotCheckin(BaseBotCheckin):
     """签到类, 用于回复模式签到."""
 
     group_pool = AsyncCountPool(base=2000)
+    ocr = default_ocr
 
     name: str = None  # 签到器的名称
     bot_id: int = None  # Bot 的 UserID
@@ -240,7 +241,9 @@ class BotCheckin(BaseBotCheckin):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
         captcha = (
-            ocr.classification(image).translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
+            self.ocr.classification(image)
+            .translate(str.maketrans("", "", string.punctuation))
+            .replace(" ", "")
         )
         if captcha:
             self.log.info(f"[gray50]接收验证码: {captcha}.[/]")
