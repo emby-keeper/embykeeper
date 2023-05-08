@@ -62,8 +62,11 @@ async def label(config: Path, inp: Path = "captchas.txt"):
                 if not len(labelmsg.text) == 5:
                     continue
                 else:
-                    tasks.append(asyncio.create_task(tg.download_media(photo, f"data/{labelmsg.text.lower()}.png")))
+                    tasks.append(
+                        asyncio.create_task(tg.download_media(photo, f"data/{labelmsg.text.lower()}.png"))
+                    )
         await asyncio.gather(*tasks)
+
 
 if __name__ == "__main__":
     app()

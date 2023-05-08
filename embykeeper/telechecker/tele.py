@@ -154,7 +154,9 @@ class Client(_Client):
                 if current >= total:
                     return
 
-    async def wait_reply(self, chat_id: Union[int, str], text: str = None, timeout: float = 3, outgoing=False):
+    async def wait_reply(
+        self, chat_id: Union[int, str], text: str = None, timeout: float = 3, outgoing=False
+    ):
         async def handler_func(client, message, future: asyncio.Future):
             future.set_result(message)
 
