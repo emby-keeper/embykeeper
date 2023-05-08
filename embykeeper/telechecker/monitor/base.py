@@ -174,12 +174,20 @@ class Monitor:
             return False
         if self.notify_create_name:
             self.unique_name = self.get_unique_name()
+
         spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"
-        self.log.info(f"开始监视: {spec}.")
-        async with self.listener():
-            await self.failed.wait()
-            self.log.error(f"发生错误, 不再监视: {spec}.")
+        if await self.init():
+            self.log.info(f"开始监视: {spec}.")
+            async with self.listener():
+                await self.failed.wait()
+                self.log.error(f"发生错误, 不再监视: {spec}.")
+                return False
+        else:
+            self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
             return False
+
+    async def init(self):
+        return True
 
     @classmethod
     def keys(cls, message: Message):

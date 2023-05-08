@@ -22,6 +22,7 @@ class MistyMonitor(Monitor):
     notify_create_name = True
 
     async def init(self, initial=True):
+        self.captcha = None
         self.log.info(f"正在初始化机器人状态.")
         wr = async_partial(self.client.wait_reply, self.bot_username)
         for _ in range(10 if initial else 3):
@@ -59,11 +60,6 @@ class MistyMonitor(Monitor):
         else:
             self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
             return False
-
-    async def start(self):
-        self.captcha = None
-        if await self.init(initial=True):
-            return await super().start()
 
     async def on_trigger(self, message: Message, keys, reply):
         wr = async_partial(self.client.wait_reply, self.bot_username)

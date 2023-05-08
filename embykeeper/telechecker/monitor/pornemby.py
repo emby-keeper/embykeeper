@@ -103,11 +103,12 @@ class PornembyMonitor:
             except asyncio.TimeoutError:
                 self.log.debug("等待其他协程缓存问题答案历史.")
                 async with self.lock:
-                    pass
+                    return True
             else:
                 try:
                     await self.update_cache()
-                    self.cache = await self.read_cache()
+                    self.__class__.cache = await self.read_cache()
+                    return True
                 finally:
                     self.lock.release()
 
@@ -119,10 +120,9 @@ class PornembyMonitor:
             except asyncio.CancelledError:
                 raise
 
-        async def start(self):
-            await self.update()
+        async def init(self):
             t = asyncio.create_task(self.cache_watchdog())
-            return await super().start()
+            return await self.update()
 
         async def on_trigger(self, message: Message, key, reply):
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"

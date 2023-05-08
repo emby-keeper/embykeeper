@@ -269,7 +269,10 @@ class BotCheckin(BaseBotCheckin):
         elif any(s in text for s in ("成功", "通过", "完成", "获得")):
             matches = re.search(self.bot_success_pat, text)
             if matches:
-                self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
+                try:
+                    self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
+                except IndexError:
+                    self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
             else:
                 matches = re.search(r"\d+", text)
                 if matches:
