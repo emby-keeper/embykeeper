@@ -2,13 +2,11 @@ import asyncio
 import csv
 from datetime import datetime
 from pyrogram.types import Message
-from appdirs import user_cache_dir
 from pathlib import Path
 
 from ...utils import truncate_str
 from ..link import Link
 
-import embykeeper
 from .base import Monitor
 
 

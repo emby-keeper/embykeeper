@@ -15,4 +15,4 @@ WORKDIR /app
 RUN touch config.toml
 ENV PATH="/opt/venv/bin:$PATH"
 
-ENTRYPOINT ["embykeeper", "--session-dir", "/app"]
+ENTRYPOINT ["embykeeper", "--basedir", "/app"]
