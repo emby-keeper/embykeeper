@@ -27,7 +27,7 @@ class MistyMonitor(Monitor):
         self.captcha = None
         self.log.info(f"正在初始化机器人状态.")
         wr = async_partial(self.client.wait_reply, self.bot_username)
-        for _ in range(10 if initial else 3):
+        for _ in range(20 if initial else 3):
             try:
                 msg: Message = await wr("/cancel")
                 if msg.caption and "选择您要使用的功能" in msg.caption or msg.text:
@@ -53,7 +53,7 @@ class MistyMonitor(Monitor):
                 if (
                     self.captcha
                     and len(self.captcha) == 5
-                    and (all(i not in self.captcha for i in ("1", "7", "0")) or not initial)
+                    and (all(i not in self.captcha for i in ("1", "7")) or not initial)
                 ):
                     self.log.info(f"机器人状态初始化完成, 当接收到验证码时将输入验证码 {self.captcha}, 请勿操作 @EmbyMistyBot.")
                     return True
