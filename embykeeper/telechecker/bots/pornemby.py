@@ -17,4 +17,7 @@ class PornEmbyCheckin(AnswerBotCheckin):
 
     async def on_photo(self, message: Message):
         await asyncio.sleep(1)
-        await message.click(0)
+        try:
+            await message.click(0)
+        except TimeoutError:
+            pass

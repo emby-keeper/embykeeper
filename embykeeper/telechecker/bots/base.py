@@ -88,6 +88,8 @@ class BotCheckin(BaseBotCheckin):
         filter = filters.user(self.bot_id or self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
+        else:
+            filter = filter & filters.private
         return filter
 
     def get_handlers(self):
