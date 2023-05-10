@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "embykeeper"
-version = "2.0.17"
+version = "2.0.18"
 authors = [
     {name = "jackzzs", email = "jackzzs@outlook.com"},
 ]
