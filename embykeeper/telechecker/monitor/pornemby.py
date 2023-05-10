@@ -29,7 +29,6 @@ class PornembyMonitor:
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
         chat_keyword = r"问题\d+：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
-        cache_file = Path(user_cache_dir(embykeeper.__name__)) / "pornemby_question.csv"
         cache = {}
         lock = asyncio.Lock()
 
@@ -39,6 +38,10 @@ class PornembyMonitor:
             "C": "🅲",
             "D": "🅳",
         }
+
+        def __init__(self, *args, **kw):
+            super().__init__(*args, **kw)
+            self.cache_file = Path(self.basedir) / "pornemby_question.csv"
 
         async def update_cache(self, to_date=None):
             cache_timestamp = self.cache_file.with_name("pornemby_question.timestamp")

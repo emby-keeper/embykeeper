@@ -8,6 +8,7 @@ import string
 from typing import Iterable, List, Sized, Union
 
 from loguru import logger
+from appdirs import user_data_dir
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
@@ -101,9 +102,10 @@ class Monitor:
     chat_reply: str = None  # 回复的内容, 可以通过 @property 类属性重写.
     notify_create_name: bool = False  # 启动时生成 unique name 并提示
 
-    def __init__(self, client: Client, nofail=True, config: dict = {}):
+    def __init__(self, client: Client, nofail=True, basedir=None, config: dict = {}):
         self.client = client
         self.nofail = nofail
+        self.basedir = basedir or user_data_dir(__name__)
         self.config = config
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None

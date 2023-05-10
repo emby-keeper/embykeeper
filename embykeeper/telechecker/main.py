@@ -211,7 +211,12 @@ async def monitorer(config: dict):
                 cls_config = config.get("monitor", {}).get(cls.__module__.rsplit(".", 1)[-1], {})
                 jobs.append(
                     asyncio.create_task(
-                        cls(tg, nofail=config.get("nofail", True), config=cls_config)._start()
+                        cls(
+                            tg,
+                            nofail=config.get("nofail", True),
+                            basedir=config.get("basedir", True),
+                            config=cls_config,
+                        )._start()
                     )
                 )
                 names.append(cls.name)
@@ -235,7 +240,7 @@ async def messager(config: dict, scheduler):
                     username=tg.me.name,
                     proxy=config.get("proxy", None),
                     nofail=config.get("nofail", True),
-                    sessiondir=config.get("sessiondir", True),
+                    basedir=config.get("basedir", True),
                 ).start()
 
 
@@ -355,7 +360,7 @@ async def notifier(config: dict):
             notifier = None
     if notifier:
         async with ClientsSession(
-            [notifier], proxy=config.get("proxy", None), sessiondir=config.get("sessiondir", None)
+            [notifier], proxy=config.get("proxy", None), basedir=config.get("basedir", None)
         ) as clients:
             async for tg in clients:
                 logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{tg.phone_number}" 账号.')

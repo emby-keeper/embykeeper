@@ -80,7 +80,7 @@ async def main(
     ),
     follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试参数", help="仅启动消息调试"),
     analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试参数", help="仅启动历史信息分析"),
-    session_dir: Path = typer.Option(None, rich_help_panel="调试参数", help="设定Session文件位置"),
+    basedir: Path = typer.Option(None, rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
     from .log import logger, initialize
 
@@ -104,14 +104,15 @@ async def main(
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等. 您可以通过 Ctrl+C 以结束运行.")
     logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
 
-    session_dir = Path(session_dir or user_data_dir(__name__))
-    session_dir.mkdir(parents=True, exist_ok=True)
-    config["sessiondir"] = session_dir
+    basedir = Path(basedir or user_data_dir(__name__))
+    basedir.mkdir(parents=True, exist_ok=True)
+    config["basedir"] = basedir
     try:
-        session_dir_spec = Path("~") / session_dir.relative_to(Path.home())
+        session_dir_spec = Path("~") / basedir.relative_to(Path.home())
     except ValueError:
-        session_dir_spec = session_dir
-    logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
+        session_dir_spec = basedir
+    if not basedir == Path("/app"):
+        logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
 
     from .embywatcher.main import watcher
     from .telechecker.main import analyzer, checkiner, follower, messager, monitorer, notifier

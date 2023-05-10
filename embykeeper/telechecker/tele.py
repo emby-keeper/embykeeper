@@ -189,9 +189,7 @@ class ClientsSession:
         accounts = config.get("telegram", [])
         for k, v in kw.items():
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
-        return cls(
-            accounts=accounts, proxy=config.get("proxy", None), sessiondir=config.get("sessiondir", None)
-        )
+        return cls(accounts=accounts, proxy=config.get("proxy", None), basedir=config.get("basedir", None))
 
     @classmethod
     async def watchdog(cls, timeout=120):
@@ -260,10 +258,10 @@ class ClientsSession:
                 await client.storage.close()
                 # print(f'登出账号 "{client.phone_number}".')
 
-    def __init__(self, accounts, proxy=None, sessiondir=None, quiet=False):
+    def __init__(self, accounts, proxy=None, basedir=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
-        self.sessiondir = sessiondir or user_data_dir(__name__)
+        self.basedir = basedir or user_data_dir(__name__)
         self.phones = []
         self.done = asyncio.Queue()
         self.quiet = quiet
@@ -284,7 +282,7 @@ class ClientsSession:
                         phone_number=account["phone"],
                         proxy=proxy,
                         lang_code="zh",
-                        workdir=self.sessiondir,
+                        workdir=self.basedir,
                     )
                     await client.start()
                 except Unauthorized:
