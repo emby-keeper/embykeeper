@@ -69,5 +69,8 @@ zip-safe = false
 [tool.setuptools.packages]
 find = {namespaces = false}
 
+[tool.setuptools.package-data]
+"embykeeper.data.ocr" = ["*.json", "*.onnx"]
+
 [tool.black]
 line-length = 110
