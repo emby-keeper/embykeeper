@@ -10,8 +10,6 @@ from embykeeper.data import ocr as ocr_models
 from ...utils import async_partial
 from .base import Monitor
 
-__ignore__ = True
-
 
 class MistyMonitor(Monitor):
     with resources.path(ocr_models, "digit5-teko.onnx") as onnx:
