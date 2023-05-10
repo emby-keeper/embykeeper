@@ -1,13 +1,19 @@
 # Configs and outputs
 *.toml
 !/pyproject.toml
+*.session
 *.msgs
 
+# Test files
 /test.py
 /test.ipynb
+/tests
+
+# Utils
+/utils
 
 # Docs
-images
+/images
 
 # Git
 .git

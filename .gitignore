@@ -3,8 +3,9 @@
 !/pyproject.toml
 *.session
 *.msgs
-utils/data
+/utils/data
 
+# Test files
 /test.py
 /test.ipynb
 
