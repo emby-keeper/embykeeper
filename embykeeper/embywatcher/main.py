@@ -34,6 +34,7 @@ async def get_latest(emby: Emby, n=10):
     for i in items:
         yield i
 
+
 async def set_played(obj: EmbyObject):
     c: Connector = obj.connector
     return is_ok(await c.post(f"/Users/{{UserId}}/PlayedItems/{obj.id}"))

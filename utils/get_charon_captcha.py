@@ -8,8 +8,9 @@ from embykeeper.utils import AsyncTyper, async_partial
 
 app = AsyncTyper()
 
-bot = 'charontv_bot'
+bot = "charontv_bot"
 chat = "api_group"
+
 
 @app.async_command()
 async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
@@ -32,6 +33,7 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
             finally:
                 with open(output, "w+") as f:
                     f.writelines(str(photo) + "\n" for photo in photos)
+
 
 @app.async_command()
 async def label(config: Path, inp: Path = "captchas.txt"):
