@@ -1,7 +1,7 @@
 import asyncio
 import random
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time
 from typing import Iterable, List, Union
 
 from dateutil import parser
@@ -9,7 +9,7 @@ from loguru import logger
 from schedule import CancelJob, Scheduler
 from pyrogram.errors import BadRequest
 
-from ...utils import to_iterable
+from ...utils import to_iterable, random_time
 from ..tele import ClientsSession
 
 __ignore__ = True
@@ -81,17 +81,6 @@ class Messager:
     def next_info(self):
         self.log.info(f"下一次发送将在 [blue]{self.scheduler.next_run.strftime('%m-%d %H:%M:%S %p')}[/] 进行.")
 
-    @staticmethod
-    def random_time(start_time, end_time):
-        start_datetime = datetime.combine(date.today(), start_time)
-        end_datetime = datetime.combine(date.today(), end_time)
-        if end_datetime < start_datetime:
-            end_datetime += timedelta(days=1)
-        time_diff_seconds = (end_datetime - start_datetime).seconds
-        random_seconds = random.randint(0, time_diff_seconds)
-        random_time = (start_datetime + timedelta(seconds=random_seconds)).time()
-        return random_time
-
     def schedule(self, message, at, every, possibility, only):
         def once(*args):
             try:
@@ -106,7 +95,7 @@ class Messager:
             if len(_at) == 1:
                 t = _at[0]
             elif len(_at) == 2:
-                t = self.random_time(*_at)
+                t = random_time(*_at)
             else:
                 t = random.choice(_at)
             if isinstance(message, Iterable):

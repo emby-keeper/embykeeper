@@ -56,8 +56,10 @@ async def send_playing(obj: EmbyObject, playing_info: dict):
         while True:
             try:
                 await asyncio.wait_for(c.post("/Sessions/Playing", **playing_info), 10)
-            except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError):
-                pass
+            except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError) as e:
+                logger.debug(f'播放状态设定错误: {e}')
+            else:
+                break
             await asyncio.sleep(10)
     except asyncio.CancelledError:
         pass
@@ -162,7 +164,8 @@ async def watch(emby, time, progress, logger, retries=5):
                         logger.info(f"发生错误: {e}, 正在重试其他视频.")
                         break
                     finally:
-                        await hide_from_resume(obj)
+                        if await hide_from_resume(obj):
+                            logger.debug(f"未能成功从最近播放中隐藏视频.")
             else:
                 logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False

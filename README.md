@@ -83,7 +83,7 @@ embykeeper
 ```toml
 [proxy]
 hostname = "127.0.0.1"
-port = "1080"
+port = 1080
 scheme = "socks5"
 
 [[telegram]]

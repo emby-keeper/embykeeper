@@ -102,10 +102,10 @@ def write_faked_config(path):
     doc["concurrent"] = 1
     doc.add(nl())
     doc.add(comment("计划任务时, 各签到器启动前等待的随机时间 (分钟)."))
-    doc["random"] = 15
+    doc["random"] = 60
     doc["proxy"] = {
         "hostname": "127.0.0.1",
-        "port": "1080",
+        "port": 1080,
         "scheme": "socks5",
     }
     doc["proxy"]["scheme"].comment("可选: http / socks5")
@@ -194,7 +194,8 @@ def prepare_config(config_file=None):
         sys.exit(253)
     proxy: dict = config.get("proxy", None)
     if proxy:
+        logger.debug(f'默认代理已设定为: socks5://127.0.0.1:1080')
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
-        proxy.setdefault("port", "1080")
+        proxy.setdefault("port", 1080)
     return config

@@ -7,7 +7,7 @@ from loguru import logger
 from pyrogram import Client as _Client
 from pyrogram import raw, types, utils, filters
 from pyrogram.enums import SentCodeType
-from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded
+from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded, CodeInvalid, PhoneCodeInvalid
 from pyrogram.handlers import MessageHandler
 from aiocache import Cache
 
@@ -54,12 +54,12 @@ class Client(_Client):
                 }
                 if not self.phone_code:
                     if retry:
-                        msg = f'验证码错误, 请在重新输入 "{self.phone_number}" 的登录验证码: '
+                        msg = f'验证码错误, 请在重新输入 "{self.phone_number}" 的登录验证码'
                     else:
-                        msg = f'请在{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码: '
-                    self.phone_code = Prompt.ask(" " * 29 + msg)
+                        msg = f'请在{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码'
+                    self.phone_code = Prompt.ask(" " * 23 + msg)
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
-            except BadRequest:
+            except (CodeInvalid, PhoneCodeInvalid):
                 self.phone_code = None
                 retry = True
             except SessionPasswordNeeded:
@@ -70,7 +70,7 @@ class Client(_Client):
                             msg = f'密码错误, 请重新输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认):'
                         else:
                             msg = f'需要输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认): '
-                        self.password = Prompt.ask(" " * 29 + msg, password=True)
+                        self.password = Prompt.ask(" " * 23 + msg, password=True)
                     try:
                         return await self.check_password(self.password)
                     except BadRequest:
@@ -212,7 +212,7 @@ class ClientsSession:
                     except (TypeError, KeyError):
                         pass
         except asyncio.CancelledError:
-            print("\r正在停止... ", end="")
+            print("\r正在停止...\r", end="")
             await cls.shutdown()
 
     @classmethod
@@ -256,7 +256,7 @@ class ClientsSession:
                 client: Client = v[0]
                 await client.storage.save()
                 await client.storage.close()
-                # print(f'登出账号 "{client.phone_number}".')
+                logger.debug(f'登出账号 "{client.phone_number}".')
 
     def __init__(self, accounts, proxy=None, basedir=None, quiet=False):
         self.accounts = accounts
@@ -296,6 +296,7 @@ class ClientsSession:
         except Exception as e:
             logger.exception(f'登录账号 "{client.phone_number}" 时发生异常, 将被跳过:')
         else:
+            logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client
 
     async def loginer(self, account):
@@ -306,6 +307,9 @@ class ClientsSession:
                 self.pool[phone] = (client, 1)
                 self.phones.append(phone)
                 await self.done.put(client)
+                logger.debug(f'Telegram 账号池计数增加: {phone} => 1')
+        else:
+            await self.done.put(None)
 
     async def __aenter__(self):
         for a in self.accounts:
@@ -322,6 +326,7 @@ class ClientsSession:
                     ref += 1
                     self.pool[phone] = (client, ref)
                     await self.done.put(client)
+                    logger.debug(f'Telegram 账号池计数增加: {phone} => {ref}')
                 else:
                     self.pool[phone] = asyncio.create_task(self.loginer(a))
         return self
@@ -330,9 +335,8 @@ class ClientsSession:
         async def aiter():
             for _ in range(len(self.accounts)):
                 client: Client = await self.done.get()
-                if client == None:
-                    break
-                yield client
+                if client:
+                    yield client
 
         return aiter()
 
@@ -343,4 +347,4 @@ class ClientsSession:
                 client, ref = entry
                 ref -= 1
                 self.pool[phone] = (client, ref)
-                # print(f"Telegram 账号池计数 {client.phone_number} => {ref}.")
+                logger.debug(f'Telegram 账号池计数降低: {phone} => {ref}')

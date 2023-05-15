@@ -1,8 +1,9 @@
 from pathlib import Path
 from datetime import datetime, timedelta
+from random import randrange
+import re
 import sys
 
-import tomli as tomllib
 import typer
 import asyncio
 from appdirs import user_data_dir
@@ -10,7 +11,7 @@ from schedule import Scheduler
 from dateutil import parser
 
 from . import __author__, __name__, __url__, __version__
-from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool
+from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool, random_time
 from .settings import prepare_config
 
 app = AsyncTyper(
@@ -46,7 +47,7 @@ async def main(
         help="配置文件 (置空以生成)",
     ),
     checkin: str = typer.Option(
-        Flagged("", "6:00PM"),
+        Flagged("", "<5:00PM,8:00PM>"),
         "--checkin",
         "-c",
         rich_help_panel="模块开关",
@@ -96,13 +97,14 @@ async def main(
         emby = -emby
 
     if not checkin and not monitor and not emby and not send:
-        checkin = "08:00"
+        checkin = "<5:00PM,8:00PM>"
         emby = 7
         monitor = True
         send = True
 
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等. 您可以通过 Ctrl+C 以结束运行.")
     logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
+    logger.debug(f'命令行参数: "{" ".join(sys.argv[1:])}".')
 
     basedir = Path(basedir or user_data_dir(__name__))
     basedir.mkdir(parents=True, exist_ok=True)
@@ -137,6 +139,7 @@ async def main(
         if checkin:
             instants.append(checkiner(config, instant=True))
         await asyncio.gather(*instants)
+        logger.debug('立即执行任务完成.')
 
     if not once:
         pool = AsyncTaskPool()
@@ -156,7 +159,11 @@ async def main(
         if checkin:
             schedule_checkin = Scheduler()
             pool.add(run_pending(schedule_checkin))
-            checkin = (debug_time or parser.parse(checkin).time()).strftime("%H:%M:%S")
+            checkin_range_match = re.match(r'<\s*(.*),\s*(.*)\s*>', checkin)
+            if checkin_range_match:
+                checkin = random_time(*[parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]).strftime("%H:%M:%S")
+            else:
+                checkin = (debug_time or parser.parse(checkin).time()).strftime("%H:%M:%S")
             schedule_checkin.every().day.at(checkin).do(
                 lambda: pool.add(checkiner(config, instant=debug_cron))
             )
@@ -171,6 +178,7 @@ async def main(
             pool.add(monitorer(config))
 
         async for t in pool.as_completed():
+            logger.debug(f'任务 {t} 已完成.')
             try:
                 await t
             except Exception as e:
@@ -181,4 +189,5 @@ async def main(
 
 
 if __name__ == "__main__":
+    app()
     app()

@@ -265,7 +265,7 @@ class BotCheckin(BaseBotCheckin):
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in ("拉黑", "黑名单", "冻结")):
+        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户")):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
         elif any(s in text for s in ("失败", "错误", "超时")):

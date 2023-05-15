@@ -1,6 +1,8 @@
 import asyncio
 from collections import namedtuple
+from datetime import date, datetime, timedelta
 from functools import wraps
+import random
 import sys
 from typing import Any, Iterable, Union
 
@@ -92,7 +94,7 @@ class AsyncTaskPool:
         self.tasks.append(t)
 
     async def as_completed(self):
-        while True:
+        while self.tasks:
             async with self.waiter:
                 await self.waiter.wait()
                 for t in self.tasks:
@@ -158,3 +160,13 @@ def async_partial(f, *args1, **kw1):
 
 async def idle():
     await asyncio.Event().wait()
+
+def random_time(start_time, end_time):
+    start_datetime = datetime.combine(date.today(), start_time)
+    end_datetime = datetime.combine(date.today(), end_time)
+    if end_datetime < start_datetime:
+        end_datetime += timedelta(days=1)
+    time_diff_seconds = (end_datetime - start_datetime).seconds
+    random_seconds = random.randint(0, time_diff_seconds)
+    random_time = (start_datetime + timedelta(seconds=random_seconds)).time()
+    return random_time
