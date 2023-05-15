@@ -243,7 +243,7 @@ class Monitor:
     async def message_handler(self, client: Client, message: Message):
         for key in self.keys(message):
             spec = self.get_spec(key)
-            self.log.info(f"监听到关键信息: {spec}.")
+            self.log.debug(f"监听到关键信息: {spec}.")
             if random.random() >= self.chat_probability:
                 self.log.info(f"由于概率设置, 不予回应: {spec}.")
                 return False
