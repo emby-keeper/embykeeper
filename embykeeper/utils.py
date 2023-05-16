@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 import random
 import sys
-from typing import Any, Iterable, Union
+from typing import Any, Coroutine, Iterable, Union
 
 from loguru import logger
 import click
@@ -82,7 +82,7 @@ class AsyncTaskPool:
         self.waiter = asyncio.Condition()
         self.tasks = []
 
-    def add(self, coro):
+    def add(self, coro: Coroutine):
         async def wrapper():
             task = asyncio.ensure_future(coro)
             await asyncio.wait([task])
@@ -91,6 +91,7 @@ class AsyncTaskPool:
                 return await task
 
         t = asyncio.create_task(wrapper())
+        t.set_name(coro.__name__)
         self.tasks.append(t)
 
     async def as_completed(self):

@@ -130,7 +130,8 @@ async def dump_message(client: Client, message: Message, table: Table):
 
 
 async def checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
-    checkiner.log.debug(f'随机启动等待: 将等待 {wait} 秒以启动.')
+    if wait > 0:
+        checkiner.log.debug(f'随机启动等待: 将等待 {wait} 秒以启动.')
     await asyncio.sleep(wait)
     async with sem:
         return await checkiner._start()

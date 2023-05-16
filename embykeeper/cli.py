@@ -139,7 +139,7 @@ async def main(
         if checkin:
             instants.append(checkiner(config, instant=True))
         await asyncio.gather(*instants)
-        logger.debug('立即执行任务完成.')
+        logger.debug('启动时立刻执行签到和保活: 已完成.')
 
     if not once:
         pool = AsyncTaskPool()
@@ -178,7 +178,12 @@ async def main(
             pool.add(monitorer(config))
 
         async for t in pool.as_completed():
-            logger.debug(f'任务 {t} 已完成.')
+            msg = f'任务 {t.get_name()} 已完成'
+            try:
+                msg += f', 发生错误: {t.exception()}'
+            except asyncio.InvalidStateError:
+                pass
+            logger.debug(f'{msg}.')
             try:
                 await t
             except Exception as e:
