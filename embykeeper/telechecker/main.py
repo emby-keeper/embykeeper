@@ -331,8 +331,6 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
 
 
 async def notifier(config: dict):
-    logger.debug("正在启动消息反馈模块, 请等待登录.")
-
     def _filter(record):
         notify = record.get("extra", {}).get("notify", None)
         if notify or record["level"].no == logging.ERROR:
@@ -365,6 +363,7 @@ async def notifier(config: dict):
         except IndexError:
             notifier = None
     if notifier:
+        logger.debug("正在启动消息反馈模块, 请等待登录.")
         async with ClientsSession(
             [notifier], proxy=config.get("proxy", None), basedir=config.get("basedir", None)
         ) as clients:

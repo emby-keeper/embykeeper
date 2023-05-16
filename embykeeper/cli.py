@@ -180,12 +180,16 @@ async def main(
             pool.add(monitorer(config))
 
         async for t in pool.as_completed():
-            msg = f"任务 {t.get_name()} 已完成"
+            msg = f"任务 {t.get_name()} "
             try:
-                msg += f", 发生错误: {t.exception()}"
-            except asyncio.InvalidStateError:
-                pass
-            logger.debug(f"{msg}.")
+                e = t.exception()
+                if e:
+                    msg += f"发生错误并退出: {e}"
+                else:
+                    msg += f"成功结束."
+            except asyncio.CancelledError:
+                msg += f"被取消."
+            logger.debug(msg)
             try:
                 await t
             except Exception as e:
