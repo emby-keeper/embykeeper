@@ -33,7 +33,7 @@ class MessageType(Flag):
 class BaseBotCheckin(ABC):
     name = None
 
-    def __init__(self, client: Client, retries=10, timeout=120, nofail=True):
+    def __init__(self, client: Client, retries=4, timeout=120, nofail=True):
         self.client = client
         self.retries = retries
         self.timeout = timeout

@@ -96,7 +96,7 @@ def write_faked_config(path):
     doc["timeout"] = 120
     doc.add(nl())
     doc.add(comment("每个 Telegram Bot 签到的最大尝试次数."))
-    doc["retries"] = 10
+    doc["retries"] = 4
     doc.add(nl())
     doc.add(comment("最大可同时进行的 Telegram Bot 签到."))
     doc["concurrent"] = 1

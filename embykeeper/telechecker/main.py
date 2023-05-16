@@ -155,7 +155,7 @@ async def checkiner(config: dict, instant=False):
             checkiners = [
                 cls(
                     tg,
-                    retries=config.get("retries", 10),
+                    retries=config.get("retries", 4),
                     timeout=config.get("timeout", 120),
                     nofail=config.get("nofail", True),
                 )

@@ -30,7 +30,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 - Telegram 机器人签到
   - 支持群组
     - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
-    - 卷毛鼠: [频道]() [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
+    - 卷毛鼠: [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
     - Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
     - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
     - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
@@ -301,7 +301,7 @@ $ embykeeper config.toml -a
 | 设置项       | 值类型             | 简介                                         | 默认值  |
 | ------------ | ------------------ | -------------------------------------------- | ------- |
 | `timeout`    | `int`              | Telegram 机器人签到超时 (秒)                 | `120`   |
-| `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `10`    |
+| `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `4`    |
 | `concurrent` | `int`              | Telegram 机器人签到最大并发                  | `1`     |
 | `random`     | `int`              | Telegram 机器人签到定时任务时间随机量 (分钟) | `15`    |
 | `notifier`   | `int`/`bool`/`str` | 发送通知到 Telegram 账号 (序号/手机号)       | `False` |
