@@ -268,8 +268,11 @@ class BotCheckin(BaseBotCheckin):
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户")):
+        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊")):
             self.log.warning(f"签到失败: 账户错误.")
+            await self.fail()
+        elif any(s in text for s in ("已尝试", "过多")):
+            self.log.warning(f"签到失败: 尝试次数过多.")
             await self.fail()
         elif any(s in text for s in ("失败", "错误", "超时")):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")

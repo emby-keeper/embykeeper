@@ -68,7 +68,7 @@ class NebulaCheckin(BaseBotCheckin):
             async with session.get(url_checkin, headers={"User-Agent": useragent}) as resp:
                 results = await resp.json()
             message = results["message"]
-            if "未找到用户" in message:
+            if any(s in message for s in ("未找到用户", "权限错误")):
                 self.log.info("签到失败: 账户错误.")
                 return self.fail()
             if "失败" in message:
