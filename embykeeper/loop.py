@@ -14,7 +14,7 @@ def cancel_all_tasks():
         return
     for task in to_cancel:
         task.cancel()
-    logger.debug(f'等待任务处理取消.')
+    logger.debug(f"等待任务处理取消.")
     loop.run_until_complete(asyncio.gather(*to_cancel, loop=loop, return_exceptions=True))
     for task in to_cancel:
         if task.cancelled():

@@ -162,6 +162,7 @@ def async_partial(f, *args1, **kw1):
 async def idle():
     await asyncio.Event().wait()
 
+
 def random_time(start_time, end_time):
     start_datetime = datetime.combine(date.today(), start_time)
     end_datetime = datetime.combine(date.today(), end_time)

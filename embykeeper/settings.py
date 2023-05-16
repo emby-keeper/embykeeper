@@ -194,7 +194,7 @@ def prepare_config(config_file=None):
         sys.exit(253)
     proxy: dict = config.get("proxy", None)
     if proxy:
-        logger.debug(f'默认代理已设定为: socks5://127.0.0.1:1080')
+        logger.debug(f"默认代理已设定为: socks5://127.0.0.1:1080")
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
         proxy.setdefault("port", 1080)

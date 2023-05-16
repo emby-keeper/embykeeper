@@ -57,7 +57,7 @@ async def send_playing(obj: EmbyObject, playing_info: dict):
             try:
                 await asyncio.wait_for(c.post("/Sessions/Playing", **playing_info), 10)
             except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError) as e:
-                logger.debug(f'播放状态设定错误: {e}')
+                logger.debug(f"播放状态设定错误: {e}")
             else:
                 break
             await asyncio.sleep(10)

@@ -131,7 +131,7 @@ async def dump_message(client: Client, message: Message, table: Table):
 
 async def checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     if wait > 0:
-        checkiner.log.debug(f'随机启动等待: 将等待 {wait} 秒以启动.')
+        checkiner.log.debug(f"随机启动等待: 将等待 {wait} 秒以启动.")
     await asyncio.sleep(wait)
     async with sem:
         return await checkiner._start()
@@ -142,7 +142,7 @@ async def gather_task(tasks, username):
 
 
 async def checkiner(config: dict, instant=False):
-    logger.debug('正在启动每日签到模块, 请等待登录.')
+    logger.debug("正在启动每日签到模块, 请等待登录.")
     async with ClientsSession.from_config(config) as clients:
         coros = []
         async for tg in clients:
@@ -200,7 +200,7 @@ async def checkiner(config: dict, instant=False):
 
 
 async def monitorer(config: dict):
-    logger.debug('正在启动消息监控模块, 请等待登录.')
+    logger.debug("正在启动消息监控模块, 请等待登录.")
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
@@ -229,7 +229,7 @@ async def monitorer(config: dict):
 
 
 async def messager(config: dict, scheduler):
-    logger.debug('正在启动自动水群模块.')
+    logger.debug("正在启动自动水群模块.")
     async with ClientsSession.from_config(config, send=True) as clients:
         async for tg in clients:
             log = logger.bind(scheme="telemessager", username=tg.me.name)
@@ -331,7 +331,8 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
 
 
 async def notifier(config: dict):
-    logger.debug('正在启动消息反馈模块, 请等待登录.')
+    logger.debug("正在启动消息反馈模块, 请等待登录.")
+
     def _filter(record):
         notify = record.get("extra", {}).get("notify", None)
         if notify or record["level"].no == logging.ERROR:

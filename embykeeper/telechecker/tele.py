@@ -7,7 +7,14 @@ from loguru import logger
 from pyrogram import Client as _Client
 from pyrogram import raw, types, utils, filters
 from pyrogram.enums import SentCodeType
-from pyrogram.errors import BadRequest, RPCError, Unauthorized, SessionPasswordNeeded, CodeInvalid, PhoneCodeInvalid
+from pyrogram.errors import (
+    BadRequest,
+    RPCError,
+    Unauthorized,
+    SessionPasswordNeeded,
+    CodeInvalid,
+    PhoneCodeInvalid,
+)
 from pyrogram.handlers import MessageHandler
 from aiocache import Cache
 
@@ -307,7 +314,7 @@ class ClientsSession:
                 self.pool[phone] = (client, 1)
                 self.phones.append(phone)
                 await self.done.put(client)
-                logger.debug(f'Telegram 账号池计数增加: {phone} => 1')
+                logger.debug(f"Telegram 账号池计数增加: {phone} => 1")
         else:
             await self.done.put(None)
 
@@ -326,7 +333,7 @@ class ClientsSession:
                     ref += 1
                     self.pool[phone] = (client, ref)
                     await self.done.put(client)
-                    logger.debug(f'Telegram 账号池计数增加: {phone} => {ref}')
+                    logger.debug(f"Telegram 账号池计数增加: {phone} => {ref}")
                 else:
                     self.pool[phone] = asyncio.create_task(self.loginer(a))
         return self
@@ -347,4 +354,4 @@ class ClientsSession:
                 client, ref = entry
                 ref -= 1
                 self.pool[phone] = (client, ref)
-                logger.debug(f'Telegram 账号池计数降低: {phone} => {ref}')
+                logger.debug(f"Telegram 账号池计数降低: {phone} => {ref}")
