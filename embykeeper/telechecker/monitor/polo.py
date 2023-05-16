@@ -3,6 +3,7 @@ from pyrogram.types import Message
 
 from .base import Monitor
 
+__ignore__ = True
 
 class PoloMonitor(Monitor):
     name = "Polo"
@@ -10,6 +11,7 @@ class PoloMonitor(Monitor):
     chat_keyword = r"普通可用的注册码:\n([\s\S]*)"
     bot_username = "polo_emby_bot"
     notify_create_name = True
+    allow_edit = False
 
     async def on_trigger(self, message: Message, key, reply):
         for code in key.split("\n"):

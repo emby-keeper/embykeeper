@@ -119,6 +119,9 @@ class BotCheckin(BaseBotCheckin):
             except UsernameNotOccupied:
                 self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
                 return False
+            except KeyError as e:
+                self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
+                return False
             except FloodWait as e:
                 self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
                 await asyncio.sleep(e.value)

@@ -101,6 +101,7 @@ class Monitor:
     chat_follow_user: int = 0  # 需要等待 N 个用户发送 {chat_reply} 方可回复
     chat_reply: str = None  # 回复的内容, 可以通过 @property 类属性重写.
     notify_create_name: bool = False  # 启动时生成 unique name 并提示
+    allow_edit: bool = True # 检测编辑消息内容
 
     def __init__(self, client: Client, nofail=True, basedir=None, config: dict = {}):
         self.client = client
@@ -120,10 +121,10 @@ class Monitor:
         return filter
 
     def get_handlers(self):
-        return [
-            MessageHandler(self._message_handler, self.get_filter()),
-            EditedMessageHandler(self._message_handler, self.get_filter()),
-        ]
+        handlers = [MessageHandler(self._message_handler, self.get_filter())]
+        if self.allow_edit:
+            handlers.append(EditedMessageHandler(self._message_handler, self.get_filter()))
+        return handlers
 
     @asynccontextmanager
     async def listener(self):
@@ -159,6 +160,9 @@ class Monitor:
                     chat_ids.append(chat.id)
                 except UsernameNotOccupied:
                     self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
+                    return False
+                except KeyError as e:
+                    self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
                     return False
                 except FloodWait as e:
                     self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
