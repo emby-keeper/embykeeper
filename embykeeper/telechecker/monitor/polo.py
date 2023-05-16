@@ -5,6 +5,7 @@ from .base import Monitor
 
 __ignore__ = True
 
+
 class PoloMonitor(Monitor):
     name = "Polo"
     chat_name = "poloemby"
