@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href='https://github.com/embykeeper/embykeeper'>
-    <img src="https://github.com/embykeeper/embykeeper/blob/main/images/logo.svg" alt="Embykeeper" />
+    <img src="https://github.com/embykeeper/embykeeper/raw/main/images/logo.svg" alt="Embykeeper" />
   </a>
 </p>
 <p align="center">
@@ -294,7 +294,7 @@ $ embykeeper config.toml -a
 
 ##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
 
-![Kitty](images/kitty.gif)
+![Kitty](https://github.com/embykeeper/embykeeper/raw/main/images/kitty.gif)
 
 ## 配置项
 
