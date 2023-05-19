@@ -8,7 +8,7 @@ from typing import Any, Coroutine, Iterable, Union
 
 from loguru import logger
 import click
-from typer import Typer, Exit
+from typer import Typer
 from typer.core import TyperCommand
 
 from . import __url__, __name__
@@ -30,10 +30,10 @@ class AsyncTyper(Typer):
                 try:
                     return asyncio.run(async_func(*_args, **_kwargs))
                 except KeyboardInterrupt:
-                    print("\r", end="")
+                    print("\r", end="", flush=True)
                     logger.info("所有客户端已停止, 欢迎您再次使用 Embykeeper.")
                 except Exception as e:
-                    print("\r", end="")
+                    print("\r", end="", flush=True)
                     fail_message(e)
                     sys.exit(1)
 

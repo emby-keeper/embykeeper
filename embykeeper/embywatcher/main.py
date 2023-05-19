@@ -4,7 +4,7 @@ import string
 from typing import Union
 from datetime import datetime
 
-from aiohttp import ClientError
+from aiohttp import ClientError, ClientConnectionError
 from loguru import logger
 from embypy.objects import Episode, Movie
 
@@ -119,7 +119,7 @@ async def login(config):
         )
         try:
             info = await emby.info()
-        except (ConnectionError, RuntimeError):
+        except (ConnectionError, RuntimeError, ClientConnectionError):
             logger.error(f'Emby ({a["url"]}) 连接错误, 请重新检查配置.')
             continue
         if info:

@@ -23,7 +23,7 @@ def formatter(record):
         "telemonitor": "消息监控",
         "telemessager": "定时水群",
         "telelink": "账号服务",
-        "embywatcher": "Emby 保活",
+        "embywatcher": "Emby保活",
     }
 
     if scheme in ("telegram", "telechecker", "telemonitor", "telemessager", "telelink"):

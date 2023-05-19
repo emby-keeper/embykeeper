@@ -61,9 +61,9 @@ class Client(_Client):
                 }
                 if not self.phone_code:
                     if retry:
-                        msg = f'验证码错误, 请在重新输入 "{self.phone_number}" 的登录验证码'
+                        msg = f'验证码错误, 请重新输入 "{self.phone_number}" 的登录验证码'
                     else:
-                        msg = f'请在{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码'
+                        msg = f'请从{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码'
                     self.phone_code = Prompt.ask(" " * 23 + msg)
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
             except (CodeInvalid, PhoneCodeInvalid):
@@ -74,9 +74,9 @@ class Client(_Client):
                 while True:
                     if not self.password:
                         if retry:
-                            msg = f'密码错误, 请重新输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认):'
+                            msg = f'密码错误, 请重新输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认)'
                         else:
-                            msg = f'需要输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认): '
+                            msg = f'需要输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认)'
                         self.password = Prompt.ask(" " * 23 + msg, password=True)
                     try:
                         return await self.check_password(self.password)
@@ -219,7 +219,7 @@ class ClientsSession:
                     except (TypeError, KeyError):
                         pass
         except asyncio.CancelledError:
-            print("\r正在停止...\r", end="")
+            print("\r正在停止...\r", end="", flush=True)
             await cls.shutdown()
 
     @classmethod
@@ -294,6 +294,9 @@ class ClientsSession:
                     await client.start()
                 except Unauthorized:
                     await client.storage.delete()
+                except KeyError:
+                    logger.warning(f'登录账号 "{client.phone_number}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
+                    await asyncio.sleep(3)
                 else:
                     break
         except asyncio.CancelledError:
@@ -301,7 +304,7 @@ class ClientsSession:
         except RPCError as e:
             logger.error(f'登录账号 "{client.phone_number}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
         except Exception as e:
-            logger.exception(f'登录账号 "{client.phone_number}" 时发生异常, 将被跳过:')
+            logger.opt(exception=e).error(f'登录账号 "{client.phone_number}" 时发生异常, 将被跳过:')
         else:
             logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client
@@ -321,7 +324,8 @@ class ClientsSession:
     async def __aenter__(self):
         for a in self.accounts:
             phone = a["phone"]
-            async with self.lock:
+            try:
+                await self.lock.acquire()
                 if phone in self.pool:
                     if isinstance(self.pool[phone], asyncio.Task):
                         self.lock.release()
@@ -336,6 +340,11 @@ class ClientsSession:
                     logger.debug(f"Telegram 账号池计数增加: {phone} => {ref}")
                 else:
                     self.pool[phone] = asyncio.create_task(self.loginer(a))
+            finally:
+                try:
+                    self.lock.release()
+                except RuntimeError:
+                    pass
         return self
 
     def __aiter__(self):

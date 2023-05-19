@@ -21,3 +21,8 @@ class PornEmbyCheckin(AnswerBotCheckin):
             await message.click(0)
         except TimeoutError:
             pass
+        try:
+            msg = await self.client.wait_reply(self.bot_username)
+        except asyncio.TimeoutError:
+            self.log.warning(f"签到无回应, 您可能还没有注册{self.name}.")
+            await self.fail()

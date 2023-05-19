@@ -3,11 +3,11 @@ import sys
 from loguru import logger
 
 import tomli as tomllib
-from schema import And, Optional, Or, Regex, Schema, SchemaError, Use
+from schema import And, Optional, Or, Regex, Schema, SchemaError
 
 
 def check_config(config):
-    PositiveInt = lambda: And(Use(int), lambda n: n > 0)
+    PositiveInt = lambda: And(int, lambda n: n > 0)
     schema = Schema(
         {
             Optional("timeout"): PositiveInt(),
@@ -21,15 +21,15 @@ def check_config(config):
                     Optional("hostname"): Regex(
                         r"^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$"
                     ),
-                    Optional("port"): And(Use(int), lambda n: n > 1024 and n < 65536),
+                    Optional("port"): And(int, lambda n: n > 1024 and n < 65536),
                     Optional("scheme"): Schema(Or("socks5", "http")),
                 }
             ),
             Optional("service"): Schema(
                 {
-                    Optional("checkiner"): [Use(str)],
-                    Optional("monitor"): [Use(str)],
-                    Optional("messager"): [Use(str)],
+                    Optional("checkiner"): [str],
+                    Optional("monitor"): [str],
+                    Optional("messager"): [str],
                 }
             ),
             Optional("telegram"): [
@@ -37,7 +37,7 @@ def check_config(config):
                     {
                         "api_id": Regex(r"^\d+$"),
                         "api_hash": Regex(r"^[a-z0-9]+$"),
-                        "phone": Use(str),
+                        "phone": str,
                         Optional("monitor"): bool,
                         Optional("send"): bool,
                     }
@@ -49,8 +49,8 @@ def check_config(config):
                         "url": Regex(
                             r"(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])"
                         ),
-                        "username": Use(str),
-                        "password": Use(str),
+                        "username": str,
+                        "password": str,
                         Optional("time"): PositiveInt(),
                         Optional("progress"): PositiveInt(),
                     }
@@ -194,7 +194,6 @@ def prepare_config(config_file=None):
         sys.exit(253)
     proxy: dict = config.get("proxy", None)
     if proxy:
-        logger.debug(f"默认代理已设定为: socks5://127.0.0.1:1080")
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
         proxy.setdefault("port", 1080)
