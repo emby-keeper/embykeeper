@@ -35,6 +35,8 @@ def formatter(record):
     elif scheme == "embywatcher":
         ident = ifextra(["server", "username"], " ([cyan]{}:{}[/])")
         return f"[blue]{scheme_names[scheme]}[/]{ident}: {{message}}"
+    elif scheme == "datamanager":
+        return f"[blue]{scheme_names[scheme]}[/]: {{message}}"
     else:
         return "{message}"
 
