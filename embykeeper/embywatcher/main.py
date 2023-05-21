@@ -2,12 +2,13 @@ import asyncio
 import random
 import string
 from typing import Union
-from datetime import datetime
+from datetime import datetime, time
 
 from aiohttp import ClientError, ClientConnectionError
 from loguru import logger
 from embypy.objects import Episode, Movie
 
+from ..utils import next_random_datetime
 from .emby import Emby, Connector, EmbyObject
 
 logger = logger.bind(scheme="embywatcher")
@@ -183,7 +184,7 @@ async def watch(emby, time, progress, logger, retries=5):
             return False
 
 
-async def watcher(config):
+async def watcher(config: dict):
     async def wrapper(emby, time, progress, logger):
         try:
             return await asyncio.wait_for(watch(emby, time, progress, logger), max(time * 3, 180))
@@ -198,3 +199,11 @@ async def watcher(config):
     fails = len(tasks) - sum(results)
     if fails:
         logger.error(f"保活失败 ({fails}/{len(tasks)}).")
+
+
+async def watcher_schedule(config: dict, days: int = 7):
+    dt = next_random_datetime(time(11, 0), time(23, 0), interval_days=days)
+    while True:
+        logger.bind(scheme="embywatcher").info(f"下一次保活将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
+        await asyncio.sleep((dt - datetime.now()).seconds)
+        await watcher(config)

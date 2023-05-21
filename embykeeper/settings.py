@@ -102,7 +102,7 @@ def write_faked_config(path):
     doc["concurrent"] = 1
     doc.add(nl())
     doc.add(comment("计划任务时, 各签到器启动前等待的随机时间 (分钟)."))
-    doc["random"] = 60
+    doc["random"] = 15
     doc["proxy"] = {
         "hostname": "127.0.0.1",
         "port": 1080,

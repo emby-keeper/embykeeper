@@ -227,29 +227,43 @@ $ embykeeper -h
 参数:
     config  配置文件 (置空以生成)
 模块开关:
-    --checkin     -c   启用每日指定时间签到 (不指定值时默认为6:00PM)
+    --checkin     -c   启用每日签到 (不指定值时默认为<8:00PM,9:00PM>随机时间)
     --emby        -e   启用每隔天数Emby自动保活 (不指定值时默认为每7天)
     --monitor     -m   启用群聊监视
     --send        -s   启用自动水群
 调试参数:
     --no-instant  -I   不立刻执行一次计划任务
-    --debug       -d   开启调试模式, 错误将会导致程序停止运行
+    --once        -o   仅执行一次任务而不计划执行
+    --debug       -d   开启调试输出, 错误将会导致程序停止运行
     --version     -v   打印 Embykeeper 版本
     --follow      -f   仅启动消息调试
     --analyze     -a   仅启动历史信息分析
+    --basedir          设定输出文件默认位置
 ```
 
 例如:
 
 ```bash
+# 启动所有功能 (在各账号配置中进一步设置功能开启/关闭)
+$ embykeeper config.toml
+
 # 仅启动每日签到
 $ embykeeper config.toml -c
 
 # 仅启动每日 8:00 PM 签到
 $ embykeeper config.toml -c 8:00PM
 
+# 仅启动每日 8:00 PM - 9:00 PM 随机时间签到
+$ embykeeper config.toml -c <8:00PM,9:00PM>
+
 # 启动所有功能, 同时调整签到时间为 8:00 AM, 调整保活间隔天数为 14
 $ embykeeper config.toml -c 8:00PM -e 14 -m -s
+
+# 启动所有功能, 只运行一次
+$ embykeeper config.toml --once
+
+# 启动所有功能, 不立即执行一次签到/保活
+$ embykeeper config.toml -I
 ```
 
 您也可以使用附带的调试工具帮助本项目的开发, 例如历史记录分析器:
@@ -301,7 +315,7 @@ $ embykeeper config.toml -a
 | `timeout`    | `int`              | Telegram 机器人签到超时 (秒)                 | `120`   |
 | `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `4`    |
 | `concurrent` | `int`              | Telegram 机器人签到最大并发                  | `1`     |
-| `random`     | `int`              | Telegram 机器人签到定时任务时间随机量 (分钟) | `15`    |
+| `random`     | `int`              | Telegram 机器人签到各站点间时间随机量 (分钟) | `15`    |
 | `notifier`   | `int`/`bool`/`str` | 发送通知到 Telegram 账号 (序号/手机号)       | `False` |
 | `service`    | `dict`             | 签到/水群/监视功能开启站点设置               | `{}`    |
 | `proxy`      | `dict`             | 代理设置                                     | `{}`    |

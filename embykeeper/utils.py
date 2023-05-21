@@ -1,6 +1,6 @@
 import asyncio
 from collections import namedtuple
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from functools import wraps
 import random
 import sys
@@ -28,7 +28,7 @@ class AsyncTyper(Typer):
             @wraps(async_func)
             def sync_func(*_args, **_kwargs):
                 try:
-                    return asyncio.run(async_func(*_args, **_kwargs))
+                    asyncio.run(async_func(*_args, **_kwargs))
                 except KeyboardInterrupt:
                     print("\r", end="", flush=True)
                     logger.info("所有客户端已停止, 欢迎您再次使用 Embykeeper.")
@@ -36,6 +36,8 @@ class AsyncTyper(Typer):
                     print("\r", end="", flush=True)
                     fail_message(e)
                     sys.exit(1)
+                else:
+                    logger.info("所有任务已完成, 欢迎您再次使用 Embykeeper.")
 
             self.command(*args, **kwargs)(sync_func)
             return async_func
@@ -163,12 +165,24 @@ async def idle():
     await asyncio.Event().wait()
 
 
-def random_time(start_time, end_time):
-    start_datetime = datetime.combine(date.today(), start_time)
-    end_datetime = datetime.combine(date.today(), end_time)
+def random_time(start_time: time = None, end_time: time = None):
+    start_datetime = datetime.combine(date.today(), start_time or time(0, 0))
+    end_datetime = datetime.combine(date.today(), end_time or time(23, 59, 59))
     if end_datetime < start_datetime:
         end_datetime += timedelta(days=1)
     time_diff_seconds = (end_datetime - start_datetime).seconds
     random_seconds = random.randint(0, time_diff_seconds)
     random_time = (start_datetime + timedelta(seconds=random_seconds)).time()
     return random_time
+
+
+def next_random_datetime(start_time: time = None, end_time: time = None, interval_days=1):
+    min_datetime = datetime.now() + timedelta(days=interval_days)
+    target_time = random_time(start_time, end_time)
+    offset_date = 0
+    while True:
+        offset_date += 1
+        t = datetime.combine(datetime.now() + timedelta(days=offset_date), target_time)
+        if t >= min_datetime:
+            break
+    return t

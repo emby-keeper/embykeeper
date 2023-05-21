@@ -6,11 +6,10 @@ import sys
 import typer
 import asyncio
 from appdirs import user_data_dir
-from schedule import Scheduler
 from dateutil import parser
 
 from . import __author__, __name__, __url__, __version__
-from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool, random_time
+from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool
 from .settings import prepare_config
 
 app = AsyncTyper(
@@ -19,12 +18,6 @@ app = AsyncTyper(
     add_completion=False,
     context_settings={"help_option_names": ["-h", "--help"]},
 )
-
-
-async def run_pending(scheduler: Scheduler):
-    while True:
-        scheduler.run_pending()
-        await asyncio.sleep(1)
 
 
 def version(version):
@@ -46,7 +39,7 @@ async def main(
         help="配置文件 (置空以生成)",
     ),
     checkin: str = typer.Option(
-        Flagged("", "<5:00PM,8:00PM>"),
+        Flagged("", "<10:00AM,9:00PM>"),
         "--checkin",
         "-c",
         rich_help_panel="模块开关",
@@ -117,8 +110,16 @@ async def main(
     if not basedir == Path("/app"):
         logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
 
-    from .embywatcher.main import watcher
-    from .telechecker.main import analyzer, checkiner, follower, messager, monitorer, notifier
+    from .embywatcher.main import watcher, watcher_schedule
+    from .telechecker.main import (
+        analyzer,
+        checkiner,
+        checkiner_schedule,
+        follower,
+        messager,
+        monitorer,
+        notifier,
+    )
 
     if follow:
         return await follower(config)
@@ -143,44 +144,25 @@ async def main(
         logger.debug("启动时立刻执行签到和保活: 已完成.")
 
     if not once:
-        pool = AsyncTaskPool()
-
         await notifier(config)
-
+        pool = AsyncTaskPool()
         debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
-            schedule_emby = Scheduler()
-            pool.add(run_pending(schedule_emby))
-            schedule_emby.every(1 if debug_cron else emby).days.at(
-                (debug_time or datetime.now()).strftime("%H:%M:%S")
-            ).do(lambda: pool.add(watcher(config)))
-            logger.bind(scheme="embywatcher").info(
-                f"下一次保活将在 {schedule_emby.next_run.strftime('%m-%d %H:%M %p')} 进行."
-            )
+            pool.add(watcher_schedule(config, 1 if debug_cron else emby))
         if checkin:
-            schedule_checkin = Scheduler()
-            pool.add(run_pending(schedule_checkin))
             if debug_time:
-                checkin = debug_time.strftime("%H:%M:%S")
+                start_time = end_time = debug_time.time()
             else:
                 checkin_range_match = re.match(r"<\s*(.*),\s*(.*)\s*>", checkin)
                 if checkin_range_match:
-                    time_range = [parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]
-                    checkin = random_time(*time_range).strftime("%H:%M:%S")
+                    start_time, end_time = [parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]
                 else:
-                    checkin = parser.parse(checkin).time().strftime("%H:%M:%S")
-            schedule_checkin.every().day.at(checkin).do(
-                lambda: pool.add(checkiner(config, instant=debug_cron))
-            )
-            logger.bind(scheme="telechecker").info(
-                f"下一次签到将在 {schedule_checkin.next_run.strftime('%m-%d %H:%M %p')} 进行."
-            )
-        if send:
-            schedule_send = Scheduler()
-            pool.add(run_pending(schedule_send))
-            pool.add(messager(config, schedule_send))
+                    start_time = end_time = parser.parse(checkin).time()
+            pool.add(checkiner_schedule(config, instant=debug_cron, start_time=start_time, end_time=end_time))
         if monitor:
             pool.add(monitorer(config))
+        if send:
+            pool.add(messager(config))
 
         async for t in pool.as_completed():
             msg = f"任务 {t.get_name()} "

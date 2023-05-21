@@ -182,7 +182,7 @@ class BotCheckin(BaseBotCheckin):
                     pass
                 finally:
                     if self._is_archived:
-                        self.log.debug(f'[gray50]将会话重新归档: {bot.username}[/]')
+                        self.log.debug(f"[gray50]将会话重新归档: {bot.username}[/]")
                         try:
                             await asyncio.shield(asyncio.wait_for(chat.archive(), 0.5))
                         except asyncio.TimeoutError:

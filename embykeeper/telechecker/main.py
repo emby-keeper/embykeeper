@@ -1,10 +1,10 @@
 import asyncio
+from datetime import datetime
 import inspect
 import logging
 import operator
 import pkgutil
 import random
-from logging import StreamHandler
 from typing import List, Type
 from importlib import import_module
 
@@ -19,7 +19,7 @@ from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
 from rich.table import Column, Table
 from rich.text import Text
 
-from ..utils import batch, flatten, idle, time_in_range, async_partial
+from ..utils import batch, flatten, idle, time_in_range, async_partial, next_random_datetime
 from ..log import logger, formatter
 from . import __name__
 from .link import Link
@@ -132,8 +132,8 @@ async def dump_message(client: Client, message: Message, table: Table):
 
 async def checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     if wait > 0:
-        checkiner.log.debug(f"随机启动等待: 将等待 {wait} 秒以启动.")
-    await asyncio.sleep(wait)
+        checkiner.log.debug(f"随机启动等待: 将等待 {wait} 分钟以启动.")
+    await asyncio.sleep(wait * 60)
     async with sem:
         return await checkiner._start()
 
@@ -168,7 +168,7 @@ async def checkiner(config: dict, instant=False):
             names = []
             for c in checkiners:
                 names.append(c.name)
-                wait = 0 if instant else random.randint(0, 60 * config.get("random", 60))
+                wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
             coros.append(gather_task(tasks, username=tg.me.name))
@@ -202,6 +202,14 @@ async def checkiner(config: dict, instant=False):
                     log.bind(notify=True).info(f"签到成功 ({spec}).")
 
 
+async def checkiner_schedule(config: dict, start_time=None, end_time=None, instant=False):
+    dt = next_random_datetime(start_time, end_time, 0)
+    while True:
+        logger.bind(scheme="telechecker").info(f"下一次签到将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
+        await asyncio.sleep((dt - datetime.now()).seconds)
+        await checkiner(config, instant=instant)
+
+
 async def monitorer(config: dict):
     logger.debug("正在启动消息监控模块, 请等待登录.")
     jobs = []
@@ -232,8 +240,9 @@ async def monitorer(config: dict):
         await asyncio.gather(*jobs)
 
 
-async def messager(config: dict, scheduler):
+async def messager(config: dict):
     logger.debug("正在启动自动水群模块.")
+    messagers = []
     async with ClientsSession.from_config(config, send=True) as clients:
         async for tg in clients:
             log = logger.bind(scheme="telemessager", username=tg.me.name)
@@ -242,14 +251,16 @@ async def messager(config: dict, scheduler):
                 continue
             clses = extract(get_cls("messager", names=config.get("service", {}).get("messager", None)))
             for cls in clses:
-                cls(
-                    {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
-                    scheduler,
-                    username=tg.me.name,
-                    proxy=config.get("proxy", None),
-                    nofail=config.get("nofail", True),
-                    basedir=config.get("basedir", None),
-                ).start()
+                messagers.append(
+                    cls(
+                        {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
+                        username=tg.me.name,
+                        nofail=config.get("nofail", True),
+                        proxy=config.get("proxy", None),
+                        basedir=config.get("basedir", None),
+                    )
+                )
+    await asyncio.gather(*[m.start() for m in messagers])
 
 
 async def follower(config: dict):
