@@ -1,17 +1,17 @@
 import asyncio
-import io
 import random
+import time
 from typing import Callable, Coroutine, List, Optional, Tuple, Union
 import uuid
 
 import tomli
 from loguru import logger
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
-from rich.text import Text
 
-from ..utils import async_partial
+from ..utils import async_partial, truncate_str
+from .tele import Client
 
 
 class Link:
@@ -27,11 +27,13 @@ class Link:
         rd.seed(uuid.getnode())
         return uuid.UUID(int=rd.getrandbits(128))
 
-    @staticmethod
-    async def delete_messages(messages: List[Message]):
+    async def delete_messages(self, messages: List[Message]):
         async def delete(m: Message):
             try:
                 await m.delete(revoke=True)
+                text = m.text or m.caption or "图片或其他内容"
+                text = truncate_str(text.replace("\n", ""), 30)
+                self.log.debug(f"[gray50]删除了API消息记录: {text}[/]")
             except asyncio.CancelledError:
                 pass
 
@@ -40,6 +42,8 @@ class Link:
     async def post(
         self, cmd, condition: Callable = None, timeout: int = 10, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
+        self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
+        await self.client.mute_chat(self.bot, time.time() + timeout + 5)
         future = asyncio.Future()
         handler = MessageHandler(
             async_partial(self._handler, cmd=cmd, future=future, condition=condition),
@@ -81,8 +85,8 @@ class Link:
         finally:
             groups[1].remove(handler)
 
-    @staticmethod
     async def _handler(
+        self,
         client: Client,
         message: Message,
         cmd: str,
@@ -92,7 +96,7 @@ class Link:
         try:
             toml = tomli.loads(message.text)
         except tomli.TOMLDecodeError:
-            message.delete(revoke=False)
+            self.delete_messages([message])
         else:
             try:
                 if toml.get("command", None) == cmd:
@@ -105,11 +109,11 @@ class Link:
                     if cond:
                         future.set_result(toml)
                         await asyncio.sleep(0.5)
-                        await message.delete(revoke=False)
+                        await self.delete_messages([message])
                         return
             except asyncio.CancelledError as e:
                 try:
-                    await asyncio.wait_for(message.delete(revoke=False), 1.0)
+                    await asyncio.wait_for(self.delete_messages([message]), 1)
                 except asyncio.TimeoutError:
                     pass
                 finally:
@@ -133,20 +137,6 @@ class Link:
         if results:
             return results.get("answer", None)
 
-    async def sendlog(self, message):
-        results = await self.post(f"/log {self.instance} {message}", name="发送日志到 Telegram ")
+    async def send_log(self, message):
+        results = await self.post(f"/log {self.instance} {message}", name="发送日志到 Telegram")
         return bool(results)
-
-
-class TelegramStream(io.TextIOWrapper):
-    def __init__(self, link: Link = None):
-        super().__init__(io.BytesIO(), line_buffering=True)
-        self.link = link
-
-    def write(self, message):
-        message = Text.from_markup(message).plain
-        if message.endswith("\n"):
-            message = message[:-1]
-        if message:
-            asyncio.create_task(self.link.sendlog(message))
-        super().write(message + "\n")

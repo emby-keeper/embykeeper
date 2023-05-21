@@ -1,3 +1,5 @@
+from datetime import datetime
+import time
 import asyncio
 from typing import AsyncGenerator, Optional, Union
 
@@ -185,6 +187,20 @@ class Client(_Client):
         finally:
             groups[0].remove(handler)
 
+    async def mute_chat(self, chat_id: Union[int, str], until: Union[int, datetime]):
+        if isinstance(until, datetime):
+            until = until.timestamp()
+
+        return await self.invoke(
+            raw.functions.account.UpdateNotifySettings(
+                peer=raw.types.InputNotifyPeer(peer=await self.resolve_peer(chat_id)),
+                settings=raw.types.InputPeerNotifySettings(
+                    show_previews=False,
+                    mute_until=int(until),
+                ),
+            )
+        )
+
 
 class ClientsSession:
     pool = {}
@@ -336,6 +352,7 @@ class ClientsSession:
                     client, ref = self.pool[phone]
                     ref += 1
                     self.pool[phone] = (client, ref)
+                    self.phones.append(phone)
                     await self.done.put(client)
                     logger.debug(f"Telegram 账号池计数增加: {phone} => {ref}")
                 else:

@@ -18,6 +18,7 @@
 # Git
 .git
 .gitignore
+.github
 
 # Editor Config
 .editorconfig

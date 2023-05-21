@@ -91,6 +91,8 @@ async def main(
     if debug:
         config["nofail"] = False
         logger.warning("您当前处于调试模式, 错误将会导致程序停止运行.")
+    if debug_cron:
+        logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
 
     if emby < 0:
         emby = -emby
@@ -143,7 +145,7 @@ async def main(
     if not once:
         pool = AsyncTaskPool()
 
-        pool.add(notifier(config))
+        await notifier(config)
 
         debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
@@ -158,13 +160,15 @@ async def main(
         if checkin:
             schedule_checkin = Scheduler()
             pool.add(run_pending(schedule_checkin))
-            checkin_range_match = re.match(r"<\s*(.*),\s*(.*)\s*>", checkin)
-            if checkin_range_match:
-                checkin = random_time(
-                    *[parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]
-                ).strftime("%H:%M:%S")
+            if debug_time:
+                checkin = debug_time.strftime("%H:%M:%S")
             else:
-                checkin = (debug_time or parser.parse(checkin).time()).strftime("%H:%M:%S")
+                checkin_range_match = re.match(r"<\s*(.*),\s*(.*)\s*>", checkin)
+                if checkin_range_match:
+                    time_range = [parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]
+                    checkin = random_time(*time_range).strftime("%H:%M:%S")
+                else:
+                    checkin = parser.parse(checkin).time().strftime("%H:%M:%S")
             schedule_checkin.every().day.at(checkin).do(
                 lambda: pool.add(checkiner(config, instant=debug_cron))
             )

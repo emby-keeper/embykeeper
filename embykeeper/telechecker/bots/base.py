@@ -4,9 +4,11 @@ from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from enum import Flag, auto
 import string
+import time
 from typing import Iterable, List, Union
 
 from ddddocr import DdddOcr
+from appdirs import user_data_dir
 from loguru import logger
 from PIL import Image
 from pyrogram import filters
@@ -15,6 +17,7 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
 
+from ...data import get_data
 from ...utils import to_iterable, AsyncCountPool
 from ..tele import Client
 
@@ -33,11 +36,13 @@ class MessageType(Flag):
 class BaseBotCheckin(ABC):
     name = None
 
-    def __init__(self, client: Client, retries=4, timeout=120, nofail=True):
+    def __init__(self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None):
         self.client = client
         self.retries = retries
         self.timeout = timeout
         self.nofail = nofail
+        self.basedir = basedir or user_data_dir(__name__)
+        self.proxy = proxy
         self.finished = asyncio.Event()
         self.log = logger.bind(scheme="telechecker", name=self.name, username=client.me.name)
 
@@ -63,6 +68,7 @@ class BotCheckin(BaseBotCheckin):
 
     group_pool = AsyncCountPool(base=2000)
     ocr = default_ocr
+    lock = asyncio.Lock()
 
     name: str = None  # 签到器的名称
     bot_id: int = None  # Bot 的 UserID
@@ -139,11 +145,31 @@ class BotCheckin(BaseBotCheckin):
                 if not self.bot_allow_from_scratch:
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
                     return None
+
+        async with self.lock:
+            if isinstance(self.ocr, str):
+                data = []
+                files = (f"{self.ocr}.onnx", f"{self.ocr}.json")
+                async for p in get_data(self.basedir, files, proxy=self.proxy, caller=self.name):
+                    if p is None:
+                        self.log.warning(f"初始化错误: 无法下载所需文件.")
+                        return None
+                    else:
+                        data.append(p)
+                self.__class__.ocr = DdddOcr(
+                    show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1])
+                )
+
         bot = await self.client.get_users(self.bot_id or self.bot_username)
         msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
         if chat.title:
             msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
         self.log.info(msg + ".")
+
+        if not self.chat_name:
+            self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
+            await self.client.mute_chat(ident, time.time() + self.timeout + 10)
+
         try:
             async with self.listener():
                 if self.bot_use_history is None:
@@ -156,6 +182,7 @@ class BotCheckin(BaseBotCheckin):
                     pass
                 finally:
                     if self._is_archived:
+                        self.log.debug(f'[gray50]将会话重新归档: {bot.username}[/]')
                         try:
                             await asyncio.shield(asyncio.wait_for(chat.archive(), 0.5))
                         except asyncio.TimeoutError:
@@ -163,6 +190,9 @@ class BotCheckin(BaseBotCheckin):
         except OSError as e:
             self.log.warning(f'初始化错误: "{e}".')
             return False
+        finally:
+            if not self.chat_name:
+                await self.client.read_chat_history(ident)
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
@@ -251,7 +281,7 @@ class BotCheckin(BaseBotCheckin):
             .replace(" ", "")
         )
         if captcha:
-            self.log.info(f"[gray50]接收验证码: {captcha}.[/]")
+            self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
             if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
                 self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
                 await self.retry()

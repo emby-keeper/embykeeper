@@ -22,7 +22,8 @@ from rich.text import Text
 from ..utils import batch, flatten, idle, time_in_range, async_partial
 from ..log import logger, formatter
 from . import __name__
-from .link import Link, TelegramStream
+from .link import Link
+from .log import TelegramStream
 from .tele import Client, ClientsSession
 from .bots.base import BaseBotCheckin
 
@@ -158,6 +159,8 @@ async def checkiner(config: dict, instant=False):
                     retries=config.get("retries", 4),
                     timeout=config.get("timeout", 120),
                     nofail=config.get("nofail", True),
+                    basedir=config.get("basedir", None),
+                    proxy=config.get("proxy", None),
                 )
                 for cls in clses
             ]
@@ -217,7 +220,8 @@ async def monitorer(config: dict):
                         cls(
                             tg,
                             nofail=config.get("nofail", True),
-                            basedir=config.get("basedir", True),
+                            basedir=config.get("basedir", None),
+                            proxy=config.get("proxy", None),
                             config=cls_config,
                         )._start()
                     )
@@ -244,7 +248,7 @@ async def messager(config: dict, scheduler):
                     username=tg.me.name,
                     proxy=config.get("proxy", None),
                     nofail=config.get("nofail", True),
-                    basedir=config.get("basedir", True),
+                    basedir=config.get("basedir", None),
                 ).start()
 
 
@@ -363,11 +367,11 @@ async def notifier(config: dict):
         except IndexError:
             notifier = None
     if notifier:
-        logger.debug("正在启动消息反馈模块, 请等待登录.")
-        async with ClientsSession(
-            [notifier], proxy=config.get("proxy", None), basedir=config.get("basedir", None)
-        ) as clients:
-            async for tg in clients:
-                logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{tg.phone_number}" 账号.')
-                logger.add(StreamHandler(TelegramStream(link=Link(tg))), format=_formatter, filter=_filter)
-            await idle()
+        logger.info(f'计划任务的关键消息将通过 Embykeeper Bot 发送至 "{notifier["phone"]}" 账号.')
+        logger.add(
+            TelegramStream(
+                account=notifier, proxy=config.get("proxy", None), basedir=config.get("basedir", None)
+            ),
+            format=_formatter,
+            filter=_filter,
+        )

@@ -34,7 +34,7 @@ async def generate(config: Path, output: Path = "captchas.txt"):
 
 
 @app.async_command()
-async def label(config: Path, inp: Path = "captchas.txt", onnx: Path=None, charsets: Path = None):
+async def label(config: Path, inp: Path = "captchas.txt", onnx: Path = None, charsets: Path = None):
     ocr = DdddOcr(beta=True, show_ad=False, import_onnx_path=str(onnx), charsets_path=str(charsets))
     output = Path(__file__).parent / "data"
     output.mkdir(exist_ok=True, parents=True)

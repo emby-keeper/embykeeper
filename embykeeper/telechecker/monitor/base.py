@@ -103,10 +103,11 @@ class Monitor:
     notify_create_name: bool = False  # 启动时生成 unique name 并提示
     allow_edit: bool = True  # 检测编辑消息内容
 
-    def __init__(self, client: Client, nofail=True, basedir=None, config: dict = {}):
+    def __init__(self, client: Client, nofail=True, basedir=None, proxy=None, config: dict = {}):
         self.client = client
         self.nofail = nofail
         self.basedir = basedir or user_data_dir(__name__)
+        self.proxy = proxy
         self.config = config
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None

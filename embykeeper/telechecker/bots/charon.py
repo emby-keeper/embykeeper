@@ -1,17 +1,11 @@
 import asyncio
-from importlib import resources
-from ddddocr import DdddOcr
 
 from .base import BotCheckin
-from embykeeper.data import ocr as ocr_models
 
 
 class CharonCheckin(BotCheckin):
-    with resources.path(ocr_models, "words6.onnx") as onnx:
-        with resources.path(ocr_models, "words6.json") as charsets:
-            ocr = DdddOcr(show_ad=False, import_onnx_path=str(onnx), charsets_path=str(charsets))
-
     name = "卡戎"
+    ocr = "words6@v1"
     bot_username = "charontv_bot"
     bot_checkin_cmd = ["/checkin", "/cancel"]
     bot_send_interval = 3

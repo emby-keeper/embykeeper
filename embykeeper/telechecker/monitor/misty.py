@@ -1,20 +1,19 @@
 import asyncio
 import string
-from importlib import resources
+from typing import Optional
 
 from pyrogram.types import Message
 from PIL import Image
 from ddddocr import DdddOcr
 
-from embykeeper.data import ocr as ocr_models
 from ...utils import async_partial
+from ...data import get_data
 from .base import Monitor
 
 
 class MistyMonitor(Monitor):
-    with resources.path(ocr_models, "digit5-teko.onnx") as onnx:
-        with resources.path(ocr_models, "digit5-teko.json") as charsets:
-            ocr = DdddOcr(show_ad=False, import_onnx_path=str(onnx), charsets_path=str(charsets))
+    ocr = "digit5-teko@v1"
+    lock = asyncio.Lock()
 
     name = "Misty"
     chat_name = "FreeEmbyGroup"
@@ -24,6 +23,20 @@ class MistyMonitor(Monitor):
     notify_create_name = True
 
     async def init(self, initial=True):
+        async with self.lock:
+            if isinstance(self.ocr, str):
+                data = []
+                files = (f"{self.ocr}.onnx", f"{self.ocr}.json")
+                async for p in get_data(self.basedir, files, proxy=self.proxy, caller=self.name):
+                    if p is None:
+                        self.log.info(f"初始化错误: 无法下载所需文件.")
+                        return False
+                    else:
+                        data.append(p)
+                self.__class__.ocr = DdddOcr(
+                    show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1])
+                )
+
         self.captcha = None
         self.log.info(f"正在初始化机器人状态.")
         wr = async_partial(self.client.wait_reply, self.bot_username)
