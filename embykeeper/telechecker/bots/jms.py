@@ -8,7 +8,7 @@ __ignore__ = True
 
 
 class JMSCheckin(AnswerBotCheckin):
-    ocr = 'idioms@v1'
+    ocr = "idioms@v1"
     idioms = None
 
     name = "卷毛鼠"
@@ -17,7 +17,9 @@ class JMSCheckin(AnswerBotCheckin):
     async def start(self):
         async with self.lock:
             if self.idioms is None:
-                with open(await get_data(self.basedir, "idioms@v1.txt", proxy=self.proxy, caller=self.name)) as f:
+                with open(
+                    await get_data(self.basedir, "idioms@v1.txt", proxy=self.proxy, caller=self.name)
+                ) as f:
                     self.__class__.idioms = [i for i in f.read().splitlines() if len(i) == 4]
         return await super().start()
 

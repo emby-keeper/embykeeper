@@ -12,6 +12,7 @@ from .utils import to_iterable, humanbytes
 
 logger = logger.bind(scheme="datamanager")
 
+
 async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict = None, caller: str = None):
     basedir.mkdir(parents=True, exist_ok=True)
 
@@ -46,17 +47,19 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                         async with session.get(url) as resp:
                             if resp.status == 200:
                                 file_size = int(resp.headers.get("Content-Length", 0))
-                                logger.info(f'开始下载: {name} ({humanbytes(file_size)})')
+                                logger.info(f"开始下载: {name} ({humanbytes(file_size)})")
                                 async with aiofiles.open(basedir / name, mode="wb+") as f:
                                     timer = time.time()
                                     length = 0
                                     async for chunk in resp.content.iter_chunked(512):
                                         if time.time() - timer > 3:
                                             timer = time.time()
-                                            logger.info(f'正在下载: {name} ({humanbytes(length)} / {humanbytes(file_size)})')
+                                            logger.info(
+                                                f"正在下载: {name} ({humanbytes(length)} / {humanbytes(file_size)})"
+                                            )
                                         await f.write(chunk)
                                         length += len(chunk)
-                                logger.info(f'下载完成: {name} ({humanbytes(file_size)})')
+                                logger.info(f"下载完成: {name} ({humanbytes(file_size)})")
                                 yield basedir / name
                                 break
                             else:
@@ -76,6 +79,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                 logger.warning(f"下载失败: {name}.")
                 yield None
                 continue
+
 
 async def get_data(basedir: Path, name: str, proxy: dict = None, caller: str = None):
     async for data in get_datas(basedir, name, proxy, caller):
