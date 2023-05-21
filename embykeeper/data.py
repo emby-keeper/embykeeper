@@ -1,19 +1,18 @@
 import asyncio
+import time
 from pathlib import Path
 from typing import Iterable, Union
 
-from rich.progress import Progress, DownloadColumn, TransferSpeedColumn
 from loguru import logger
 import aiohttp
 import aiofiles
 from aiohttp_socks import ProxyConnector, ProxyType
 
-from .utils import to_iterable
+from .utils import to_iterable, humanbytes
 
 logger = logger.bind(scheme="datamanager")
 
-
-async def get_data(basedir: Path, names: Union[str, Iterable[str]], proxy: dict = None, caller: str = None):
+async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict = None, caller: str = None):
     basedir.mkdir(parents=True, exist_ok=True)
 
     existing = {}
@@ -47,17 +46,17 @@ async def get_data(basedir: Path, names: Union[str, Iterable[str]], proxy: dict 
                         async with session.get(url) as resp:
                             if resp.status == 200:
                                 file_size = int(resp.headers.get("Content-Length", 0))
+                                logger.info(f'开始下载: {name} ({humanbytes(file_size)})')
                                 async with aiofiles.open(basedir / name, mode="wb+") as f:
-                                    progress = Progress(
-                                        *Progress.get_default_columns(),
-                                        DownloadColumn(),
-                                        TransferSpeedColumn(),
-                                    )
-                                    with progress:
-                                        task = progress.add_task(f"[green]{name}:", total=file_size)
-                                        async for chunk in resp.content.iter_chunked(512):
-                                            await f.write(chunk)
-                                            progress.update(task, advance=len(chunk))
+                                    timer = time.time()
+                                    length = 0
+                                    async for chunk in resp.content.iter_chunked(512):
+                                        if time.time() - timer > 3:
+                                            timer = time.time()
+                                            logger.info(f'正在下载: {name} ({humanbytes(length)} / {humanbytes(file_size)})')
+                                        await f.write(chunk)
+                                        length += len(chunk)
+                                logger.info(f'下载完成: {name} ({humanbytes(file_size)})')
                                 yield basedir / name
                                 break
                             else:
@@ -69,7 +68,15 @@ async def get_data(basedir: Path, names: Union[str, Iterable[str]], proxy: dict 
                         logger.warning(f"下载失败: {name}, 将在 3 秒后重试.")
                         await asyncio.sleep(3)
                         continue
+                    except:
+                        (basedir / name).unlink(missing_ok=True)
+                        logger.warning(f"下载失败: {name}")
+                        raise
             else:
                 logger.warning(f"下载失败: {name}.")
                 yield None
                 continue
+
+async def get_data(basedir: Path, name: str, proxy: dict = None, caller: str = None):
+    async for data in get_datas(basedir, name, proxy, caller):
+        return data

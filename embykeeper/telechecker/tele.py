@@ -235,7 +235,6 @@ class ClientsSession:
                     except (TypeError, KeyError):
                         pass
         except asyncio.CancelledError:
-            print("\r正在停止...\r", end="", flush=True)
             await cls.shutdown()
 
     @classmethod
@@ -260,6 +259,7 @@ class ClientsSession:
 
     @classmethod
     async def shutdown(cls):
+        print("\r正在停止...\r", end="", flush=True)
         for v in cls.pool.values():
             if isinstance(v, asyncio.Task):
                 v.cancel()
@@ -273,7 +273,7 @@ class ClientsSession:
                         pass
         while len(asyncio.all_tasks()) > 1:
             await asyncio.sleep(0.1)
-        print(f"Telegram 账号池停止.", end="")
+        print(f"Telegram 账号池停止.\r", end="")
         for v in cls.pool.values():
             if isinstance(v, tuple):
                 client: Client = v[0]

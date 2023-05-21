@@ -17,7 +17,7 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
 
-from ...data import get_data
+from ...data import get_datas
 from ...utils import to_iterable, AsyncCountPool
 from ..tele import Client
 
@@ -150,7 +150,7 @@ class BotCheckin(BaseBotCheckin):
             if isinstance(self.ocr, str):
                 data = []
                 files = (f"{self.ocr}.onnx", f"{self.ocr}.json")
-                async for p in get_data(self.basedir, files, proxy=self.proxy, caller=self.name):
+                async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
                     if p is None:
                         self.log.warning(f"初始化错误: 无法下载所需文件.")
                         return None

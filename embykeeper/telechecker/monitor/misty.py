@@ -1,13 +1,12 @@
 import asyncio
 import string
-from typing import Optional
 
 from pyrogram.types import Message
 from PIL import Image
 from ddddocr import DdddOcr
 
 from ...utils import async_partial
-from ...data import get_data
+from ...data import get_datas
 from .base import Monitor
 
 
@@ -27,7 +26,7 @@ class MistyMonitor(Monitor):
             if isinstance(self.ocr, str):
                 data = []
                 files = (f"{self.ocr}.onnx", f"{self.ocr}.json")
-                async for p in get_data(self.basedir, files, proxy=self.proxy, caller=self.name):
+                async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
                     if p is None:
                         self.log.info(f"初始化错误: 无法下载所需文件.")
                         return False
