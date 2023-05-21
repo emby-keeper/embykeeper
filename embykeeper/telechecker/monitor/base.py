@@ -174,7 +174,7 @@ class Monitor:
         try:
             me = await chat.get_member("me")
         except UserNotParticipant:
-            self.log.warning(f'初始化错误: 尚未加入群组 "{chat.title}".')
+            self.log.warning(f'跳过监控: 尚未加入群组 "{chat.title}".')
             return False
         if me.status in (ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED):
             self.log.warning(f'初始化错误: 被群组 "{chat.title}" 禁言.')

@@ -5,7 +5,7 @@ from pyrogram.types import Message
 
 
 class PornEmbyCheckin(AnswerBotCheckin):
-    name = "Pronemby"
+    name = "Pornemby"
     bot_username = "PronembyTGBot2_bot"
     bot_success_pat = r"(\d+).*?(\d+)[^\d]*$"
 
@@ -22,7 +22,7 @@ class PornEmbyCheckin(AnswerBotCheckin):
         except TimeoutError:
             pass
         try:
-            msg = await self.client.wait_reply(self.bot_username)
+            msg = await self.client.wait_reply(self.bot_username, timeout=10)
         except asyncio.TimeoutError:
             self.log.warning(f"签到无回应, 您可能还没有注册{self.name}.")
             await self.fail()

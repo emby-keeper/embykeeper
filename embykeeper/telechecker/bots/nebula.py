@@ -70,10 +70,10 @@ class NebulaCheckin(BaseBotCheckin):
             message = results["message"]
             if any(s in message for s in ("未找到用户", "权限错误")):
                 self.log.info("签到失败: 账户错误.")
-                return self.fail()
+                await self.fail()
             if "失败" in message:
                 self.log.info("签到失败.")
-                return self.fail()
+                await self.fail()
             if "重复" in message:
                 self.log.info("今日已经签到过了.")
                 self.finished.set()
