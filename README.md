@@ -177,6 +177,12 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 恭喜您！您已经成功部署了 Embykeeper.
 
+当您需要更新版本时, 您需要执行:
+
+```bash
+docker pull embykeeper/embykeeper
+```
+
 ### 通过 Docker Compose 部署
 
 您可以使用 [docker-compose](https://docs.docker.com/compose/) 部署 Embykeeper.
@@ -203,7 +209,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:rw
 ```
 
-其中, [watchtower](https://github.com/containrrr/watchtower) 被用于自动更新容器服务.
+其中, [watchtower](https://github.com/containrrr/watchtower) 被用于自动更新版本.
 
 然后运行以下命令以启动:
 
