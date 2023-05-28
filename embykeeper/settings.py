@@ -204,7 +204,7 @@ def decrypt(data: bytes, password: str):
 def interactive_config(config: dict = {}):
     from tomlkit import item
     from rich import get_console
-    from rich.prompt import Prompt, Confirm
+    from rich.prompt import Prompt, IntPrompt, Confirm
 
     from . import __name__, __url__
 
@@ -248,8 +248,8 @@ def interactive_config(config: dict = {}):
         url = Prompt.ask(pad + "请输入您的 Emby 站点 URL <协议://域名:端口> [dark_green](https://abc.com:443)[/]")
         username = Prompt.ask(pad + "请输入您在该 Emby 站点的用户名")
         password = Prompt.ask(pad + "请输入您在该 Emby 站点的密码 (不显示, 按回车确认)", password=True)
-        time = int(Prompt.ask(pad + "设置模拟观看时长 (秒)", default=10, show_default=True))
-        progress = int(Prompt.ask(pad + "设置模拟观看后进度条位置 (秒)", default=1000, show_default=True))
+        time = IntPrompt.ask(pad + "设置模拟观看时长 (秒)", default=10, show_default=True)
+        progress = IntPrompt.ask(pad + "设置模拟观看后进度条位置 (秒)", default=1000, show_default=True)
         embies.append(
             {"url": url, "username": username, "password": password, "progress": progress, "time": time}
         )
@@ -265,19 +265,18 @@ def interactive_config(config: dict = {}):
         logger.info(f"\t0. 不使用消息推送功能")
         for i, t in enumerate(telegrams):
             logger.info(f'\t{i+1}. {t["phone"]}')
-        notifier = Prompt.ask(pad + "请选择", default=1)
-        config["notifier"] = int(notifier) if notifier else False
-        config["timeout"] = int(
-            Prompt.ask(pad + "设置每个 Telegram Bot 签到的最大尝试时间 (秒)", default=config["timeout"], show_default=True)
+        config["notifier"] = IntPrompt.ask(pad + "请选择", default=1)
+        config["timeout"] = IntPrompt.ask(
+            pad + "设置每个 Telegram Bot 签到的最大尝试时间 (秒)", default=config["timeout"], show_default=True
         )
-        config["retries"] = int(
-            Prompt.ask(pad + "设置每个 Telegram Bot 签到的最大尝试次数", default=config["retries"], show_default=True)
+        config["retries"] = IntPrompt.ask(
+            pad + "设置每个 Telegram Bot 签到的最大尝试次数", default=config["retries"], show_default=True
         )
-        config["concurrent"] = int(
-            Prompt.ask(pad + "设置最大可同时进行的 Telegram Bot 签到", default=config["concurrent"], show_default=True)
+        config["concurrent"] = IntPrompt.ask(
+            pad + "设置最大可同时进行的 Telegram Bot 签到", default=config["concurrent"], show_default=True
         )
-        config["random"] = int(
-            Prompt.ask(pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True)
+        config["random"] = IntPrompt.ask(
+            pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True
         )
     content = item(config).as_string()
     enc = Confirm.ask(pad + "是否生成加密配置 ([red]为了您的密钥安全, 强烈建议生成[/])", default=True)
