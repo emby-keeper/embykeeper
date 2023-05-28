@@ -310,7 +310,8 @@ class ClientsSession:
                     await client.start()
                 except Unauthorized:
                     await client.storage.delete()
-                except KeyError:
+                except KeyError as e:
+                    logger.debug(f'登录错误: {e}.')
                     logger.warning(f'登录账号 "{client.phone_number}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     await asyncio.sleep(3)
                 else:
