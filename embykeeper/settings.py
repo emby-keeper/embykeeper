@@ -325,19 +325,20 @@ def prepare_config(config_file=None, public=False):
             config = {}
             if config_file:
                 try:
-                    config = tomllib.load(f)
+                    with open(config_file, "rb") as f:
+                        config = tomllib.load(f)
                 except tomllib.TOMLDecodeError as e:
                     logger.error(f"TOML 配置文件错误: {e}.")
                     sys.exit(252)
                 else:
                     logger.info(f"将以 {Path(config_file).name} 为基础生成配置.")
             interactive_config(config)
-            sys.exit(250)
+            sys.exit(0)
         default_config_file = Path("config.toml")
         if not config_file:
             if not default_config_file.exists():
                 write_faked_config(default_config_file)
-                sys.exit(250)
+                sys.exit(0)
             else:
                 config_file = default_config_file
         try:
