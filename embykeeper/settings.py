@@ -300,9 +300,9 @@ def load_env_config(data: str):
         config = tomllib.loads(data.decode())
     except (tomllib.TOMLDecodeError, UnicodeDecodeError):
         try:
-            logger.info("您正在使用加密配置文件作为输入 (AES256).")
+            logger.info("您正在使用加密配置文件作为输入 (AES).")
             config = tomllib.loads(decrypt(data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True)))
-        except tomllib.TOMLDecodeError:
+        except (tomllib.TOMLDecodeError, UnicodeDecodeError):
             config = {}
         if not config:
             logger.error("密钥无效或配置格式错误, 请删除 SECRETS 变量设置, 并重新配置.")
