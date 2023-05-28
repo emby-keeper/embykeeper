@@ -14,7 +14,7 @@ class JMSCheckin(AnswerBotCheckin):
     idioms = None
 
     name = "卷毛鼠"
-    bot_username = "jmsembybot"  
+    bot_username = "jmsembybot"
 
     async def start(self):
         self.retries = 2
