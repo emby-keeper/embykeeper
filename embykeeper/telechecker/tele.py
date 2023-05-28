@@ -63,9 +63,9 @@ class Client(_Client):
                 }
                 if not self.phone_code:
                     if retry:
-                        msg = f'验证码错误, 请重新输入 "{self.phone_number}" 的登录验证码'
+                        msg = f'验证码错误, 请重新输入 "{self.phone_number}" 的登录验证码 (按回车确认)'
                     else:
-                        msg = f'请从{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码'
+                        msg = f'请从{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码 (按回车确认)'
                     self.phone_code = Prompt.ask(" " * 23 + msg)
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
             except (CodeInvalid, PhoneCodeInvalid):

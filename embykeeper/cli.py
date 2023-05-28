@@ -60,6 +60,7 @@ async def main(
         True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
     ),
     once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
+    public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
     debug: bool = typer.Option(False, "--debug", "-d", rich_help_panel="调试参数", help="开启调试模式"),
     debug_cron: bool = typer.Option(False, hidden=True, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"),
     version: bool = typer.Option(
@@ -79,7 +80,7 @@ async def main(
 
     initialize(level="DEBUG" if debug else "INFO")
 
-    config: dict = prepare_config(config)
+    config: dict = prepare_config(config, public=public)
 
     if debug:
         config["nofail"] = False
@@ -125,7 +126,7 @@ async def main(
         return await follower(config)
 
     if analyze:
-        indent = " " * 29
+        indent = " " * 23
         chats = typer.prompt(indent + "请输入群组用户名 (以空格分隔)").split()
         keywords = typer.prompt(indent + "请输入关键词 (以空格分隔)", default="", show_default=False)
         keywords = keywords.split() if keywords else []

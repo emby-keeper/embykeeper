@@ -31,13 +31,13 @@ class AsyncTyper(Typer):
                     asyncio.run(async_func(*_args, **_kwargs))
                 except KeyboardInterrupt:
                     print("\r", end="", flush=True)
-                    logger.info("所有客户端已停止, 欢迎您再次使用 Embykeeper.")
+                    logger.info(f"所有客户端已停止, 欢迎您再次使用 {__name__.capitalize()}.")
                 except Exception as e:
                     print("\r", end="", flush=True)
                     fail_message(e)
                     sys.exit(1)
                 else:
-                    logger.info("所有任务已完成, 欢迎您再次使用 Embykeeper.")
+                    logger.info(f"所有任务已完成, 欢迎您再次使用 {__name__.capitalize()}.")
 
             self.command(*args, **kwargs)(sync_func)
             return async_func

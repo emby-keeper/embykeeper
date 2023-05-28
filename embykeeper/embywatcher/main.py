@@ -66,7 +66,7 @@ async def send_playing(obj: EmbyObject, playing_info: dict):
         pass
 
 
-async def play(obj: EmbyObject, time=800, progress=1000):
+async def play(obj: EmbyObject, time=10, progress=1000):
     c: Connector = obj.connector
     # 检查
     if obj.object_dict.get("RunTimeTicks") < max(progress, time) * 10000000:
@@ -126,7 +126,7 @@ async def login(config):
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
             loggeruser.info(f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).')
-            yield emby, a.get("time", 800), a.get("progress", 1000), loggeruser
+            yield emby, a.get("time", 10), a.get("progress", 1000), loggeruser
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
             continue
