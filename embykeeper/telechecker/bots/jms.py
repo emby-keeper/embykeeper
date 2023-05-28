@@ -1,3 +1,5 @@
+import asyncio
+import random
 from pyrogram.types import Message
 from thefuzz import process, fuzz
 
@@ -12,9 +14,10 @@ class JMSCheckin(AnswerBotCheckin):
     idioms = None
 
     name = "卷毛鼠"
-    bot_username = "jmsembybot"
+    bot_username = "jmsembybot"  
 
     async def start(self):
+        self.retries = 2
         async with self.lock:
             if self.idioms is None:
                 with open(
@@ -40,6 +43,7 @@ class JMSCheckin(AnswerBotCheckin):
             for l in captcha:
                 try:
                     await self.message.click(l)
+                    await asyncio.sleep(random.randint(50, 300) / 100)
                 except ValueError:
                     self.log.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
                     await self.retry()
