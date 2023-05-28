@@ -25,7 +25,6 @@
    ```bash
     pre-commit run -a
     tox -e py
-    pre-commit install
     ```
 
 7. 在 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 提交新 Pull Request.
