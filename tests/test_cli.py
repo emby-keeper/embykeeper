@@ -12,6 +12,7 @@ from embykeeper.settings import check_config
 
 runner = CliRunner()
 
+
 @pytest.fixture()
 def in_temp_dir(tmp_path: Path):
     current = os.getcwd()
@@ -19,10 +20,12 @@ def in_temp_dir(tmp_path: Path):
     yield tmp_path
     os.chdir(current)
 
+
 def test_version():
     result = runner.invoke(app, ["--version"])
     assert embykeeper.__version__ in result.stdout
     assert result.exit_code == 0
+
 
 def test_create_config(in_temp_dir: Path):
     result = runner.invoke(app)
@@ -31,6 +34,7 @@ def test_create_config(in_temp_dir: Path):
     with open("config.toml", "rb") as f:
         config = tomllib.load(f)
     assert not check_config(config)
+
 
 def test_create_config_empty(in_temp_dir: Path):
     config_file = Path("config.toml")
