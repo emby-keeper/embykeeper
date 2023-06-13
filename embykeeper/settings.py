@@ -290,7 +290,8 @@ def interactive_config(config: dict = {}):
     print()
     get_console().rule("EMBYKEEPER_CONFIG")
     print(content.decode())
-    print('\n\n')
+    print("\n\n")
+
 
 def load_env_config(data: str):
     from rich.prompt import Prompt
@@ -301,7 +302,9 @@ def load_env_config(data: str):
     except (tomllib.TOMLDecodeError, UnicodeDecodeError):
         try:
             logger.info("您正在使用加密配置文件作为输入 (AES).")
-            config = tomllib.loads(decrypt(data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True)))
+            config = tomllib.loads(
+                decrypt(data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True))
+            )
         except (tomllib.TOMLDecodeError, UnicodeDecodeError):
             config = {}
         if not config:
