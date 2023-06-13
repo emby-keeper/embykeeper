@@ -340,7 +340,7 @@ def prepare_config(config_file=None, public=False):
         if not config_file:
             if not default_config_file.exists():
                 write_faked_config(default_config_file)
-                sys.exit(0)
+                sys.exit(250)
             else:
                 config_file = default_config_file
         try:
