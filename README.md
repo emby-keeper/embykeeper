@@ -370,28 +370,6 @@ only_history = true # 仅当问题历史中找到答案时自动回答
 2. 为本项目提供 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 并被合并;
 3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
 
-## 开发工具
-
-您可以使用附带的调试工具帮助本项目的开发, 例如历史记录分析器:
-
-```bash
-# 启动历史信息分析
-$ embykeeper config.toml -a
-
-请输入群组用户名 (以空格分隔): https://t.me/XXX YYY 10253512
-请输入关键词 (以空格分隔):
-输入时间范围 (以"-"分割): 8:00AM-10:00AM
-请输入各群组最大获取数量 [1000]:
-```
-
-该命令会分析特定群组的历史记录, 以帮助您撰写自动水群工具的话术列表.
-
-另一个工具是即时信息分析:
-
-![follow screenshot](images/follow.svg)
-
-该工具可以实时输出消息的 ID 等信息, 以方便调试.
-
 ## 支持 Embykeeper
 
 ##### 开发者团队
@@ -456,6 +434,28 @@ class DummyCheckin(AnswerBotCheckin):
 上述代码实现每次按对应一个字符按键的功能.
 
 当您实现一个新的签到器时, 欢迎您提出 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 以帮助更多人使用!
+
+## 开发工具
+
+您可以使用附带的调试工具帮助本项目的开发, 例如历史记录分析器:
+
+```bash
+# 启动历史信息分析
+$ embykeeper config.toml -a
+
+请输入群组用户名 (以空格分隔): https://t.me/XXX YYY 10253512
+请输入关键词 (以空格分隔):
+输入时间范围 (以"-"分割): 8:00AM-10:00AM
+请输入各群组最大获取数量 [1000]:
+```
+
+该命令会分析特定群组的历史记录, 以帮助您撰写自动水群工具的话术列表.
+
+另一个工具是即时信息分析:
+
+![follow screenshot](images/follow.svg)
+
+该工具可以实时输出消息的 ID 等信息, 以方便调试.
 
 ## 趋势
 
