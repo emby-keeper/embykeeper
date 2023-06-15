@@ -291,6 +291,7 @@ def interactive_config(config: dict = {}):
     get_console().rule("EK_CONFIG")
     print(content.decode())
     get_console().rule()
+    print()
     start_now = Confirm.ask(pad + "是否立即启动?", default=True)
     if start_now:
         return config
