@@ -136,7 +136,7 @@ def start(data):
 
 
 @cli.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
-def run(ctx: typer.Context, port: int = 1818, host: str = "127.0.0.1", debug: bool = False):
+def run(ctx: typer.Context, port: int = 1818, host: str = "0.0.0.0", debug: bool = False):
     app.config["args"] = ctx.args
     logger.info(f"Embykeeper webserver started at {host}:{port}.")
     socketio.run(app, port=port, host=host, debug=debug)
