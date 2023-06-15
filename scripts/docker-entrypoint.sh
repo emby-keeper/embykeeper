@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 if [ -z "${EK_WEBPASS}" ]; then
     exec "embykeeper" "--basedir" "/app" "$@"
