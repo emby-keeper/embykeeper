@@ -279,19 +279,21 @@ def interactive_config(config: dict = {}):
             pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True
         )
     content = item(config).as_string()
-    enc = Confirm.ask(pad + "是否生成加密配置 ([red]为了您的密钥安全, 强烈建议生成[/])", default=True)
+    enc = Confirm.ask(pad + "是否生成加密配置", default=False)
     if enc:
         enc_password = Prompt.ask(pad + "请输入加密密码, 程序启动时将要求输入 (不显示, 按回车确认)", password=True)
         content = encrypt(content, enc_password)
     else:
         content = content.encode()
     content = base64.b64encode(content)
-    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入 SECRETS 变量配置 (名称: EK_CONFIG), 然后重新部署.")
+    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入 SECRETS 变量配置 (名称: EK_CONFIG), 否则配置将在重启后丢失.")
     print()
     get_console().rule("EK_CONFIG")
     print(content.decode())
-    print("\n\n")
-
+    get_console().rule()
+    start_now = Confirm.ask(pad + "是否立即启动?", default=True)
+    if start_now:
+        return config
 
 def load_env_config(data: str):
     from rich.prompt import Prompt
@@ -332,31 +334,33 @@ def prepare_config(config_file=None, public=False):
                     sys.exit(252)
                 else:
                     logger.info(f"将以 {Path(config_file).name} 为基础生成配置.")
-            interactive_config(config)
-            sys.exit(0)
-        default_config_file = Path("config.toml")
-        if not config_file:
-            if not default_config_file.exists():
-                write_faked_config(default_config_file)
+            config = interactive_config(config)
+            if not config:
                 sys.exit(250)
-            else:
-                config_file = default_config_file
-        try:
-            if not Path(config_file).exists():
-                logger.error(f'配置文件 "{config_file}" 不存在.')
-                sys.exit(251)
-            elif config_file == default_config_file:
-                with open(config_file, "rb") as f:
-                    config = tomllib.load(f)
-                if not config:
-                    write_faked_config(config_file)
+        else:
+            default_config_file = Path("config.toml")
+            if not config_file:
+                if not default_config_file.exists():
+                    write_faked_config(default_config_file)
                     sys.exit(250)
-            else:
-                with open(config_file, "rb") as f:
-                    config = tomllib.load(f)
-        except tomllib.TOMLDecodeError as e:
-            logger.error(f"TOML 配置文件错误: {e}.")
-            sys.exit(252)
+                else:
+                    config_file = default_config_file
+            try:
+                if not Path(config_file).exists():
+                    logger.error(f'配置文件 "{config_file}" 不存在.')
+                    sys.exit(251)
+                elif config_file == default_config_file:
+                    with open(config_file, "rb") as f:
+                        config = tomllib.load(f)
+                    if not config:
+                        write_faked_config(config_file)
+                        sys.exit(250)
+                else:
+                    with open(config_file, "rb") as f:
+                        config = tomllib.load(f)
+            except tomllib.TOMLDecodeError as e:
+                logger.error(f"TOML 配置文件错误: {e}.")
+                sys.exit(252)
     error = check_config(config)
     if error:
         logger.error(f"配置文件错误, 请检查配置文件:\n{error}.")
