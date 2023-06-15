@@ -77,6 +77,7 @@ Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gi
 ```bash
 docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
+(若您不需要连接本机代理, 可以去除 '--net=host' 参数)
 
 命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
 
