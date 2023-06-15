@@ -13,7 +13,8 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /src/scripts/docker-entrypoint.sh /entrypoint.sh
 
 WORKDIR /app
-RUN touch config.toml
+RUN chmod +x /entrypoint.sh \
+    && touch config.toml
 ENV PATH="/opt/venv/bin:$PATH"
 
 ENTRYPOINT ["/entrypoint.sh"]
