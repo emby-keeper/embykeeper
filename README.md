@@ -64,8 +64,11 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ### Railway 在线部署
 
-点击下方按钮即可部署:
+Embykeeper 可以通过免费的 Railway Docker 托管平台进行部署, 点击下方按钮开始部署:
+
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/WFYaj9?referralCode=Fj6Yvy)
+
+请注意 Railway 的免费用量有每月 5 美元, 500 小时 (21 天) 的限制. 如有额外需要请通过 Docker 部署.
 
 ### 通过 Docker 部署
 
