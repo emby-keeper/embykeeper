@@ -3,7 +3,7 @@
 set -eu
 
 if [ -z "${EK_WEBPASS}" ]; then
-    exec "embykeeperweb" "--basedir" "/app" "--public" "$@"
-else
     exec "embykeeper" "--basedir" "/app" "$@"
+else
+    exec "embykeeperweb" "--basedir" "/app" "--public" "$@"
 fi
