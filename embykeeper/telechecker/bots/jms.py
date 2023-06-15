@@ -6,11 +6,9 @@ from thefuzz import process, fuzz
 from ...data import get_data
 from .base import AnswerBotCheckin
 
-__ignore__ = True
-
 
 class JMSCheckin(AnswerBotCheckin):
-    ocr = "idioms@v1"
+    ocr = "idioms@v2"
     idioms = None
 
     name = "卷毛鼠"
@@ -40,6 +38,7 @@ class JMSCheckin(AnswerBotCheckin):
         async with self.operable:
             if not self.message:
                 await self.operable.wait()
+            await asyncio.sleep(random.randint(300, 500) / 100)
             for l in captcha:
                 try:
                     await self.message.click(l)

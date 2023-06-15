@@ -47,4 +47,4 @@ def initialize(level="INFO"):
         console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio]
     )
     handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
-    logger.add(handler, format=formatter, level=level, colorize=False, enqueue=True)
+    logger.add(handler, format=formatter, level=level, colorize=False)

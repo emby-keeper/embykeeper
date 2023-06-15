@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+
+global-exclude *.pyc
+
+graft embykeeperweb/templates

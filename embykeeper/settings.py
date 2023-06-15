@@ -209,7 +209,7 @@ def interactive_config(config: dict = {}):
     from . import __name__, __url__
 
     pad = " " * 23
-    logger.info("我们将为您生成配置, 需要您根据提示填入信息, 并按回车确认, 您可以随时通过 Ctrl+C 结束运行.")
+    logger.info("我们将为您生成配置, 需要您根据提示填入信息, 并按回车确认.")
     logger.info(f"配置帮助详见: {__url__}.")
     telegrams = config.get("telegram", [])
     while True:
@@ -286,9 +286,9 @@ def interactive_config(config: dict = {}):
     else:
         content = content.encode()
     content = base64.b64encode(content)
-    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入 SECRETS 变量配置 (名称: {__name__.upper()}_CONFIG)")
+    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入 SECRETS 变量配置 (名称: EK_CONFIG), 然后重新部署.")
     print()
-    get_console().rule("EMBYKEEPER_CONFIG")
+    get_console().rule("EK_CONFIG")
     print(content.decode())
     print("\n\n")
 
@@ -316,14 +316,12 @@ def load_env_config(data: str):
 
 
 def prepare_config(config_file=None, public=False):
-    from . import __name__
-
-    env_config = os.environ.get(f"{__name__.upper()}_CONFIG", None)
+    env_config = os.environ.get(f"EK_CONFIG", None)
     if env_config:
         config = load_env_config(env_config)
     else:
         if public:
-            logger.warning("您正在使用公共仓库, 因此[red]请勿[/]将密钥存储于[red]任何配置文件[/].")
+            # logger.warning("您正在使用公共仓库, 因此[red]请勿[/]将密钥存储于[red]任何配置文件[/].")
             config = {}
             if config_file:
                 try:

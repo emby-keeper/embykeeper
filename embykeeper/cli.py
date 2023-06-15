@@ -32,7 +32,6 @@ def version(version):
 async def main(
     config: Path = typer.Argument(
         None,
-        envvar=f"{__name__.upper()}_CONFIG",
         dir_okay=False,
         allow_dash=True,
         rich_help_panel="参数",
@@ -97,7 +96,8 @@ async def main(
         monitor = True
         send = True
 
-    logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等. 您可以通过 Ctrl+C 以结束运行.")
+    msg = ' 您可以通过 Ctrl+C 以结束运行.' if public else ''
+    logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等.{msg}")
     logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
     logger.debug(f'命令行参数: "{" ".join(sys.argv[1:])}".')
 

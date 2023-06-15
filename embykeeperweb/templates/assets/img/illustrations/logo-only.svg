@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+ <defs>
+  <linearGradient id="svg_2" x1="0" x2="0" y1="0.62" y2="0">
+   <stop id="jq_stop_8839" offset="0" stop-color="#d299c2"/>
+   <stop id="jq_stop_4910" offset="1" stop-color="#fef9d7"/>
+  </linearGradient>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="svg_1">
+   <image height="0" id="svg_7" width="0" x="10.09" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAIAAACNMk6CAAAABmJLR0QA/wD/AP+gvaeTAAAAh0lEQVQ4jaWNUQ7DIAxDH+b+99ndWmA/IKUstGQViuQY+4UPTWTUhMhovJYRqWsZnRzdpz1pnA5TjoDG4fAiY/2dzPCjnF3Gv/+rW0bvcsJdJ+dyA38XXjAb2u+4zr7D9vq33lPHYdi77j5xVpkf9txZeHWRq05meLV7di/GK31O0JnQATrgC1fJndkGZW9fAAAAAElFTkSuQmCC" y="-132.71"/>
+   <image height="0" id="svg_12" width="0" x="88.08" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAIAAACNMk6CAAAABmJLR0QA/wD/AP+gvaeTAAAAh0lEQVQ4jaWNUQ7DIAxDH+b+99ndWmA/IKUstGQViuQY+4UPTWTUhMhovJYRqWsZnRzdpz1pnA5TjoDG4fAiY/2dzPCjnF3Gv/+rW0bvcsJdJ+dyA38XXjAb2u+4zr7D9vq33lPHYdi77j5xVpkf9txZeHWRq05meLV7di/GK31O0JnQATrgC1fJndkGZW9fAAAAAElFTkSuQmCC" y="179.29"/>
+   <path d="m70.99,3.92c0,0 -41.83,41.52 -41.99,41.3c-0.15,-0.22 6.76,6.5 6.76,6.5c0,0 -35.85,35.85 -36.01,35.64c-0.15,-0.22 41.67,42.05 41.67,42.05c0,0 6.3,-6.3 6.13,-6.5c-0.15,-0.22 36.33,35.75 36.33,35.75c0,0 41.83,-41.83 41.67,-42.05c-0.15,-0.22 -5.82,-5.45 -5.98,-5.65c-0.15,-0.22 36.33,-35.32 36.17,-35.55c-0.15,-0.22 -42.62,-41.92 -42.77,-42.15c-0.15,-0.22 -5.5,6.2 -5.5,6.2c0,0 -36.48,-35.55 -36.48,-35.55z" fill="url(#svg_2)" id="svg_13" stroke="#000000" stroke-width="0"/>
+   <path d="m60.3,52.99c0,0 0,56.93 0,56.93c0,0 50.32,-28.3 50.32,-28.3c0,0 -50.32,-28.62 -50.32,-28.62z" fill="#ffffff" id="svg_14" stroke="#000000" stroke-width="0"/>
+  </g>
+ </g>
+</svg>

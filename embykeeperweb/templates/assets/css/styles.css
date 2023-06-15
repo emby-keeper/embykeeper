@@ -1,0 +1,37 @@
+.reccircle {
+  border-radius: 50vh;
+}
+
+.small-dot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+}
+
+.chinese {
+  font-family: 'Raleway', 'Noto Sans SC', 'Arial', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: rgba(0,0,0,0.1);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.4);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb:active {
+  background: rgba(0,0,0,.9);
+}
+
