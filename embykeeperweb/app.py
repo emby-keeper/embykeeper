@@ -17,116 +17,130 @@ from embykeeper import settings
 
 cli = typer.Typer()
 app = Flask(__name__, static_folder="templates/assets")
-app.config['SECRET_KEY'] = os.urandom(24)
+app.config["SECRET_KEY"] = os.urandom(24)
 socketio = SocketIO(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
 
-app.config['args'] = None
-app.config['fd'] = None
-app.config['pid'] = None
-app.config['hist'] = ''
-app.config['faillog'] = []
+app.config["args"] = None
+app.config["fd"] = None
+app.config["pid"] = None
+app.config["hist"] = ""
+app.config["faillog"] = []
+
 
 class DummyUser:
     def is_authenticated(self):
         return True
 
-    def is_active(self):   
+    def is_active(self):
         return True
-    
+
     def is_anonymous(self):
         return False
-    
-    def get_id(self):         
+
+    def get_id(self):
         return 0
+
 
 @login_manager.user_loader
 def load_user(_):
     return DummyUser()
 
+
 @app.route("/")
 def index():
-    return redirect(url_for('console'))
+    return redirect(url_for("console"))
+
 
 @app.route("/console")
 @login_required
 def console():
     return render_template("console.html")
 
-@app.route('/login', methods=['GET'])
+
+@app.route("/login", methods=["GET"])
 def login():
     return render_template("login.html")
 
-@app.route('/login', methods=['POST'])
+
+@app.route("/login", methods=["POST"])
 def login_submit():
-    password = request.form.get('password', '')
-    webpass = os.environ.get('EK_WEBPASS', '')
+    password = request.form.get("password", "")
+    webpass = os.environ.get("EK_WEBPASS", "")
     if not webpass:
         emsg = "Web console password not set."
-    elif sum(t > time.time() - 3600 for t in app.config['faillog'][-5:]) == 5:
+    elif sum(t > time.time() - 3600 for t in app.config["faillog"][-5:]) == 5:
         emsg = "Too many login trials in one hour."
     else:
         if password == webpass:
             login_user(DummyUser())
-            return redirect(request.args.get('next') or url_for('index'))
+            return redirect(request.args.get("next") or url_for("index"))
         else:
             emsg = "Wrong password."
-            app.config['faillog'].append(time.time())
-    return render_template('login.html', emsg=emsg)
+            app.config["faillog"].append(time.time())
+    return render_template("login.html", emsg=emsg)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template("404.html"), 404
+
 
 @socketio.on("pty-input", namespace="/pty")
 def pty_input(data):
-    if app.config['fd']:
-        os.write(app.config['fd'], data["input"].encode())
+    if app.config["fd"]:
+        os.write(app.config["fd"], data["input"].encode())
+
 
 def set_size(fd, row, col, xpix=0, ypix=0):
-    logger.debug(f'Resizing pty to: {row} {col}.')
+    logger.debug(f"Resizing pty to: {row} {col}.")
     size = struct.pack("HHHH", row, col, xpix, ypix)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, size)
 
+
 @socketio.on("resize", namespace="/pty")
 def resize(data):
-    if app.config['fd']:
-        set_size(app.config['fd'], data["rows"], data["cols"])
+    if app.config["fd"]:
+        set_size(app.config["fd"], data["rows"], data["cols"])
+
 
 def read_and_forward_pty_output():
     max_read_bytes = 1024 * 20
     while True:
         socketio.sleep(0.01)
-        if app.config['fd']:
-            (data, _, _) = select.select([app.config['fd']], [], [], 0)
+        if app.config["fd"]:
+            (data, _, _) = select.select([app.config["fd"]], [], [], 0)
             if data:
-                output = os.read(app.config['fd'], max_read_bytes).decode(errors="ignore")
-                app.config['hist'] += output
+                output = os.read(app.config["fd"], max_read_bytes).decode(errors="ignore")
+                app.config["hist"] += output
                 socketio.emit("pty-output", {"output": output}, namespace="/pty")
+
 
 @socketio.on("embykeeper", namespace="/pty")
 def start(data):
-    if app.config['fd']:
-        set_size(app.config['fd'], data["rows"], data["cols"])
-        socketio.emit("pty-output", {"output": app.config['hist']}, namespace="/pty")
+    if app.config["fd"]:
+        set_size(app.config["fd"], data["rows"], data["cols"])
+        socketio.emit("pty-output", {"output": app.config["hist"]}, namespace="/pty")
     else:
         (pid, fd) = pty.fork()
         if pid == 0:
-            subprocess.run(['embykeeper', *app.config['args']])
+            subprocess.run(["embykeeper", *app.config["args"]])
         else:
-            app.config['fd'] = fd
-            app.config['pid'] = pid
-            logger.debug(f'Embykeeper started at: {pid}.')
-            set_size(app.config['fd'], data["rows"], data["cols"])
+            app.config["fd"] = fd
+            app.config["pid"] = pid
+            logger.debug(f"Embykeeper started at: {pid}.")
+            set_size(app.config["fd"], data["rows"], data["cols"])
             socketio.start_background_task(target=read_and_forward_pty_output)
 
-@cli.command(context_settings={"ignore_unknown_options": True, 'allow_extra_args': True})   
-def run(ctx: typer.Context, port:int=1818, host:str='127.0.0.1', debug:bool=False):
-    app.config['args'] = ctx.args
-    logger.info(f'Embykeeper webserver started at {host}:{port}.')
+
+@cli.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
+def run(ctx: typer.Context, port: int = 1818, host: str = "127.0.0.1", debug: bool = False):
+    app.config["args"] = ctx.args
+    logger.info(f"Embykeeper webserver started at {host}:{port}.")
     socketio.run(app, port=port, host=host, debug=debug)
-    
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     cli()

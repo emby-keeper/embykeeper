@@ -23,4 +23,3 @@
   }
 
 })(); // End of use strict
-
