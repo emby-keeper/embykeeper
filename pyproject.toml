@@ -51,7 +51,10 @@ dependencies = [
     "schema",
     "aiocache",
     "fake_useragent",
-    "pycryptodome"
+    "pycryptodome",
+    "flask",
+    "flask_socketio",
+    "flask_login"
 ]
 
 [project.urls]
