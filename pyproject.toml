@@ -54,7 +54,9 @@ dependencies = [
     "pycryptodome",
     "flask",
     "flask_socketio",
-    "flask_login"
+    "flask_login",
+    "simple-websocket",
+    "eventlet",
 ]
 
 [project.urls]
