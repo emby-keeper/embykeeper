@@ -71,7 +71,7 @@ def test_check_config(in_temp_dir: Path):
     result = runner.invoke(app)
     assert result.exit_code == 252
 
-    config = {"telegram": {k: "Test" for k in ("api_id", "api_hash", "phone")}}
+    config = {"telegram": {"phone": "Test"}}
     with open("config.toml", "w+") as f:
         tomlkit.dump(config, f)
     result = runner.invoke(app)

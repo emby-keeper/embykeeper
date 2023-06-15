@@ -165,7 +165,10 @@ async def watch(emby, time, progress, logger, retries=5):
                         logger.info(f"发生错误: {e}, 正在重试其他视频.")
                         break
                     finally:
-                        if not await hide_from_resume(obj):
+                        try:
+                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 0.5)):
+                                logger.debug(f"未能成功从最近播放中隐藏视频.")
+                        except asyncio.TimeoutError:
                             logger.debug(f"未能成功从最近播放中隐藏视频.")
             else:
                 logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")

@@ -88,8 +88,6 @@ port = 1080
 scheme = "socks5"
 
 [[telegram]]
-api_id = "27894236"
-api_hash = "622159182fdd4b15b627eeb3ac695271"
 phone = "+8612109347899"
 
 [[emby]]
@@ -97,8 +95,6 @@ url = "https://weiss-griffin.com/"
 username = "carrie19"
 password = "s*D7MMCpS$"
 ```
-
-对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试.
 
 随后, 您需要再次执行:
 
@@ -156,7 +152,7 @@ docker-compose up -d
 
 ### 从 PyPi 安装
 
-Embykeeper 可以通过 `python >= 3.7, < 3.11` 运行, 您可以通过 [virtualvenv](https://virtualenv.pypa.io/) 进行环境的管理:
+Embykeeper 可以通过 `python >= 3.8, < 3.11` 运行, 您可以通过 [virtualvenv](https://virtualenv.pypa.io/) 进行环境的管理:
 
 ```bash
 python -m venv embykeeper-venv
@@ -310,6 +306,7 @@ $ embykeeper config.toml -I
 若您需要禁用部分签到站点, 您可以在列表中删除对应的名称.
 若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
 当前支持的名称包括:
+
 | 站点        | 名称       |     | 站点        | 名称          |
 | ----------- | ---------- | --- | ----------- | ------------- |
 | 垃圾影音    | `ljyy`     |     | 搜书神器    | `sosdbot`     |
@@ -331,11 +328,13 @@ $ embykeeper config.toml -I
 
 | 设置项     | 值类型 | 简介                                                               | 默认值  |
 | ---------- | ------ | ------------------------------------------------------------------ | ------- |
-| `api_id`   | `str`  | 从[Telegram 官网](https://my.telegram.org/)申请的 Application ID   |         |
-| `api_hash` | `str`  | 从[Telegram 官网](https://my.telegram.org/)申请的 Application Hash |         |
 | `phone`    | `str`  | 账户手机号, 一般为 "`+86...`"                                      |         |
 | `monitor`  | `bool` | 启用群组监控系列功能                                               | `false` |
 | `send`     | `bool` | 启用自动水群系列功能                                               | `false` |
+| `api_id`   | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application ID   |         |
+| `api_hash` | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application Hash |         |
+
+如果您在使用过程中遇到 'API_ID_PUBLISHED_FLOOD' 错误, 您可能需要申请自己的 API, 可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试. 申请后请将 api_id 和 api_hash 填入 telegram 配置中即可.
 
 `emby` 设置可以为:
 

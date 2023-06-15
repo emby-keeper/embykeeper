@@ -171,13 +171,16 @@ async def checkiner(config: dict, instant=False):
                 wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
-            coros.append(gather_task(tasks, username=tg.me.name))
+            coros.append(asyncio.ensure_future(gather_task(tasks, username=tg.me.name)))
             if names:
                 log.debug(f'已启用签到器: {", ".join(names)}')
         while coros:
             done, coros = await asyncio.wait(coros, return_when=asyncio.FIRST_COMPLETED)
             for t in done:
-                username, results = await t
+                try:
+                    username, results = await t
+                except asyncio.CancelledError:
+                    continue
                 log = logger.bind(scheme="telechecker", username=username)
                 failed = []
                 ignored = []

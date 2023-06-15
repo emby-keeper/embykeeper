@@ -8,6 +8,12 @@ from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
 
+PUBLISHED_API = {
+    "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+    "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
+    "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+}
+
 
 def check_config(config):
     PositiveInt = lambda: And(int, lambda n: n > 0)
@@ -38,11 +44,11 @@ def check_config(config):
             Optional("telegram"): [
                 Schema(
                     {
-                        "api_id": Regex(r"^\d+$"),
-                        "api_hash": Regex(r"^[a-z0-9]+$"),
                         "phone": str,
                         Optional("monitor"): bool,
                         Optional("send"): bool,
+                        Optional("api_id"): Regex(r"^\d+$"),
+                        Optional("api_hash"): Regex(r"^[a-z0-9]+$"),
                     }
                 )
             ],
@@ -138,15 +144,11 @@ def write_faked_config(path, without_censitive=True):
     for _ in range(2):
         t = item(
             {
-                "api_id": fake.numerify(text="########"),
-                "api_hash": uuid.uuid4().hex,
                 "phone": f'+861{fake.numerify(text="##########")}',
                 "send": False,
                 "monitor": False,
             }
         )
-        t["api_id"].comment("通过 Telegram 官网申请 API: https://my.telegram.org/")
-        t["api_hash"].comment("通过 Telegram 官网申请 API: https://my.telegram.org/")
         telegram.append(t)
     doc["telegram"] = telegram
     for t in doc["telegram"]:
@@ -230,12 +232,8 @@ def interactive_config(config: dict = {}):
         if not more:
             break
         phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]")
-        api_id = Prompt.ask(pad + "请输入您的 Telegram api_id")
-        api_hash = Prompt.ask(pad + "请输入您的 Telegram api_hash")
         monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False)
-        telegrams.append(
-            {"phone": phone, "api_id": api_id, "api_hash": api_hash, "send": False, "monitor": monitor}
-        )
+        telegrams.append({"phone": phone, "send": False, "monitor": monitor})
     embies = config.get("emby", [])
     while True:
         if len(embies) > 0:
@@ -372,4 +370,7 @@ def prepare_config(config_file=None, public=False):
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
         proxy.setdefault("port", 1080)
+    for tg in config.get("telegram", []):
+        if tg.get("api_id", None) is None and tg.get("api_hash", None) is None:
+            tg.update(PUBLISHED_API["nicegram"])
     return config
