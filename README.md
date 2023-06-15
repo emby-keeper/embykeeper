@@ -62,23 +62,20 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ## 安装与使用
 
-### 从 PyPi 安装
+### Railway 在线部署
 
-Embykeeper 可以通过 `python` 运行, 您可以通过 [conda](https://github.com/conda/conda) 或 [virtualvenv](https://virtualenv.pypa.io/) 等工具进行环境的管理.
+点击下方按钮即可部署:
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/WFYaj9?referralCode=Fj6Yvy)
 
-您可以通过 `pip` 安装 `embykeeper` (需要 `python >= 3.7, < 3.11`):
+### 通过 Docker 部署
 
-```bash
-pip install embykeeper
-```
-
-随后, 您需要执行:
+Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
 
 ```bash
-embykeeper
+docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
 
-命令将会在当前目录生成模板 `config.toml` 文件, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
+命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
 
 ```toml
 [proxy]
@@ -98,6 +95,78 @@ password = "s*D7MMCpS$"
 ```
 
 对于 Telegram 而言, 您可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试.
+
+随后, 您需要再次执行:
+
+```bash
+docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
+```
+
+您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
+
+恭喜您！您已经成功部署了 Embykeeper.
+
+当您需要更新版本时, 您需要执行:
+
+```bash
+docker pull embykeeper/embykeeper
+```
+
+### 通过 Docker Compose 部署
+
+您可以使用 [docker-compose](https://docs.docker.com/compose/) 部署 Embykeeper.
+
+**注意**: 您需要先进行过 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2) 才能通过 `docker-compose` 部署, 这是由于首次登录会命令行请求两步验证码, 登录成功后会生成 `.session` 文件, 随后才能部署为 `docker-compose` 服务.
+
+您需要新建一个文件 `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+  embykeeper:
+    container_name: embykeeper
+    image: embykeeper/embykeeper
+    restart: unless-stopped
+    volumes:
+      - ./embykeeper:/app
+    network_mode: host
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+```
+
+其中, [watchtower](https://github.com/containrrr/watchtower) 被用于自动更新版本.
+
+然后运行以下命令以启动:
+
+```bash
+docker-compose up -d
+```
+
+即可在后台启动 embykeeper.
+
+您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
+
+### 从 PyPi 安装
+
+Embykeeper 可以通过 `python >= 3.7, < 3.11` 运行, 您可以通过 [virtualvenv](https://virtualenv.pypa.io/) 进行环境的管理:
+
+```bash
+python -m venv embykeeper-venv
+. ./embykeeper-venv/bin/activate
+pip install embykeeper
+```
+
+随后, 您需要执行:
+
+```bash
+embykeeper
+```
+
+命令将会在当前目录生成模板 `config.toml` 文件, 您需要配置您的账户信息, 参见 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2).
 
 随后, 您需要再次执行:
 
@@ -133,11 +202,13 @@ pip install -U embykeeper
 
 ### 从源码构建
 
-和从 PyPi 安装类似，您需要一个先设置 Python 环境, 然后拉取 Github 并安装:
+首先拉取并设置环境:
 
 ```bash
 git clone https://github.com/embykeeper/embykeeper.git
 cd embykeeper
+python -m venv venv
+. ./venv/bin/activate
 pip install -e .
 ```
 
@@ -147,7 +218,7 @@ pip install -e .
 embykeeper
 ```
 
-详细配置方法详见 [从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-pypi-%E5%AE%89%E8%A3%85).
+详细配置方法详见 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2).
 
 当版本更新时, 您需要执行:
 
@@ -156,70 +227,6 @@ git pull
 ```
 
 然后重新运行应用.
-
-### 从 Docker 部署
-
-Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gitbook.io/docker_practice/install), 然后执行:
-
-```bash
-docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
-```
-
-命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息 (详见[从 Pypi 安装](https://github.com/embykeeper/embykeeper#%E4%BB%8E-pypi-%E5%AE%89%E8%A3%85)).
-
-随后, 您需要再次执行:
-
-```bash
-docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
-```
-
-您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
-
-恭喜您！您已经成功部署了 Embykeeper.
-
-当您需要更新版本时, 您需要执行:
-
-```bash
-docker pull embykeeper/embykeeper
-```
-
-### 通过 Docker Compose 部署
-
-您可以使用 [docker-compose](https://docs.docker.com/compose/) 部署 Embykeeper.
-
-**注意**: 您需要先进行过 [从 Docker 部署](https://github.com/embykeeper/embykeeper#%E4%BB%8E-Docker-%E9%83%A8%E7%BD%B2) 才能通过 `docker-compose` 部署, 这是由于首次登录会命令行请求两步验证码, 登录成功后会生成 `.session` 文件, 随后才能部署为 `docker-compose` 服务.
-
-您需要新建一个文件 `docker-compose.yml`:
-
-```yaml
-version: '3'
-services:
-  embykeeper:
-    container_name: embykeeper
-    image: embykeeper/embykeeper
-    restart: unless-stopped
-    volumes:
-      - ./embykeeper:/app
-    network_mode: host
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:rw
-```
-
-其中, [watchtower](https://github.com/containrrr/watchtower) 被用于自动更新版本.
-
-然后运行以下命令以启动:
-
-```bash
-docker-compose up -d
-```
-
-即可在后台启动 embykeeper.
-
-您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
 
 ## 命令行帮助
 
@@ -245,6 +252,7 @@ $ embykeeper -h
     --follow      -f   仅启动消息调试
     --analyze     -a   仅启动历史信息分析
     --basedir          设定输出文件默认位置
+    --public           启用在线部署模式
 ```
 
 例如:
@@ -272,54 +280,12 @@ $ embykeeper config.toml --once
 $ embykeeper config.toml -I
 ```
 
-您也可以使用附带的调试工具帮助本项目的开发, 例如历史记录分析器:
-
-```bash
-# 启动历史信息分析
-$ embykeeper config.toml -a
-
-请输入群组用户名 (以空格分隔): https://t.me/XXX YYY 10253512
-请输入关键词 (以空格分隔):
-输入时间范围 (以"-"分割): 8:00AM-10:00AM
-请输入各群组最大获取数量 [1000]:
-```
-
-该命令会分析特定群组的历史记录, 以帮助您撰写自动水群工具的话术列表.
-
-另一个工具是即时信息分析:
-
-![follow screenshot](images/follow.svg)
-
-该工具可以实时输出消息的 ID 等信息, 以方便调试.
-
-## 消息推送与高级用户
-
-您可以通过设置项 "`notifier`" 设置 成功/失败 通知将被发送的 Telegram 账号, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot) 设置消息每日发送的时间.
-
-本项目涉及的需要 Cloudflare 验证码付费跳过的操作 (例如 Nebula 签到)、可能会引起竞争的操作 (例如自动抢邀请码)将需要高级用户, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot?start=__prime) 成为高级用户.
-
-目前有三种方式成为高级用户:
-
-1. 分享 1 个邀请制 Emby 的邀请码;
-2. 为本项目提供 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 并被合并;
-3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
-
-## 支持 Embykeeper
-
-##### 开发者团队
-
-- [jackzzs](https://github.com/jackzzs)
-
-##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
-
-![Kitty](https://github.com/embykeeper/embykeeper/raw/main/images/kitty.gif)
-
 ## 配置项
 
 | 设置项       | 值类型             | 简介                                         | 默认值  |
 | ------------ | ------------------ | -------------------------------------------- | ------- |
 | `timeout`    | `int`              | Telegram 机器人签到超时 (秒)                 | `120`   |
-| `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `4`    |
+| `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `4`     |
 | `concurrent` | `int`              | Telegram 机器人签到最大并发                  | `1`     |
 | `random`     | `int`              | Telegram 机器人签到各站点间时间随机量 (分钟) | `15`    |
 | `notifier`   | `int`/`bool`/`str` | 发送通知到 Telegram 账号 (序号/手机号)       | `False` |
@@ -340,14 +306,14 @@ $ embykeeper config.toml -a
 若您需要禁用部分签到站点, 您可以在列表中删除对应的名称.
 若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
 当前支持的名称包括:
-| 站点 | 名称 | | 站点 | 名称 |
-| --- | --- | --- |--- | --- |
-| 垃圾影音 | `ljyy` | | 搜书神器 | `sosdbot` |
-| 卷毛鼠 IPTV | `jms_iptv` | | 终点站 | `terminus` |
-| Pornemby | `pornemby` | | Singularity | `singularity` |
-| Peach | `peach` | | Nebula | `nebula` |
-| Bluesea | `bluesea` | | Embyhub | `embyhub` |
-| 卷毛鼠 | `jms` | | 卡戎 | `charon` |
+| 站点        | 名称       |     | 站点        | 名称          |
+| ----------- | ---------- | --- | ----------- | ------------- |
+| 垃圾影音    | `ljyy`     |     | 搜书神器    | `sosdbot`     |
+| 卷毛鼠 IPTV | `jms_iptv` |     | 终点站      | `terminus`    |
+| Pornemby    | `pornemby` |     | Singularity | `singularity` |
+| Peach       | `peach`    |     | Nebula      | `nebula`      |
+| Bluesea     | `bluesea`  |     | Embyhub     | `embyhub`     |
+| 卷毛鼠      | `jms`      |     | 卡戎        | `charon`      |
 
 `proxy` 设置可以为:
 
@@ -387,6 +353,50 @@ unique_name = "your_username_for_registeration" # 自动抢注时使用的用户
 [monitor.pornemby]
 only_history = true # 仅当问题历史中找到答案时自动回答
 ```
+
+## 消息推送与高级用户
+
+您可以通过设置项 "`notifier`" 设置 成功/失败 通知将被发送的 Telegram 账号, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot) 设置消息每日发送的时间.
+
+本项目涉及的需要 Cloudflare 验证码付费跳过的操作 (例如 Nebula 签到)、可能会引起竞争的操作 (例如自动抢邀请码)将需要高级用户, 您可以通过 [Embykeeper Bot](https://t.me/embykeeper_bot?start=__prime) 成为高级用户.
+
+目前有三种方式成为高级用户:
+
+1. 分享 1 个邀请制 Emby 的邀请码;
+2. 为本项目提供 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 并被合并;
+3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
+
+## 开发工具
+
+您可以使用附带的调试工具帮助本项目的开发, 例如历史记录分析器:
+
+```bash
+# 启动历史信息分析
+$ embykeeper config.toml -a
+
+请输入群组用户名 (以空格分隔): https://t.me/XXX YYY 10253512
+请输入关键词 (以空格分隔):
+输入时间范围 (以"-"分割): 8:00AM-10:00AM
+请输入各群组最大获取数量 [1000]:
+```
+
+该命令会分析特定群组的历史记录, 以帮助您撰写自动水群工具的话术列表.
+
+另一个工具是即时信息分析:
+
+![follow screenshot](images/follow.svg)
+
+该工具可以实时输出消息的 ID 等信息, 以方便调试.
+
+## 支持 Embykeeper
+
+##### 开发者团队
+
+- [jackzzs](https://github.com/jackzzs)
+
+##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
+
+![Kitty](https://github.com/embykeeper/embykeeper/raw/main/images/kitty.gif)
 
 ## 代码重用与开发
 

@@ -295,6 +295,7 @@ def interactive_config(config: dict = {}):
     if start_now:
         return config
 
+
 def load_env_config(data: str):
     from rich.prompt import Prompt
 
