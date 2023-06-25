@@ -28,6 +28,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 ## 功能
 
 - Telegram 机器人签到
+
   - 卷毛鼠: [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
   - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
   - Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
@@ -42,16 +43,16 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 默认禁用:
     - ~~BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~ (无响应)
     - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
-
 - Emby 保活
+
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-
 - Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
+
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
-
 - Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
+
   - Pornemby 科举考试: [活动频道](https://t.me/PornembyFun) (由于需要使用 OpenAI API 进行回答, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 回答准确率一般请谨慎使用)
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
   - Viper 抢邀请码: [频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)
@@ -77,16 +78,10 @@ Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gi
 ```bash
 docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
-(若您不需要连接本机代理, 可以去除 '--net=host' 参数)
 
 命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
 
 ```toml
-[proxy]
-hostname = "127.0.0.1"
-port = 1080
-scheme = "socks5"
-
 [[telegram]]
 phone = "+8612109347899"
 
@@ -94,6 +89,15 @@ phone = "+8612109347899"
 url = "https://weiss-griffin.com/"
 username = "carrie19"
 password = "s*D7MMCpS$"
+```
+
+若您需要连接代理, 还需要在 `config.toml` 中追加代理配置:
+
+```toml
+[proxy]
+hostname = "127.0.0.1"
+port = 1080
+scheme = "socks5"
 ```
 
 随后, 您需要再次执行:
@@ -176,7 +180,7 @@ embykeeper
 
 您将被询问设备验证码以登录, 登录成功后, Embykeeper 将首先执行一次签到和保活, 然后启动群组监控和水群计划任务 (若启用).
 
-恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以通过`Ctrl+C`停止, 然后运行:
+恭喜您！您已经成功部署了 Embykeeper, 为了让 Embykeeper 长期后台运行, 您可以通过 `Ctrl+C`停止, 然后运行:
 
 ```bash
 tmux
@@ -282,22 +286,22 @@ $ embykeeper config.toml -I
 
 ## 配置项
 
-| 设置项       | 值类型             | 简介                                         | 默认值  |
-| ------------ | ------------------ | -------------------------------------------- | ------- |
-| `timeout`    | `int`              | Telegram 机器人签到超时 (秒)                 | `120`   |
-| `retries`    | `int`              | Telegram 机器人签到错误重试次数              | `4`     |
-| `concurrent` | `int`              | Telegram 机器人签到最大并发                  | `1`     |
-| `random`     | `int`              | Telegram 机器人签到各站点间时间随机量 (分钟) | `15`    |
+| 设置项         | 值类型                   | 简介                                         | 默认值    |
+| -------------- | ------------------------ | -------------------------------------------- | --------- |
+| `timeout`    | `int`                  | Telegram 机器人签到超时 (秒)                 | `120`   |
+| `retries`    | `int`                  | Telegram 机器人签到错误重试次数              | `4`     |
+| `concurrent` | `int`                  | Telegram 机器人签到最大并发                  | `1`     |
+| `random`     | `int`                  | Telegram 机器人签到各站点间时间随机量 (分钟) | `15`    |
 | `notifier`   | `int`/`bool`/`str` | 发送通知到 Telegram 账号 (序号/手机号)       | `False` |
-| `service`    | `dict`             | 签到/水群/监视功能开启站点设置               | `{}`    |
-| `proxy`      | `dict`             | 代理设置                                     | `{}`    |
-| `telegram`   | `list`             | Telegram 账号设置 (支持多账号)               | `[]`    |
-| `emby`       | `list`             | Emby 账号设置 (支持多账号)                   | `[]`    |
+| `service`    | `dict`                 | 签到/水群/监视功能开启站点设置               | `{}`    |
+| `proxy`      | `dict`                 | 代理设置                                     | `{}`    |
+| `telegram`   | `list`                 | Telegram 账号设置 (支持多账号)               | `[]`    |
+| `emby`       | `list`                 | Emby 账号设置 (支持多账号)                   | `[]`    |
 
 `service`设置可以为:
 
-| 设置项      | 值类型 | 简介           | 默认值               |
-| ----------- | ------ | -------------- | -------------------- |
+| 设置项        | 值类型   | 简介           | 默认值               |
+| ------------- | -------- | -------------- | -------------------- |
 | `checkiner` | `list` | 启用的签到站点 | (当前所有支持的站点) |
 | `monitor`   | `list` | 启用的监视会话 | (当前所有支持的会话) |
 | `messager`  | `list` | 启用的水群会话 | (当前所有支持的会话) |
@@ -307,44 +311,44 @@ $ embykeeper config.toml -I
 若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
 当前支持的名称包括:
 
-| 站点        | 名称       |     | 站点        | 名称          |
-| ----------- | ---------- | --- | ----------- | ------------- |
-| 垃圾影音    | `ljyy`     |     | 搜书神器    | `sosdbot`     |
-| 卷毛鼠 IPTV | `jms_iptv` |     | 终点站      | `terminus`    |
-| Pornemby    | `pornemby` |     | Singularity | `singularity` |
-| Peach       | `peach`    |     | Nebula      | `nebula`      |
-| Bluesea     | `bluesea`  |     | Embyhub     | `embyhub`     |
-| 卷毛鼠      | `jms`      |     | 卡戎        | `charon`      |
+| 站点        | 名称         |  | 站点        | 名称            |
+| ----------- | ------------ | - | ----------- | --------------- |
+| 垃圾影音    | `ljyy`     |  | 搜书神器    | `sosdbot`     |
+| 卷毛鼠 IPTV | `jms_iptv` |  | 终点站      | `terminus`    |
+| Pornemby    | `pornemby` |  | Singularity | `singularity` |
+| Peach       | `peach`    |  | Nebula      | `nebula`      |
+| Bluesea     | `bluesea`  |  | Embyhub     | `embyhub`     |
+| 卷毛鼠      | `jms`      |  | 卡戎        | `charon`      |
 
 `proxy` 设置可以为:
 
-| 设置项     | 值类型 | 简介                                    | 默认值      |
-| ---------- | ------ | --------------------------------------- | ----------- |
-| `hostname` | `str`  | 代理服务器地址                          | `localhost` |
-| `port`     | `int`  | 代理端口号                              | `1080`      |
-| `scheme`   | `str`  | 代理协议, 可以为 "`socks5`" 或 "`http`" | `socks5`    |
+| 设置项       | 值类型  | 简介                                        | 默认值        |
+| ------------ | ------- | ------------------------------------------- | ------------- |
+| `hostname` | `str` | 代理服务器地址                              | `localhost` |
+| `port`     | `int` | 代理端口号                                  | `1080`      |
+| `scheme`   | `str` | 代理协议, 可以为 "`socks5`" 或 "`http`" | `socks5`    |
 
 `telegram` 设置可以为:
 
-| 设置项     | 值类型 | 简介                                                               | 默认值  |
-| ---------- | ------ | ------------------------------------------------------------------ | ------- |
-| `phone`    | `str`  | 账户手机号, 一般为 "`+86...`"                                      |         |
-| `monitor`  | `bool` | 启用群组监控系列功能                                               | `false` |
-| `send`     | `bool` | 启用自动水群系列功能                                               | `false` |
-| `api_id`   | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application ID   |         |
-| `api_hash` | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application Hash |         |
+| 设置项       | 值类型   | 简介                                                                   | 默认值    |
+| ------------ | -------- | ---------------------------------------------------------------------- | --------- |
+| `phone`    | `str`  | 账户手机号, 一般为 "`+86...`"                                        |           |
+| `monitor`  | `bool` | 启用群组监控系列功能                                                   | `false` |
+| `send`     | `bool` | 启用自动水群系列功能                                                   | `false` |
+| `api_id`   | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application ID   |           |
+| `api_hash` | `str`  | (可选) 从[Telegram 官网](https://my.telegram.org/)申请的 Application Hash |           |
 
 如果您在使用过程中遇到 'API_ID_PUBLISHED_FLOOD' 错误, 您可能需要申请自己的 API, 可以通过 [Telegram 官网](https://my.telegram.org/) 申请 `api_id` 和 `api_hash`. 登陆后选择 `API development tools`, 随后应用信息可以随意填写, 请注意 `URL` 是必填项, 可以填写 `localhost`. 提交时若显示 "Error", 您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试. 申请后请将 api_id 和 api_hash 填入 telegram 配置中即可.
 
 `emby` 设置可以为:
 
-| 设置项     | 值类型 | 简介                                                      | 默认值 |
-| ---------- | ------ | --------------------------------------------------------- | ------ |
-| `url`      | `str`  | Emby 服务器地址, 一般为 "`https://...`" 或 "`http://...`" |        |
-| `username` | `str`  | Emby 服务器用户名                                         |        |
-| `password` | `str`  | Emby 服务器密码                                           |        |
-| `time`     | `int`  | 模拟观看的时间 (秒)                                       | `800`  |
-| `progress` | `int`  | 观看后模拟进度条保存的时间 (秒)                           | `1000` |
+| 设置项       | 值类型  | 简介                                                          | 默认值   |
+| ------------ | ------- | ------------------------------------------------------------- | -------- |
+| `url`      | `str` | Emby 服务器地址, 一般为 "`https://...`" 或 "`http://...`" |          |
+| `username` | `str` | Emby 服务器用户名                                             |          |
+| `password` | `str` | Emby 服务器密码                                               |          |
+| `time`     | `int` | 模拟观看的时间 (秒)                                           | `800`  |
+| `progress` | `int` | 观看后模拟进度条保存的时间 (秒)                               | `1000` |
 
 服务可以进行特定配置, 如下所示:
 
