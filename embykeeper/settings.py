@@ -243,7 +243,7 @@ def interactive_config(config: dict = {}):
             more = Confirm.ask(pad + "是否添加 Emby 账号?", default=True)
         if not more:
             break
-        url = Prompt.ask(pad + "请输入您的 Emby 站点 URL <协议://域名:端口> [dark_green](https://abc.com:443)[/]")
+        url = Prompt.ask(pad + "请输入您的 Emby 站点 URL [dark_green](https://abc.com:443)[/]")
         username = Prompt.ask(pad + "请输入您在该 Emby 站点的用户名")
         password = Prompt.ask(pad + "请输入您在该 Emby 站点的密码 (不显示, 按回车确认)", password=True)
         time = IntPrompt.ask(pad + "设置模拟观看时长 (秒)", default=10, show_default=True)
