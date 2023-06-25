@@ -29,24 +29,40 @@ window.addEventListener('DOMContentLoaded', function() {
     fit.fit();
     console.debug("Web console init: ", term.cols, term.rows);
 
-    const socket = io.connect("/pty");
+    const socket = io.connect("/pty", {'reconnection': true, 'reconnectionDelay': 1000});
     socket.on("connect", () => {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "green";
         var statusMsg = document.getElementById("status-msg");
-        statusMsg.textContent = "Program Connected"
+        statusMsg.textContent = "Program Connected";
+        var restartIcon = document.getElementById("restart-icon");
+        restartIcon.style.animationPlayState = "paused";
         console.info("Web console connected: ", term.cols, term.rows);
-        term.focus()
-        term.clear()
+        term.focus();
+        term.clear();
+        term.reset();
         const dims = { cols: term.cols, rows: term.rows };
-        socket.emit("embykeeper", dims);
+        socket.emit("embykeeper_start", dims);
     });
 
     socket.on("disconnect", () => {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "red";
         var statusMsg = document.getElementById("status-msg");
-        statusMsg.textContent = "Program Disconnected"
+        statusMsg.textContent = "Program Disconnected";
+        var restartIcon = document.getElementById("restart-icon");
+        restartIcon.style.animationPlayState = "running";
+        console.info("Web console disconnected.");
+    });
+
+    var restartBtn = document.getElementById("restart-btn");
+    restartBtn.addEventListener('click', () => {
+        socket.emit("embykeeper_kill");
+        socket.disconnect();
+        var statusMsg = document.getElementById("status-msg");
+        statusMsg.textContent = "Program Restarting"
+        console.info("Web console restarting.");
+        socket.open();
     });
 
     function resize() {

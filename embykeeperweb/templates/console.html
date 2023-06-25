@@ -34,14 +34,23 @@
     <section class="py-5 mt-5">
         <div class="container">
             <div class="row">
-                <div class="col-12 mx-auto">
+                <div class="col-10 mx-auto">
                     <div class="d-inline-flex reccircle bg-light my-2 px-3 align-items-center">
                         <div id="status-icon" class="small-dot" style="border-radius: 50%;"></div>
                         <div class="text-center">
-                            <p class="fw-semibold my-0 ms-2" id="status-msg">Console Connecting</p>
+                            <p class="fw-semibold my-0 ms-2" id="status-msg">Program Connecting</p>
                         </div>
                     </div>
-                    <div></div>
+                </div>
+                <div class="col d-flex d-lg-flex justify-content-end" id="restart-btn">
+                    <div class="bs-icon-circle bs-icon my-2 bg-light"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-repeat" id="restart-icon">
+                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"></path>
+                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"></path>
+                        </svg></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
                     <div class="card" style="border-radius: 5px;height: 65vh;">
                         <div class="card-body">
                             <div id="terminal" class="h-100"></div>

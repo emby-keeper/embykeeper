@@ -34,3 +34,23 @@
 .xterm-viewport::-webkit-scrollbar-thumb:active {
   background: rgba(0,0,0,.9);
 }
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#restart-icon {
+  animation-name: rotate;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+#restart-btn {
+  cursor: pointer;
+}
