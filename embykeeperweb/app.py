@@ -6,14 +6,13 @@ import struct
 import subprocess
 import termios
 import time
+import signal
 
 import typer
 from loguru import logger
 from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO
 from flask_login import LoginManager, login_user, login_required
-
-from embykeeper import settings
 
 cli = typer.Typer()
 app = Flask(__name__, static_folder="templates/assets")
@@ -118,7 +117,7 @@ def read_and_forward_pty_output():
                 socketio.emit("pty-output", {"output": output}, namespace="/pty")
 
 
-@socketio.on("embykeeper", namespace="/pty")
+@socketio.on("embykeeper_start", namespace="/pty")
 def start(data):
     if app.config["fd"]:
         set_size(app.config["fd"], data["rows"], data["cols"])
@@ -133,6 +132,25 @@ def start(data):
             logger.debug(f"Embykeeper started at: {pid}.")
             set_size(app.config["fd"], data["rows"], data["cols"])
             socketio.start_background_task(target=read_and_forward_pty_output)
+
+
+@socketio.on("embykeeper_kill", namespace="/pty")
+def stop():
+    if app.config["pid"] is not None:
+        os.kill(app.config["pid"], signal.SIGINT)
+        for _ in range(50):
+            try:
+                os.kill(app.config["pid"], 0)
+            except OSError:
+                break
+            else:
+                time.sleep(0.1)
+        else:
+            os.kill(app.config["pid"], signal.SIGKILL)
+        app.config["fd"] = None
+        app.config["pid"] = None
+        app.config["hist"] = ""
+        logger.debug(f"Embykeeper stopped.")
 
 
 @cli.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
