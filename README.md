@@ -34,7 +34,6 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot) (由于需要付费跳过 Cloudflare 验证码, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
   - Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)
   - Peach: [频道](https://t.me/peach_emby_channel) [群组](https://t.me/peach_emby_chat) [机器人](https://t.me/peach_emby_bot)
-  - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
   - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
   - 卡戎: [频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)
@@ -43,6 +42,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 默认禁用:
     - ~~BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~ (无响应)
     - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (无响应)
+    - ~~EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)~~ (停止签到)
 - Emby 保活
 
   - 定时模拟账号登录视频播放
@@ -60,6 +60,10 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - Misty 开注自动注册: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)
   - 默认禁用:
     - ~~Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~ (公益服关闭)
+
+## 示例
+
+
 
 ## 安装与使用
 
@@ -471,6 +475,15 @@ $ embykeeper config.toml -a
 该命令会分析特定群组的历史记录, 以帮助您撰写自动水群工具的话术列表.
 
 另一个工具是即时信息分析:
+
+<!--
+;    用户             会话   (ChatID)                发信人   (UserID)                      信息
+; ────────────────────────────────────────────────────────────────────────────────────────────────────────────
+;   Tester  │  👥 Group A  -1001464166237   │   🤖 Bot A   1965142520   │  Welcome to the bar, what to drink?
+;   Tester  │  👥 Group A  -1001464166237   │   👤 User A  749799257    │  I want -1 cup of beer.
+;   Tester  │  👥 Group A  -1001464166237   │   👤 User B  749799257    │  A dish of asdfQwer@24dg!&*(@.
+;   Tester  │  👥 Group A  -1001464166237   │   🤖 Bot A   1965142520   │  Boom.
+-->
 
 ![follow screenshot](images/follow.svg)
 
