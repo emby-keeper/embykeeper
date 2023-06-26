@@ -50,9 +50,11 @@ class Dispatcher(dispatcher.Dispatcher):
         self.mutex = asyncio.Lock()
 
     async def start(self):
-        logger.debug('Telegram 更新分配器启动.')
+        logger.debug("Telegram 更新分配器启动.")
         if not self.client.no_updates:
-            self.handler_worker_tasks = [self.loop.create_task(self.handler_worker()) for _ in range(self.client.workers)]
+            self.handler_worker_tasks = [
+                self.loop.create_task(self.handler_worker()) for _ in range(self.client.workers)
+            ]
 
     def add_handler(self, handler, group: int):
         async def fn():
@@ -61,18 +63,20 @@ class Dispatcher(dispatcher.Dispatcher):
                     self.groups[group] = []
                     self.groups = OrderedDict(sorted(self.groups.items()))
                 self.groups[group].append(handler)
-                logger.debug(f'增加了 Telegram 更新处理器: {handler.__class__.__name__}.')
+                logger.debug(f"增加了 Telegram 更新处理器: {handler.__class__.__name__}.")
+
         self.loop.create_task(fn())
-    
+
     def remove_handler(self, handler, group: int):
         async def fn():
             async with self.mutex:
                 if group not in self.groups:
                     raise ValueError(f"Group {group} does not exist. Handler was not removed.")
                 self.groups[group].remove(handler)
-                logger.debug(f'移除了 Telegram 更新处理器: {handler.__class__.__name__}.')
+                logger.debug(f"移除了 Telegram 更新处理器: {handler.__class__.__name__}.")
+
         self.loop.create_task(fn())
-        
+
     async def handler_worker(self):
         while True:
             packet = await self.updates_queue.get()
@@ -85,14 +89,12 @@ class Dispatcher(dispatcher.Dispatcher):
                 parser = self.update_parsers.get(type(update), None)
 
                 parsed_update, handler_type = (
-                    await parser(update, users, chats)
-                    if parser is not None
-                    else (None, type(None))
+                    await parser(update, users, chats) if parser is not None else (None, type(None))
                 )
-                
+
                 async with self.mutex:
                     groups = {i: g[:] for i, g in self.groups.items()}
-                
+
                 for group in groups.values():
                     for handler in group:
                         args = None
@@ -102,7 +104,7 @@ class Dispatcher(dispatcher.Dispatcher):
                                 if await handler.check(self.client, parsed_update):
                                     args = (parsed_update,)
                             except Exception as e:
-                                logger.warning(f'Telegram Error: {e}')
+                                logger.warning(f"Telegram Error: {e}")
                                 continue
 
                         elif isinstance(handler, RawUpdateHandler):
@@ -116,22 +118,20 @@ class Dispatcher(dispatcher.Dispatcher):
                                 await handler.callback(self.client, *args)
                             else:
                                 await self.loop.run_in_executor(
-                                    self.client.executor,
-                                    handler.callback,
-                                    self.client,
-                                    *args
+                                    self.client.executor, handler.callback, self.client, *args
                                 )
                         except pyrogram.StopPropagation:
                             raise
                         except pyrogram.ContinuePropagation:
                             continue
                         except Exception as e:
-                            logger.opt(exception=e).error(f'Update callback error: {e}')
+                            logger.opt(exception=e).error(f"Update callback error: {e}")
                         break
             except pyrogram.StopPropagation:
                 pass
             except Exception as e:
-                logger.opt(exception=e).error(f'Update handling error: {e}')
+                logger.opt(exception=e).error(f"Update handling error: {e}")
+
 
 class Client(pyrogram.Client):
     def __init__(self, *args, **kw):
