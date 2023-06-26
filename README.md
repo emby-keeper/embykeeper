@@ -61,10 +61,6 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 默认禁用:
     - ~~Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~ (公益服关闭)
 
-## 示例
-
-
-
 ## 安装与使用
 
 ### 在线部署
