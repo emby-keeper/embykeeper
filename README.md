@@ -399,7 +399,9 @@ only_history = true # 仅当问题历史中找到答案时自动回答
 
 ## 代码重用与开发
 
-代码架构如下:
+您可以查看 [CONTRIBUTING](https://github.com/embykeeper/embykeeper/blob/main/CONTRIBUTING.md) 以了解如何贡献代码.
+
+项目代码架构如下:
 
 ```mermaid
 flowchart TD
