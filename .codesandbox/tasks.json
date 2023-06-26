@@ -1,0 +1,46 @@
+{
+  "$schema": "https://codesandbox.io/schemas/tasks.json",
+
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "Installing Dependencies",
+      "command": "pip install -e ."
+    }
+  ],
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "reinstall": {
+      "name": "Retry installing dependencies",
+      "command": "pip install -e ."
+    },
+    "embykeeper": {
+      "name": "Run embykeeper with config.toml",
+      "command": "embykeeper config.toml"
+    },
+    "embykeeper-dev": {
+      "name": "Run embykeeper with config.toml in development mode",
+      "command": "embykeeper config.toml -d"
+    },
+    "embykeeper-web": {
+      "name": "Run embykeeper web console",
+      "command": "embykeeperweb --public",
+      "preview": {
+        "port": 1818,
+        "pr-link": "direct"
+      }
+    },
+    "pytest": {
+      "name": "Run pytest",
+      "command": "pytest"
+    },
+    "black": {
+      "name": "Run black",
+      "command": "black ."
+    },
+    "pre-commit": {
+      "name": "Run pre-commit checks",
+      "command": "pre-commit run -a"
+    }
+  }
+}
