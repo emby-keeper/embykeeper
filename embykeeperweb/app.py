@@ -102,9 +102,9 @@ def heartbeat():
                 app.config["fd"] = fd
                 app.config["pid"] = pid
                 logger.debug(f"Embykeeper started at: {pid}.")
-            return jsonify({"status": "restarted", "pid": pid})
+            return jsonify({"status": "restarted", "pid": pid}), 201
         else:
-            return jsonify({"status": "running", "pid": app.config["pid"]})
+            return jsonify({"status": "running", "pid": app.config["pid"]}), 200
     else:
         return abort(403)
 

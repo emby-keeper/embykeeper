@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', function() {
     fit.fit();
     console.debug("Web console init: ", term.cols, term.rows);
 
-    const socket = io.connect("/pty", {'reconnection': true, 'reconnectionDelay': 1000});
+    const socket = io.connect("/pty", {'reconnection': false});
     socket.on("connect", () => {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "green";
