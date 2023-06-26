@@ -40,50 +40,53 @@ class Link:
         return await asyncio.gather(*[delete(m) for m in messages])
 
     async def post(
-        self, cmd, condition: Callable = None, timeout: int = 10, name: str = None
+        self, cmd, condition: Callable = None, timeout: int = 5, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
-        self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
-        await self.client.mute_chat(self.bot, time.time() + timeout + 5)
-        future = asyncio.Future()
-        handler = MessageHandler(
-            async_partial(self._handler, cmd=cmd, future=future, condition=condition),
-            filters.text & filters.bot & filters.user(self.bot),
-        )
-        groups = self.client.dispatcher.groups
-        if 1 not in groups:
-            groups[1] = [handler]
-        else:
-            groups[1].append(handler)
-        messages = []
-        messages.append(await self.client.send_message(self.bot, f"/start quiet"))
-        await asyncio.sleep(0.5)
-        messages.append(await self.client.send_message(self.bot, cmd))
-        try:
-            results = await asyncio.wait_for(future, timeout=timeout)
-        except asyncio.CancelledError:
-            try:
-                await asyncio.wait_for(self.delete_messages(messages), 1.0)
-            except asyncio.TimeoutError:
-                pass
-            finally:
-                raise
-        except asyncio.TimeoutError:
-            await self.delete_messages(messages)
-            self.log.warning(f"{name}超时.")
-            return None
-        else:
-            await self.delete_messages(messages)
-            status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
-            if status == "error":
-                self.log.warning(f"{name}错误: {errmsg}.")
-                return None
-            elif status == "ok":
-                return results
+        for _ in range(retries):
+            self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
+            await self.client.mute_chat(self.bot, time.time() + timeout + 5)
+            future = asyncio.Future()
+            handler = MessageHandler(
+                async_partial(self._handler, cmd=cmd, future=future, condition=condition),
+                filters.text & filters.bot & filters.user(self.bot),
+            )
+            groups = self.client.dispatcher.groups
+            if 1 not in groups:
+                groups[1] = [handler]
             else:
-                self.log.warning(f"{name}出现未知错误.")
-                return None
-        finally:
-            groups[1].remove(handler)
+                groups[1].append(handler)
+            messages = []
+            messages.append(await self.client.send_message(self.bot, f"/start quiet"))
+            await asyncio.sleep(0.5)
+            messages.append(await self.client.send_message(self.bot, cmd))
+            try:
+                results = await asyncio.wait_for(future, timeout=timeout)
+            except asyncio.CancelledError:
+                try:
+                    await asyncio.wait_for(self.delete_messages(messages), 1.0)
+                except asyncio.TimeoutError:
+                    pass
+                finally:
+                    raise
+            except asyncio.TimeoutError:
+                await self.delete_messages(messages)
+                self.log.warning(f"{name}超时.")
+                continue
+            else:
+                await self.delete_messages(messages)
+                status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
+                if status == "error":
+                    self.log.warning(f"{name}错误: {errmsg}.")
+                    return False
+                elif status == "ok":
+                    return results
+                else:
+                    self.log.warning(f"{name}出现未知错误.")
+                    return False
+            finally:
+                groups[1].remove(handler)
+        else:
+            return None
 
     async def _handler(
         self,
