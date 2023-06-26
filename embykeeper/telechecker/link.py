@@ -50,16 +50,12 @@ class Link:
                 async_partial(self._handler, cmd=cmd, future=future, condition=condition),
                 filters.text & filters.bot & filters.user(self.bot),
             )
-            groups = self.client.dispatcher.groups
-            if 1 not in groups:
-                groups[1] = [handler]
-            else:
-                groups[1].append(handler)
-            messages = []
-            messages.append(await self.client.send_message(self.bot, f"/start quiet"))
-            await asyncio.sleep(0.5)
-            messages.append(await self.client.send_message(self.bot, cmd))
+            self.client.add_handler(handler, group=1)
             try:
+                messages = []
+                messages.append(await self.client.send_message(self.bot, f"/start quiet"))
+                await asyncio.sleep(0.5)
+                messages.append(await self.client.send_message(self.bot, cmd))
                 results = await asyncio.wait_for(future, timeout=timeout)
             except asyncio.CancelledError:
                 try:
@@ -84,7 +80,7 @@ class Link:
                     self.log.warning(f"{name}出现未知错误.")
                     return False
             finally:
-                groups[1].remove(handler)
+                self.client.remove_handler(handler, group=1)
         else:
             return None
 

@@ -1,13 +1,16 @@
+from __future__ import annotations
+from collections import OrderedDict
+
 from datetime import datetime
-import time
 import asyncio
-from typing import AsyncGenerator, Optional, Union
+import inspect
+from typing import AsyncGenerator, List, Optional, Union
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
 from loguru import logger
-from pyrogram import Client as _Client
-from pyrogram import raw, types, utils, filters
+import pyrogram
+from pyrogram import raw, types, utils, filters, dispatcher
 from pyrogram.enums import SentCodeType
 from pyrogram.errors import (
     BadRequest,
@@ -17,7 +20,7 @@ from pyrogram.errors import (
     CodeInvalid,
     PhoneCodeInvalid,
 )
-from pyrogram.handlers import MessageHandler
+from pyrogram.handlers import MessageHandler, RawUpdateHandler
 from aiocache import Cache
 
 from .. import __name__, __version__
@@ -41,10 +44,100 @@ setattr(types.User, "name", property(_name))
 setattr(types.Chat, "name", property(_chat_name))
 
 
-class Client(_Client):
+class Dispatcher(dispatcher.Dispatcher):
+    def __init__(self, client: Client):
+        super().__init__(client)
+        self.mutex = asyncio.Lock()
+
+    async def start(self):
+        logger.debug('Telegram 更新分配器启动.')
+        if not self.client.no_updates:
+            self.handler_worker_tasks = [self.loop.create_task(self.handler_worker()) for _ in range(self.client.workers)]
+
+    def add_handler(self, handler, group: int):
+        async def fn():
+            async with self.mutex:
+                if group not in self.groups:
+                    self.groups[group] = []
+                    self.groups = OrderedDict(sorted(self.groups.items()))
+                self.groups[group].append(handler)
+                logger.debug(f'增加了 Telegram 更新处理器: {handler.__class__.__name__}.')
+        self.loop.create_task(fn())
+    
+    def remove_handler(self, handler, group: int):
+        async def fn():
+            async with self.mutex:
+                if group not in self.groups:
+                    raise ValueError(f"Group {group} does not exist. Handler was not removed.")
+                self.groups[group].remove(handler)
+                logger.debug(f'移除了 Telegram 更新处理器: {handler.__class__.__name__}.')
+        self.loop.create_task(fn())
+        
+    async def handler_worker(self):
+        while True:
+            packet = await self.updates_queue.get()
+
+            if packet is None:
+                break
+
+            try:
+                update, users, chats = packet
+                parser = self.update_parsers.get(type(update), None)
+
+                parsed_update, handler_type = (
+                    await parser(update, users, chats)
+                    if parser is not None
+                    else (None, type(None))
+                )
+                
+                async with self.mutex:
+                    groups = {i: g[:] for i, g in self.groups.items()}
+                
+                for group in groups.values():
+                    for handler in group:
+                        args = None
+
+                        if isinstance(handler, handler_type):
+                            try:
+                                if await handler.check(self.client, parsed_update):
+                                    args = (parsed_update,)
+                            except Exception as e:
+                                logger.warning(f'Telegram Error: {e}')
+                                continue
+
+                        elif isinstance(handler, RawUpdateHandler):
+                            args = (update, users, chats)
+
+                        if args is None:
+                            continue
+
+                        try:
+                            if inspect.iscoroutinefunction(handler.callback):
+                                await handler.callback(self.client, *args)
+                            else:
+                                await self.loop.run_in_executor(
+                                    self.client.executor,
+                                    handler.callback,
+                                    self.client,
+                                    *args
+                                )
+                        except pyrogram.StopPropagation:
+                            raise
+                        except pyrogram.ContinuePropagation:
+                            continue
+                        except Exception as e:
+                            logger.opt(exception=e).error(f'Update callback error: {e}')
+                        break
+            except pyrogram.StopPropagation:
+                pass
+            except Exception as e:
+                logger.opt(exception=e).error(f'Update handling error: {e}')
+
+class Client(pyrogram.Client):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.cache = Cache()
+        self.dispatcher = Dispatcher(self)
 
     async def authorize(self):
         if self.bot_token:
@@ -174,18 +267,14 @@ class Client(_Client):
         if not outgoing:
             filter = filter & (~filters.outgoing)
         handler = MessageHandler(async_partial(handler_func, future=future), filter)
-        groups = self.dispatcher.groups
-        if 0 not in groups:
-            groups[0] = [handler]
-        else:
-            groups[0].append(handler)
+        self.add_handler(handler, group=0)
         try:
             if text:
                 await self.send_message(chat_id, text)
             msg: types.Message = await asyncio.wait_for(future, timeout)
             return msg
         finally:
-            groups[0].remove(handler)
+            self.remove_handler(handler, group=0)
 
     async def mute_chat(self, chat_id: Union[int, str], until: Union[int, datetime]):
         if isinstance(until, datetime):
