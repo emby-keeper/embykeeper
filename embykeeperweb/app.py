@@ -17,7 +17,7 @@ from flask_login import LoginManager, login_user, login_required, current_user
 cli = typer.Typer()
 app = Flask(__name__, static_folder="templates/assets")
 app.config["SECRET_KEY"] = os.urandom(24)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
