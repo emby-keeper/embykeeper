@@ -12,7 +12,7 @@ import typer
 from loguru import logger
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_socketio import SocketIO
-from flask_login import LoginManager, login_user, login_required
+from flask_login import LoginManager, login_user, login_required, current_user
 
 cli = typer.Typer()
 app = Flask(__name__, static_folder="templates/assets")
@@ -116,6 +116,8 @@ def page_not_found(e):
 
 @socketio.on("pty-input", namespace="/pty")
 def pty_input(data):
+    if not current_user.is_authenticated():
+        return
     if app.config["fd"]:
         os.write(app.config["fd"], data["input"].encode())
 
@@ -128,6 +130,8 @@ def set_size(fd, row, col, xpix=0, ypix=0):
 
 @socketio.on("resize", namespace="/pty")
 def resize(data):
+    if not current_user.is_authenticated():
+        return
     if app.config["fd"]:
         set_size(app.config["fd"], data["rows"], data["cols"])
 
@@ -146,6 +150,8 @@ def read_and_forward_pty_output():
 
 @socketio.on("embykeeper_start", namespace="/pty")
 def start(data):
+    if not current_user.is_authenticated():
+        return
     if app.config["fd"]:
         set_size(app.config["fd"], data["rows"], data["cols"])
         socketio.emit("pty-output", {"output": app.config["hist"]}, namespace="/pty")
@@ -163,6 +169,8 @@ def start(data):
 
 @socketio.on("embykeeper_kill", namespace="/pty")
 def stop():
+    if not current_user.is_authenticated():
+        return
     if app.config["pid"] is not None:
         os.kill(app.config["pid"], signal.SIGINT)
         for _ in range(50):
