@@ -10,7 +10,7 @@ import signal
 
 import typer
 from loguru import logger
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_socketio import SocketIO
 from flask_login import LoginManager, login_user, login_required
 
@@ -81,6 +81,30 @@ def login_submit():
             app.config["faillog"].append(time.time())
     return render_template("login.html", emsg=emsg)
 
+@app.route("/healthz")
+def healthz():
+    return '200 OK'
+
+@app.route("/heartbeat")
+def heartbeat():
+    webpass = os.environ.get("EK_WEBPASS", "")
+    password = request.args.get('pass', None)
+    if (not password) or (not webpass):
+        return abort(403)
+    if password == webpass:
+        if app.config["pid"] is None:
+            (pid, fd) = pty.fork()
+            if pid == 0:
+                subprocess.run(["embykeeper", *app.config["args"]])
+            else:
+                app.config["fd"] = fd
+                app.config["pid"] = pid
+                logger.debug(f"Embykeeper started at: {pid}.")
+            return jsonify({'status': 'restarted', 'pid': pid})
+        else:
+            return jsonify({'status': 'running', 'pid': app.config["pid"]})
+    else:
+        return abort(403)
 
 @app.errorhandler(404)
 def page_not_found(e):
