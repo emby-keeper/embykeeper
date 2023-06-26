@@ -81,14 +81,16 @@ def login_submit():
             app.config["faillog"].append(time.time())
     return render_template("login.html", emsg=emsg)
 
+
 @app.route("/healthz")
 def healthz():
-    return '200 OK'
+    return "200 OK"
+
 
 @app.route("/heartbeat")
 def heartbeat():
     webpass = os.environ.get("EK_WEBPASS", "")
-    password = request.args.get('pass', None)
+    password = request.args.get("pass", None)
     if (not password) or (not webpass):
         return abort(403)
     if password == webpass:
@@ -100,11 +102,12 @@ def heartbeat():
                 app.config["fd"] = fd
                 app.config["pid"] = pid
                 logger.debug(f"Embykeeper started at: {pid}.")
-            return jsonify({'status': 'restarted', 'pid': pid})
+            return jsonify({"status": "restarted", "pid": pid})
         else:
-            return jsonify({'status': 'running', 'pid': app.config["pid"]})
+            return jsonify({"status": "running", "pid": app.config["pid"]})
     else:
         return abort(403)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
