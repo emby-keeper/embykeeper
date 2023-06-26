@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: embykeeper
+    runtime: docker
+    region: singapore
+    plan: free
+    branch: stable
+    healthCheckPath: /healthz
+    envVars:
+      - key: EK_WEBPASS
+        sync: false
+    autoDeploy: true
