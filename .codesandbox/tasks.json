@@ -26,8 +26,7 @@
       "name": "Run embykeeper web console",
       "command": "embykeeperweb --public",
       "preview": {
-        "port": 1818,
-        "pr-link": "direct"
+        "port": 1818
       }
     },
     "pytest": {
