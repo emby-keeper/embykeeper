@@ -50,12 +50,13 @@ class Link:
                 async_partial(self._handler, cmd=cmd, future=future, condition=condition),
                 filters.text & filters.bot & filters.user(self.bot),
             )
-            self.client.add_handler(handler, group=1)
+            await self.client.add_handler(handler, group=1)
             try:
                 messages = []
                 messages.append(await self.client.send_message(self.bot, f"/start quiet"))
                 await asyncio.sleep(0.5)
                 messages.append(await self.client.send_message(self.bot, cmd))
+                self.log.debug(f"[gray50]-> {cmd}[/]")
                 results = await asyncio.wait_for(future, timeout=timeout)
             except asyncio.CancelledError:
                 try:
@@ -85,7 +86,7 @@ class Link:
                     self.log.warning(f"{name}出现未知错误.")
                     return False
             finally:
-                self.client.remove_handler(handler, group=1)
+                await self.client.remove_handler(handler, group=1)
 
     async def _handler(
         self,

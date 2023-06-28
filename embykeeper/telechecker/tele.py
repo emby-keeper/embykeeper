@@ -20,7 +20,8 @@ from pyrogram.errors import (
     CodeInvalid,
     PhoneCodeInvalid,
 )
-from pyrogram.handlers import MessageHandler, RawUpdateHandler
+from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler
+from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
 from .. import __name__, __version__
@@ -65,7 +66,7 @@ class Dispatcher(dispatcher.Dispatcher):
                 self.groups[group].append(handler)
                 logger.debug(f"增加了 Telegram 更新处理器: {handler.__class__.__name__}.")
 
-        self.loop.create_task(fn())
+        return self.loop.create_task(fn())
 
     def remove_handler(self, handler, group: int):
         async def fn():
@@ -75,7 +76,7 @@ class Dispatcher(dispatcher.Dispatcher):
                 self.groups[group].remove(handler)
                 logger.debug(f"移除了 Telegram 更新处理器: {handler.__class__.__name__}.")
 
-        self.loop.create_task(fn())
+        return self.loop.create_task(fn())
 
     async def handler_worker(self):
         while True:
@@ -185,6 +186,28 @@ class Client(pyrogram.Client):
         else:
             raise BadRequest("该账户尚未注册")
 
+    def add_handler(self, handler: Handler, group: int = 0):
+        if isinstance(handler, DisconnectHandler):
+            self.disconnect_handler = handler.callback
+
+            async def dummy():
+                pass
+
+            return asyncio.ensure_future(dummy())
+        else:
+            return self.dispatcher.add_handler(handler, group)
+
+    def remove_handler(self, handler: Handler, group: int = 0):
+        if isinstance(handler, DisconnectHandler):
+            self.disconnect_handler = None
+
+            async def dummy():
+                pass
+
+            return asyncio.ensure_future(dummy())
+        else:
+            return self.dispatcher.remove_handler(handler, group)
+
     async def get_dialogs(
         self, limit: int = 0, exclude_pinned=None, folder_id=None
     ) -> Optional[AsyncGenerator["types.Dialog", None]]:
@@ -267,7 +290,7 @@ class Client(pyrogram.Client):
         if not outgoing:
             filter = filter & (~filters.outgoing)
         handler = MessageHandler(async_partial(handler_func, future=future), filter)
-        self.add_handler(handler, group=0)
+        await self.add_handler(handler, group=0)
         try:
             if text:
                 await self.send_message(chat_id, text)

@@ -172,31 +172,36 @@ class BotCheckin(BaseBotCheckin):
 
         try:
             async with self.listener():
-                if self.bot_use_history is None:
-                    await self.send_checkin()
-                elif not await self.walk_history(self.bot_use_history):
-                    await self.send_checkin()
+                cancelled = False
                 try:
+                    if self.bot_use_history is None:
+                        await self.send_checkin()
+                    elif not await self.walk_history(self.bot_use_history):
+                        await self.send_checkin()
                     await asyncio.wait_for(self.finished.wait(), self.timeout)
-                except asyncio.TimeoutError:
-                    pass
+                except asyncio.CancelledError:
+                    cancelled = True
+                    raise
                 finally:
-                    if self._is_archived:
-                        self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
-                        try:
-                            await asyncio.shield(asyncio.wait_for(chat.archive(), 3))
-                        except asyncio.TimeoutError:
-                            self.log.debug(f"[gray50]归档失败: {ident}[/]")
+                    if not cancelled:
+                        if self._is_archived:
+                            self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
+                            try:
+                                await chat.archive()
+                            except asyncio.TimeoutError:
+                                self.log.debug(f"[gray50]归档失败: {ident}[/]")
+                        if not self.chat_name:
+                            self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
+                            try:
+                                if await self.client.read_chat_history(ident):
+                                    self.log.debug(f"[gray50]设为已读成功: {ident}[/]")
+                            except asyncio.TimeoutError:
+                                self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
         except OSError as e:
             self.log.warning(f'初始化错误: "{e}".')
             return False
-        finally:
-            if not self.chat_name:
-                self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
-                try:
-                    await asyncio.shield(asyncio.wait_for(self.client.read_chat_history(ident), 3))
-                except asyncio.TimeoutError:
-                    self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
+        except asyncio.TimeoutError:
+            pass
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
