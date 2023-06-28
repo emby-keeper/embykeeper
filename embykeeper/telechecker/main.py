@@ -214,7 +214,7 @@ async def checkiner_schedule(config: dict, start_time=None, end_time=None, insta
 
 
 async def monitorer(config: dict):
-    logger.debug("正在启动消息监控模块, 请等待登录.")
+    logger.debug("正在启动消息监控模块.")
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
