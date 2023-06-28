@@ -45,14 +45,14 @@ window.addEventListener('DOMContentLoaded', function() {
         socket.emit("embykeeper_start", dims);
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (reason) => {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "red";
         var statusMsg = document.getElementById("status-msg");
         statusMsg.textContent = "Program Disconnected";
         var restartIcon = document.getElementById("restart-icon");
         restartIcon.style.animationPlayState = "running";
-        console.info("Web console disconnected.");
+        console.info("Web console disconnected: ", reason);
     });
 
     var restartBtn = document.getElementById("restart-btn");
@@ -84,6 +84,7 @@ window.addEventListener('DOMContentLoaded', function() {
     window.onresize = debounce(resize, 50);
 
     term.onData((data) => {
+        console.debug(data)
         socket.emit("pty-input", { input: data });
     });
 

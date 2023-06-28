@@ -5,6 +5,7 @@ import fcntl
 import struct
 import subprocess
 import termios
+import threading
 import time
 import signal
 
@@ -27,6 +28,8 @@ app.config["fd"] = None
 app.config["pid"] = None
 app.config["hist"] = ""
 app.config["faillog"] = []
+
+lock = threading.Lock()
 
 
 class DummyUser:
@@ -86,7 +89,6 @@ def login_submit():
 def healthz():
     return "200 OK"
 
-
 @app.route("/heartbeat")
 def heartbeat():
     webpass = os.environ.get("EK_WEBPASS", "")
@@ -95,19 +97,12 @@ def heartbeat():
         return abort(403)
     if password == webpass:
         if app.config["pid"] is None:
-            (pid, fd) = pty.fork()
-            if pid == 0:
-                subprocess.run(["embykeeper", *app.config["args"]])
-            else:
-                app.config["fd"] = fd
-                app.config["pid"] = pid
-                logger.debug(f"Embykeeper started at: {pid}.")
-            return jsonify({"status": "restarted", "pid": pid}), 201
+            start({'rows':32, 'cols': 106}, auth=False)
+            return jsonify({"status": "restarted", "pid": app.config["pid"]}), 201
         else:
             return jsonify({"status": "running", "pid": app.config["pid"]}), 200
     else:
         return abort(403)
-
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -148,44 +143,70 @@ def read_and_forward_pty_output():
                 socketio.emit("pty-output", {"output": output}, namespace="/pty")
 
 
+@socketio.on("connect", namespace="/pty")
+def connected():
+    logger.debug(f"Console connected.")
+
+
+@socketio.on("disconnect", namespace="/pty")
+def connected():
+    logger.debug(f"Console disconnected.")
+
+
 @socketio.on("embykeeper_start", namespace="/pty")
-def start(data):
-    if not current_user.is_authenticated():
+def start(data, auth=True):
+    if auth and (not current_user.is_authenticated()):
         return
-    if app.config["fd"]:
-        set_size(app.config["fd"], data["rows"], data["cols"])
-        socketio.emit("pty-output", {"output": app.config["hist"]}, namespace="/pty")
-    else:
-        (pid, fd) = pty.fork()
-        if pid == 0:
-            subprocess.run(["embykeeper", *app.config["args"]])
-        else:
-            app.config["fd"] = fd
-            app.config["pid"] = pid
-            logger.debug(f"Embykeeper started at: {pid}.")
+    with lock:
+        if app.config["fd"]:
             set_size(app.config["fd"], data["rows"], data["cols"])
-            socketio.start_background_task(target=read_and_forward_pty_output)
+            socketio.emit("pty-output", {"output": app.config["hist"]}, namespace="/pty")
+        else:
+            (pid, fd) = pty.fork()
+            if pid == 0:
+                while True:
+                    try:
+                        p = subprocess.run(["embykeeper", *app.config["args"]])
+                        if p.returncode:
+                            raise RuntimeError()
+                    except (KeyboardInterrupt, RuntimeError):
+                        print()
+                        while True:
+                            try:
+                                input("Embykeeper 已退出, 请按 Enter 以重新开始 ...")
+                                break
+                            except KeyboardInterrupt:
+                                pass
+                            finally:
+                                print()
+            else:
+                app.config["fd"] = fd
+                app.config["pid"] = pid
+                logger.debug(f"Embykeeper started at: {pid}.")
+                set_size(app.config["fd"], data["rows"], data["cols"])
+                socketio.start_background_task(target=read_and_forward_pty_output)
 
 
 @socketio.on("embykeeper_kill", namespace="/pty")
 def stop():
     if not current_user.is_authenticated():
         return
-    if app.config["pid"] is not None:
-        os.kill(app.config["pid"], signal.SIGINT)
-        for _ in range(50):
-            try:
-                os.kill(app.config["pid"], 0)
-            except OSError:
-                break
+    with lock:
+        if app.config["pid"] is not None:
+            os.kill(app.config["pid"], signal.SIGINT)
+            for _ in range(50):
+                try:
+                    os.kill(app.config["pid"], 0)
+                except OSError:
+                    break
+                else:
+                    time.sleep(0.1)
             else:
-                time.sleep(0.1)
-        else:
-            os.kill(app.config["pid"], signal.SIGKILL)
-        app.config["fd"] = None
-        app.config["pid"] = None
-        app.config["hist"] = ""
-        logger.debug(f"Embykeeper stopped.")
+                os.kill(app.config["pid"], signal.SIGKILL)
+            app.config["fd"] = None
+            app.config["pid"] = None
+            app.config["hist"] = ""
+            logger.debug(f"Embykeeper stopped.")
 
 
 @cli.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
