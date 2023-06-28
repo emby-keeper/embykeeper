@@ -2,6 +2,7 @@
 *.toml
 !/pyproject.toml
 *.session
+*.session-journal
 *.msgs
 
 # Test files
