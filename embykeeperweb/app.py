@@ -89,6 +89,7 @@ def login_submit():
 def healthz():
     return "200 OK"
 
+
 @app.route("/heartbeat")
 def heartbeat():
     webpass = os.environ.get("EK_WEBPASS", "")
@@ -97,12 +98,13 @@ def heartbeat():
         return abort(403)
     if password == webpass:
         if app.config["pid"] is None:
-            start({'rows':32, 'cols': 106}, auth=False)
+            start({"rows": 32, "cols": 106}, auth=False)
             return jsonify({"status": "restarted", "pid": app.config["pid"]}), 201
         else:
             return jsonify({"status": "running", "pid": app.config["pid"]}), 200
     else:
         return abort(403)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -174,10 +176,9 @@ def start(data, auth=True):
                         while True:
                             try:
                                 input("Embykeeper 已退出, 请按 Enter 以重新开始 ...")
+                                print()
                                 break
                             except KeyboardInterrupt:
-                                pass
-                            finally:
                                 print()
             else:
                 app.config["fd"] = fd

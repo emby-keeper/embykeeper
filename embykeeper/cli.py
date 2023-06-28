@@ -60,8 +60,12 @@ async def main(
     ),
     once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
     public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
-    debug: bool = typer.Option(False, "--debug", "-d", rich_help_panel="调试参数", help="开启调试模式"),
-    debug_cron: bool = typer.Option(False, hidden=True, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"),
+    debug: bool = typer.Option(
+        False, "--debug", "-d", envvar="EK_DEBUG", show_envvar=False, rich_help_panel="调试参数", help="开启调试模式"
+    ),
+    debug_cron: bool = typer.Option(
+        False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
+    ),
     version: bool = typer.Option(
         None,
         "--version",
