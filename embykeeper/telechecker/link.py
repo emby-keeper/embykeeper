@@ -42,7 +42,7 @@ class Link:
     async def post(
         self, cmd, condition: Callable = None, timeout: int = 5, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
-        for _ in range(retries):
+        for r in range(retries):
             self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
             await self.client.mute_chat(self.bot, time.time() + timeout + 5)
             future = asyncio.Future()
@@ -66,8 +66,13 @@ class Link:
                     raise
             except asyncio.TimeoutError:
                 await self.delete_messages(messages)
-                self.log.warning(f"{name}超时.")
-                continue
+                if r + 1 < retries:
+                    self.log.info(f"{name}超时 ({r + 1}/{retries}), 将在 3 秒后重试.")
+                    await asyncio.sleep(3)
+                    continue
+                else:
+                    self.log.warning(f"{name}超时 ({r + 1}/{retries}).")
+                    return None
             else:
                 await self.delete_messages(messages)
                 status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
@@ -81,9 +86,7 @@ class Link:
                     return False
             finally:
                 self.client.remove_handler(handler, group=1)
-        else:
-            return None
-
+                
     async def _handler(
         self,
         client: Client,

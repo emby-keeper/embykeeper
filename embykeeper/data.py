@@ -71,10 +71,11 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                         logger.warning(f"下载失败: {name}, 将在 3 秒后重试.")
                         await asyncio.sleep(3)
                         continue
-                    except:
+                    except Exception as e:
                         (basedir / name).unlink(missing_ok=True)
-                        logger.warning(f"下载失败: {name}")
-                        raise
+                        logger.warning(f"下载失败: {name} ({e})")
+                        yield None
+                        break
             else:
                 logger.warning(f"下载失败: {name}.")
                 yield None

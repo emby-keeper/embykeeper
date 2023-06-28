@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import re
 import sys
 import base64
 import hashlib
@@ -284,7 +285,7 @@ def interactive_config(config: dict = {}):
     else:
         content = content.encode()
     content = base64.b64encode(content)
-    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入 SECRETS 变量配置 (名称: EK_CONFIG), 否则配置将在重启后丢失.")
+    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入环境变量配置 (名称: EK_CONFIG), 否则配置将在重启后丢失.")
     print()
     get_console().rule("EK_CONFIG")
     print(content.decode())
@@ -298,7 +299,7 @@ def interactive_config(config: dict = {}):
 def load_env_config(data: str):
     from rich.prompt import Prompt
 
-    data = base64.b64decode(data.strip().encode())
+    data = base64.b64decode(re.sub(r'\s+', '', data).encode())
     try:
         config = tomllib.loads(data.decode())
     except (tomllib.TOMLDecodeError, UnicodeDecodeError):
@@ -310,10 +311,10 @@ def load_env_config(data: str):
         except (tomllib.TOMLDecodeError, UnicodeDecodeError):
             config = {}
         if not config:
-            logger.error("密钥无效或配置格式错误, 请删除 SECRETS 变量设置, 并重新配置.")
+            logger.error("密钥无效或配置格式错误, 请重试.")
             sys.exit(252)
     else:
-        logger.debug("您正在使用 SECRETS 变量配置.")
+        logger.debug("您正在使用环境变量配置.")
     return config
 
 
