@@ -86,7 +86,7 @@ class Link:
                     return False
             finally:
                 self.client.remove_handler(handler, group=1)
-                
+
     async def _handler(
         self,
         client: Client,

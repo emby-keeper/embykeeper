@@ -299,7 +299,7 @@ def interactive_config(config: dict = {}):
 def load_env_config(data: str):
     from rich.prompt import Prompt
 
-    data = base64.b64decode(re.sub(r'\s+', '', data).encode())
+    data = base64.b64decode(re.sub(r"\s+", "", data).encode())
     try:
         config = tomllib.loads(data.decode())
     except (tomllib.TOMLDecodeError, UnicodeDecodeError):
