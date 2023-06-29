@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from functools import lru_cache
 import inspect
 import logging
 import operator
@@ -15,7 +16,6 @@ from pyrogram.types import Message
 from rich import box
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
 from rich.table import Column, Table
 from rich.text import Text
 
@@ -45,6 +45,7 @@ def get_spec(type: str):
     return sub, suffix
 
 
+@lru_cache
 def get_names(type: str) -> List[str]:
     sub, _ = get_spec(type)
     results = []
@@ -289,6 +290,8 @@ async def follower(config: dict):
 
 
 async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
+    from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
+
     def render_page(progress, texts):
         page = Table.grid()
         page.add_row(Panel(progress))

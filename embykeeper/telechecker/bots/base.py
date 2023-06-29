@@ -16,14 +16,13 @@ from pyrogram.errors import UsernameNotOccupied, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from thefuzz import fuzz
+from aiocache import cached
 
 from ...data import get_datas
 from ...utils import to_iterable, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
-
-default_ocr = DdddOcr(beta=True, show_ad=False)
 
 
 class MessageType(Flag):
@@ -67,8 +66,7 @@ class BotCheckin(BaseBotCheckin):
     """签到类, 用于回复模式签到."""
 
     group_pool = AsyncCountPool(base=2000)
-    ocr = default_ocr
-    lock = asyncio.Lock()
+    ocr = None
 
     name: str = None  # 签到器的名称
     bot_id: int = None  # Bot 的 UserID
@@ -117,6 +115,21 @@ class BotCheckin(BaseBotCheckin):
             except ValueError:
                 pass
 
+    @cached(ttl=60, noself=True)
+    async def get_ocr(self, ocr: str = None):
+        if not ocr:
+            return DdddOcr(beta=True, show_ad=False)
+        else:
+            data = []
+            files = (f"{ocr}.onnx", f"{ocr}.json")
+            async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
+                if p is None:
+                    self.log.warning(f"初始化错误: 无法下载所需文件.")
+                    return None
+                else:
+                    data.append(p)
+            return DdddOcr(show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1]))
+
     async def start(self):
         ident = self.chat_name or self.bot_id or self.bot_username
         while True:
@@ -145,20 +158,6 @@ class BotCheckin(BaseBotCheckin):
                 if not self.bot_allow_from_scratch:
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
                     return None
-
-        async with self.lock:
-            if isinstance(self.ocr, str):
-                data = []
-                files = (f"{self.ocr}.onnx", f"{self.ocr}.json")
-                async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
-                    if p is None:
-                        self.log.warning(f"初始化错误: 无法下载所需文件.")
-                        return None
-                    else:
-                        data.append(p)
-                self.__class__.ocr = DdddOcr(
-                    show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1])
-                )
 
         bot = await self.client.get_users(self.bot_id or self.bot_username)
         msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
@@ -285,7 +284,8 @@ class BotCheckin(BaseBotCheckin):
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
         captcha = (
-            self.ocr.classification(image)
+            (await self.get_ocr(self.ocr))
+            .classification(image)
             .translate(str.maketrans("", "", string.punctuation))
             .replace(" ", "")
         )

@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 import asyncio
 import inspect
-from typing import AsyncGenerator, List, Optional, Union
+from typing import AsyncGenerator, Optional, Union
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
@@ -64,7 +64,7 @@ class Dispatcher(dispatcher.Dispatcher):
                     self.groups[group] = []
                     self.groups = OrderedDict(sorted(self.groups.items()))
                 self.groups[group].append(handler)
-                logger.debug(f"增加了 Telegram 更新处理器: {handler.__class__.__name__}.")
+                # logger.debug(f"增加了 Telegram 更新处理器: {handler.__class__.__name__}.")
 
         return self.loop.create_task(fn())
 
@@ -74,7 +74,7 @@ class Dispatcher(dispatcher.Dispatcher):
                 if group not in self.groups:
                     raise ValueError(f"Group {group} does not exist. Handler was not removed.")
                 self.groups[group].remove(handler)
-                logger.debug(f"移除了 Telegram 更新处理器: {handler.__class__.__name__}.")
+                # logger.debug(f"移除了 Telegram 更新处理器: {handler.__class__.__name__}.")
 
         return self.loop.create_task(fn())
 

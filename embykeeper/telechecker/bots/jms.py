@@ -10,6 +10,7 @@ from .base import AnswerBotCheckin
 class JMSCheckin(AnswerBotCheckin):
     ocr = "idioms@v2"
     idioms = None
+    lock = asyncio.Lock()
 
     name = "卷毛鼠"
     bot_username = "jmsembybot"

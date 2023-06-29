@@ -1,7 +1,8 @@
 from logging import Formatter
+import asyncio
+
 from loguru import logger
 from rich.logging import Console, RichHandler
-import asyncio
 
 from .utils import to_iterable
 
@@ -44,7 +45,10 @@ def formatter(record):
 def initialize(level="INFO"):
     logger.remove()
     handler = RichHandler(
-        console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio]
+        console=Console(stderr=True),
+        markup=True,
+        rich_tracebacks=True,
+        tracebacks_suppress=[asyncio],
     )
     handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
     logger.add(handler, format=formatter, level=level, colorize=False)
