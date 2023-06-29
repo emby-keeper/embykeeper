@@ -1,0 +1,19 @@
+{
+    "name": "Embykeeper",
+    "description": "中文社群规则下用于 Emby 影视服务器签到和保号的自动执行工具",
+    "keywords": ["telegram", "emby", "checkin"],
+    "website": "https://github.com/embykeeper/embykeeper",
+    "repository": "https://github.com/embykeeper/embykeeper",
+    "success_url": "/",
+    "env": {
+      "EK_WEBPASS": {
+        "description": "管理面板登录密码",
+        "required": true
+      },
+      "EK_CONFIG": {
+        "description": "无需填写, 网页编辑配置后填写到该变量以存储",
+        "required": false
+      }
+    },
+    "stack": "container"
+  }
