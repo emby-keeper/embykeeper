@@ -13,6 +13,9 @@
 # Utils
 /utils
 
+# Deploys
+/deploy
+
 # Docs
 /images
 
