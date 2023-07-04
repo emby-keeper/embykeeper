@@ -69,7 +69,10 @@ async def send_playing(obj: EmbyObject, playing_info: dict):
 async def play(obj: EmbyObject, time=10, progress=1000):
     c: Connector = obj.connector
     # 检查
-    if obj.object_dict.get("RunTimeTicks") < max(progress, time) * 10000000:
+    totalticks = obj.object_dict.get("RunTimeTicks")
+    if not totalticks:
+        raise PlayError("无法获取视频长度")
+    if totalticks < max(progress, time) * 10000000:
         raise PlayError("视频长度低于观看进度所需")
     # 获取播放源
     resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
