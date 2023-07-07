@@ -29,11 +29,12 @@ def is_ok(co):
         return True
 
 
-async def get_latest(emby: Emby, n=10):
-    items = await emby.get_items(["Movie", "Episode"], limit=n, sort="DateCreated", ascending=False)
-    i: Union[Movie, Episode]
-    for i in items:
-        yield i
+async def get_latest(emby: Emby):
+    while True:
+        items = await emby.get_items(["Movie", "Episode"], limit=10, sort="DateCreated", ascending=False)
+        i: Union[Movie, Episode]
+        for i in items:
+            yield i
 
 
 async def set_played(obj: EmbyObject):
