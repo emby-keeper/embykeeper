@@ -85,7 +85,7 @@ Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gi
 docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
 
-命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考):
+命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考, 若您只需要进行机器人签到或 Emby 模拟观看, 您也可以只填写 `telegram` 部分或 `emby` 部分):
 
 ```toml
 [[telegram]]
@@ -105,6 +105,29 @@ hostname = "127.0.0.1"
 port = 1080
 scheme = "socks5"
 ```
+
+
+<details>
+<summary>查看带代理的完整配置</summary>
+
+```toml
+[proxy]
+hostname = "127.0.0.1"
+port = 1080
+scheme = "socks5"
+
+[[telegram]]
+phone = "+8612109347899"
+
+[[emby]]
+url = "https://weiss-griffin.com/"
+username = "carrie19"
+password = "s*D7MMCpS$"
+```
+
+</details>
+
+&nbsp;
 
 随后, 您需要再次执行:
 
