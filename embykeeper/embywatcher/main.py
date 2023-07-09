@@ -92,19 +92,19 @@ async def play(obj: EmbyObject, time=10, progress=1000):
         "CanSeek": True,
     }
     task = asyncio.create_task(send_playing(obj, playing_info))
-    timeout = c.timeout
     try:
-        c.timeout = time
-        await c.get(
-            f"/Videos/{obj.id}/stream",
-            static=True,
-            playSessionId=play_session_id,
-            MediaSourceId=media_source_id,
+        await asyncio.wait_for(
+            c.get_stream_noreturn(
+                f"/Videos/{obj.id}/stream",
+                static=True,
+                playSessionId=play_session_id,
+                MediaSourceId=media_source_id,
+            ),
+            timeout=time,
         )
     except asyncio.TimeoutError:
         pass
     finally:
-        c.timeout = timeout
         task.cancel()
     if not is_ok(await c.post("/Sessions/Playing/Stopped", **playing_info)):
         raise PlayError("无法正常结束播放")
@@ -155,35 +155,36 @@ async def watch(emby, time, progress, logger, retries=5):
                             if not obj.percentage_played:
                                 raise PlayError("尝试播放后播放进度为空")
                             logger.bind(notify="成功保活.").info(
-                                f"[yellow]成功播放视频[/], 当前该视频播放{obj.play_count}次, 进度({obj.percentage_played}), 上次播放于 {last_played}."
+                                f"[yellow]成功播放视频[/], 进度 {int(obj.percentage_played * 100)} %."
                             )
+                            logger.debug(f"当前该视频播放 {obj.play_count} 次, 上次播放于 {last_played}.")
                             return True
-                    except (ClientError, OSError):
+                    except (ClientError, OSError) as e:
                         retry += 1
                         if retry > retries:
-                            logger.warning(f"超过最大重试次数, 保活失败.")
+                            logger.warning(f"超过最大重试次数, 保活失败: {e}.")
                             return False
                         else:
-                            logger.info(f"连接失败, 正在重试.")
+                            logger.info(f"连接失败, 正在重试: {e}.")
                     except PlayError as e:
                         logger.info(f"发生错误: {e}, 正在重试其他视频.")
                         break
                     finally:
                         try:
-                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 0.5)):
+                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 2)):
                                 logger.debug(f"未能成功从最近播放中隐藏视频.")
                         except asyncio.TimeoutError:
-                            logger.debug(f"未能成功从最近播放中隐藏视频.")
+                            logger.debug(f"从最近播放中隐藏视频超时.")
             else:
                 logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False
-        except (ClientError, OSError):
+        except (ClientError, OSError) as e:
             retry += 1
             if retry > retries:
-                logger.warning(f"超过最大重试次数, 保活失败.")
+                logger.warning(f"超过最大重试次数, 保活失败: {e}.")
                 return False
             else:
-                logger.info(f"连接失败, 正在重试.")
+                logger.info(f"连接失败, 正在重试: {e}.")
         except asyncio.CancelledError:
             raise
         except Exception as e:

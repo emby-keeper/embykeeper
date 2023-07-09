@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 import random
 
 import aiohttp
@@ -60,6 +61,16 @@ class Connector(_Connector):
             except (aiohttp.ClientConnectionError, OSError, asyncio.TimeoutError) as e:
                 pass
         raise aiohttp.ClientConnectionError("Emby server is probably down")
+
+    @async_func
+    async def get_stream_noreturn(self, path, **query):
+        try:
+            session = await self._get_session()
+            async with await self._req(session.get, path, **query) as resp:
+                async for _ in resp.content.iter_any():
+                    await asyncio.sleep(5)
+        finally:
+            await self._end_session()
 
 
 class Emby(_Emby):
