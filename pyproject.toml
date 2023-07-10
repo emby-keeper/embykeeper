@@ -47,7 +47,7 @@ dependencies = [
     "embypy",
     "pyrogram",
     "tgcrypto",
-    "pillow",
+    "pillow<10.0.0",
     "thefuzz[speedup]",
     "schema",
     "aiocache",
