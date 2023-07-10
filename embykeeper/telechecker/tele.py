@@ -126,12 +126,12 @@ class Dispatcher(dispatcher.Dispatcher):
                         except pyrogram.ContinuePropagation:
                             continue
                         except Exception as e:
-                            logger.opt(exception=e).error(f"Update callback error: {e}")
+                            logger.opt(exception=e).error("更新回调函数内发生错误:")
                         break
             except pyrogram.StopPropagation:
                 pass
             except Exception as e:
-                logger.opt(exception=e).error(f"Update handling error: {e}")
+                logger.opt(exception=e).error("更新控制器错误:")
 
 
 class Client(pyrogram.Client):

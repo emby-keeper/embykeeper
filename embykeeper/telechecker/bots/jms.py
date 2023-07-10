@@ -26,12 +26,13 @@ class JMSCheckin(AnswerBotCheckin):
         return await super().start()
 
     def to_idiom(self, captcha: str):
-        phrase, score = process.extractOne(captcha, self.idioms, scorer=fuzz.partial_token_sort_ratio)
+        phrase, score = process.extractOne(captcha, self.idioms)
         if score > 70 or len(captcha) < 4:
             result = phrase
-            self.log.debug(f'[gray50]已匹配识别验证码 "{captcha}" -> 成语 "{result}"[/]')
+            self.log.debug(f'[gray50]已匹配识别验证码 "{captcha}" -> 成语 "{result}".[/]')
         else:
             result = captcha
+            self.log.debug(f'[gray50]验证码 "{captcha}" 无法矫正, 使用原词.[/]')
         return result
 
     async def on_captcha(self, message: Message, captcha: str):

@@ -238,16 +238,18 @@ class BotCheckin(BaseBotCheckin):
         except OSError as e:
             self.log.info(f'发生错误: "{e}", 正在重试.')
             await self.retry()
+            message.continue_propagation()
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            if self.nofail:
-                self.log.opt(exception=e).warning(f"发生错误:")
-                await self.fail()
-            else:
+            if not self.nofail:
                 await self.fail()
                 raise
-        finally:
+            else:
+                self.log.opt(exception=e).warning(f"发生错误:")
+                await self.fail()
+                message.continue_propagation()
+        else:
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message, type=None):

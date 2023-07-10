@@ -58,7 +58,7 @@ class NebulaCheckin(BaseBotCheckin):
         token, proxy, useragent = await Link(self.client).captcha()
         if (not token) or (not proxy):
             self.log.warning("签到失败: 无法获得验证码.")
-            return self.fail()
+            return await self.fail()
         if not useragent:
             useragent = UserAgent(browsers=["edge"]).random
         query["token"] = token
