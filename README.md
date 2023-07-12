@@ -73,7 +73,7 @@ Embykeeper 可以通过免费的 Railway Docker 托管平台进行部署, 点击
 
 请注意 Render.com 的 Web 服务不活跃 15 分钟将自动停止, 因此必须部署云监控以持续激活.
 
-#### 其他免费 Pass
+#### 其他免费 PaaS
 
 您也可以通过 [Patr.cloud](https://app.patr.cloud/) ([教程](https://blog.iair.top/2023/06/26/embykeeper-patr-tutorial/)) 等平台进行部署.
 
