@@ -166,8 +166,10 @@ async def watch(emby, time, progress, logger, retries=5):
                             return False
                         else:
                             logger.info(f"连接失败, 正在重试: {e}.")
+                            await asyncio.sleep(1)
                     except PlayError as e:
                         logger.info(f"发生错误: {e}, 正在重试其他视频.")
+                        await asyncio.sleep(1)
                         break
                     finally:
                         try:
@@ -185,6 +187,7 @@ async def watch(emby, time, progress, logger, retries=5):
                 return False
             else:
                 logger.info(f"连接失败, 正在重试: {e}.")
+                await asyncio.sleep(1)
         except asyncio.CancelledError:
             raise
         except Exception as e:
