@@ -183,10 +183,13 @@ class BotCheckin(BaseBotCheckin):
                     raise
                 finally:
                     if not cancelled:
+                        if not await self.cleanup():
+                            self.log.debug(f"[gray50]执行清理失败: {ident}[/]")
                         if self._is_archived:
                             self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
                             try:
-                                await chat.archive()
+                                if await chat.archive():
+                                    self.log.debug(f"[gray50]重新归档成功: {ident}[/]")
                             except asyncio.TimeoutError:
                                 self.log.debug(f"[gray50]归档失败: {ident}[/]")
                         if not self.chat_name:
@@ -206,6 +209,9 @@ class BotCheckin(BaseBotCheckin):
             return False
         else:
             return self._retries <= self.retries
+        
+    async def cleanup(self):
+        return True
 
     async def walk_history(self, limit=0):
         async for m in self.client.get_chat_history(
@@ -309,7 +315,7 @@ class BotCheckin(BaseBotCheckin):
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注")):
+        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册")):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
         elif any(s in text for s in ("已尝试", "过多")):
@@ -332,7 +338,7 @@ class BotCheckin(BaseBotCheckin):
                 else:
                     self.log.info(f"[yellow]签到成功[/].")
             self.finished.set()
-        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过", "明日再来")):
+        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到")):
             self.log.info(f"今日已经签到过了.")
             self.finished.set()
         else:
@@ -347,7 +353,7 @@ class BotCheckin(BaseBotCheckin):
             self.log.warning("超过最大重试次数.")
             self.finished.set()
 
-    async def fail(self, message=None):
+    async def fail(self):
         self.finished.set()
         self._retries = float("inf")
 

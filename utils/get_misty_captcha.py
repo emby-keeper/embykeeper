@@ -20,7 +20,7 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
     async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
         async for tg in clients:
             m = MistyMonitor(tg)
-            wr = async_partial(tg.wait_reply, m.bot_username)
+            wr = async_partial(tg.wait_reply, m.bot_username, timeout=None)
             msg = await wr("/cancel")
             while True:
                 if msg.caption and "选择您要使用的功能" in msg.caption:

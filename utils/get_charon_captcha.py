@@ -19,7 +19,7 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
     proxy = config.get("proxy", None)
     async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
         async for tg in clients:
-            wr = async_partial(tg.wait_reply, bot)
+            wr = async_partial(tg.wait_reply, bot, timeout=None)
             photos = []
             try:
                 for _ in trange(num, desc="获取验证码"):
