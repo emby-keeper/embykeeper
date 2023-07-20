@@ -58,6 +58,7 @@ dependencies = [
     "flask_login",
     "simple-websocket",
     "eventlet",
+    "cryptography",
 ]
 
 [project.urls]
