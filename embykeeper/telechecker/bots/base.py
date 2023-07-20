@@ -332,7 +332,7 @@ class BotCheckin(BaseBotCheckin):
                 try:
                     self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
                 except IndexError:
-                    self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
+                    self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
             else:
                 matches = re.search(r"\d+", text)
                 if matches:
