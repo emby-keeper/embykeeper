@@ -33,7 +33,7 @@ class Link:
                 await m.delete(revoke=True)
                 text = m.text or m.caption or "图片或其他内容"
                 text = truncate_str(text.replace("\n", ""), 30)
-                self.log.debug(f"[gray50]删除了API消息记录: {text}[/]")
+                self.log.debug(f"[gray50]删除了 API 消息记录: {text}[/]")
             except asyncio.CancelledError:
                 pass
 
