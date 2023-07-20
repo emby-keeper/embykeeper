@@ -145,6 +145,22 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 恭喜您！您已经成功部署了 Embykeeper.
 
+为了让 Embykeeper 长期后台运行, 您可以通过 `Ctrl+C`停止, 然后运行:
+
+```bash
+tmux
+```
+
+这将启动一个 `tmux` 终端, 您可以在该终端中重新运行上述命令, 并按 Ctrl + B, 松开再按 D, 以脱离 `tmux` 终端.
+
+您随时可以通过运行:
+
+```bash
+tmux a
+```
+
+以重新连接到 `tmux` 终端.
+
 当您需要更新版本时, 您需要执行:
 
 ```bash
@@ -221,7 +237,7 @@ embykeeper
 tmux
 ```
 
-这将启动一个 `tmux` 终端, 您可以在该终端中运行上述命令 (`embykeeper config.toml`), 并按 Ctrl + B, 松开 B 再按 D, 以脱离 `tmux` 终端.
+这将启动一个 `tmux` 终端, 您可以在该终端中运行上述命令 (`embykeeper config.toml`), 并按 Ctrl + B, 松开再按 D, 以脱离 `tmux` 终端.
 
 您随时可以通过运行:
 
