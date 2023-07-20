@@ -10,6 +10,10 @@
 /test.py
 /test.ipynb
 
+# Venvs
+/venv
+/conda
+
 # Vscode
 .vscode/*
 !.vscode/settings.json

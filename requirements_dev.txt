@@ -1,3 +1,5 @@
 pytest
 black
 bump2version
+pre-commit
+debugpy

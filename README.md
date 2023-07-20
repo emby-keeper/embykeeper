@@ -233,23 +233,20 @@ pip install -U embykeeper
 
 ### 从源码构建
 
-首先拉取并设置环境:
+拉取并设置环境:
 
 ```bash
 git clone https://github.com/embykeeper/embykeeper.git
-cd embykeeper
-python -m venv venv
-. ./venv/bin/activate
-pip install -e .
-```
-
-然后即可执行 Embykeeper:
-
-```bash
-embykeeper
+make install && make run
 ```
 
 详细配置方法详见 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2).
+
+若您需要通过 [systemd](https://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html) 部署自启动服务, 您可以在成功运行一次后执行:
+
+```bash
+make systemd
+```
 
 当版本更新时, 您需要执行:
 

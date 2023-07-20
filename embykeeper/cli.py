@@ -55,17 +55,6 @@ async def main(
     ),
     monitor: bool = typer.Option(False, "--monitor", "-m", rich_help_panel="模块开关", help="启用群聊监视"),
     send: bool = typer.Option(False, "--send", "-s", rich_help_panel="模块开关", help="启用自动水群"),
-    instant: bool = typer.Option(
-        True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
-    ),
-    once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
-    public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
-    debug: bool = typer.Option(
-        False, "--debug", "-d", envvar="EK_DEBUG", show_envvar=False, rich_help_panel="调试参数", help="开启调试模式"
-    ),
-    debug_cron: bool = typer.Option(
-        False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
-    ),
     version: bool = typer.Option(
         None,
         "--version",
@@ -75,13 +64,25 @@ async def main(
         is_eager=True,
         help=f"打印 {__name__.capitalize()} 版本",
     ),
+    instant: bool = typer.Option(
+        True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
+    ),
+    once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
+    debug: bool = typer.Option(
+        False, "--debug", "-d", envvar="EK_DEBUG", show_envvar=False, rich_help_panel="调试参数", help="开启调试模式"
+    ),
+    debug_cron: bool = typer.Option(
+        False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
+    ),
+    simple_log: bool = typer.Option(False, "--simple-log", "-L", help="简化日志输出格式"),
     follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试参数", help="仅启动消息调试"),
     analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试参数", help="仅启动历史信息分析"),
+    public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
     basedir: Path = typer.Option(None, rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
     from .log import logger, initialize
 
-    initialize(level="DEBUG" if debug else "INFO")
+    initialize(level="DEBUG" if debug else "INFO", show_path=debug and (not simple_log), show_time=not simple_log)
 
     config: dict = prepare_config(config, public=public)
 

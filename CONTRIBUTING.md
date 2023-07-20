@@ -16,22 +16,25 @@
 
 1. Fork 本仓库
 2. 通过 `git clone <forked repo>` 以将仓库克隆到本地
-3. 启用一个虚拟空间, 例如:
+3. 创建虚拟环境:
 
    ```bash
-   python -m venv .venv
-   . .venv/bin/activate
+   make develop
    ```
-4. 安装项目为可编辑模式:
+
+5. 修改代码以实现需求, 您可以使用如下工具:
 
    ```bash
-   pip install -e .
+   make run # 运行 embykeeper
+   make run/web # 运行 embykeeperweb
+   make debugpy # 使用 vscode 的远程调试连接到 embykeeper
    ```
-5. 修改代码以实现需求
-6. 在提交 Pull Request 前, 请使用 `pre-commit` 工具检查代码:
+
+6. 在提交 Pull Request 前, 请检查代码:
 
    ```bash
-   pre-commit run -a
-   tox -e py
+   make lint
+   make test
    ```
-7. 在 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 提交新 Pull Request.
+
+7. 提交 Commit, 并在 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 提交新 Pull Request.
