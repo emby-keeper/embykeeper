@@ -1,5 +1,6 @@
 from __future__ import annotations
 from collections import OrderedDict
+from contextlib import asynccontextmanager
 
 from datetime import datetime
 import asyncio
@@ -279,9 +280,8 @@ class Client(pyrogram.Client):
                 if current >= total:
                     return
 
-    async def wait_reply(
-        self, chat_id: Union[int, str], text: str = None, timeout: float = 10, outgoing=False
-    ):
+    @asynccontextmanager
+    async def catch_reply(self, chat_id: Union[int, str], outgoing=False):
         async def handler_func(client, message, future: asyncio.Future):
             future.set_result(message)
 
@@ -292,12 +292,18 @@ class Client(pyrogram.Client):
         handler = MessageHandler(async_partial(handler_func, future=future), filter)
         await self.add_handler(handler, group=0)
         try:
-            if text:
-                await self.send_message(chat_id, text)
-            msg: types.Message = await asyncio.wait_for(future, timeout)
-            return msg
+            yield future
         finally:
             self.remove_handler(handler, group=0)
+
+    async def wait_reply(
+        self, chat_id: Union[int, str], send: str = None, timeout: float = 10, outgoing=False
+    ):
+        async with self.catch_reply(chat_id=chat_id, outgoing=outgoing) as f:
+            if send:
+                await self.send_message(chat_id, send)
+            msg: types.Message = await asyncio.wait_for(f, timeout)
+            return msg
 
     async def mute_chat(self, chat_id: Union[int, str], until: Union[int, datetime]):
         if isinstance(until, datetime):

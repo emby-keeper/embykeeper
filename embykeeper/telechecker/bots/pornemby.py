@@ -17,12 +17,13 @@ class PornEmbyCheckin(AnswerBotCheckin):
 
     async def on_photo(self, message: Message):
         await asyncio.sleep(1)
-        try:
-            await message.click(0)
-        except TimeoutError:
-            pass
-        try:
-            msg = await self.client.wait_reply(self.bot_username, timeout=10)
-        except asyncio.TimeoutError:
-            self.log.warning(f"签到失败: 签到无回应, 您可能还没有注册{self.name}.")
-            await self.fail()
+        async with self.client.catch_reply(self.bot_username) as f:
+            try:
+                await message.click(0)
+            except TimeoutError:
+                pass
+            try:
+                await asyncio.wait_for(f, 10)
+            except asyncio.TimeoutError:
+                self.log.warning(f"签到失败: 签到无回应, 您可能还没有注册{self.name}.")
+                await self.fail()

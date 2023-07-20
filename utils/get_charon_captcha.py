@@ -46,8 +46,9 @@ async def label(config: Path, inp: Path = "captchas.txt"):
     async with ClientsSession(config["telegram"][:1], proxy=proxy) as clients:
         async for tg in clients:
             for photo in tqdm(photos, desc="标记验证码"):
-                await tg.send_photo(chat, photo)
-                labelmsg = await tg.wait_reply(chat, timeout=None, outgoing=True)
+                async with tg.catch_reply(chat) as f:
+                    await tg.send_photo(chat, photo)
+                    labelmsg = await asyncio.wait_for(f, None)
                 if not len(labelmsg.text) == 6:
                     continue
                 else:
