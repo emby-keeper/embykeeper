@@ -82,7 +82,9 @@ async def main(
 ):
     from .log import logger, initialize
 
-    initialize(level="DEBUG" if debug else "INFO", show_path=debug and (not simple_log), show_time=not simple_log)
+    initialize(
+        level="DEBUG" if debug else "INFO", show_path=debug and (not simple_log), show_time=not simple_log
+    )
 
     config: dict = prepare_config(config, public=public)
 

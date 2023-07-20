@@ -45,11 +45,7 @@ def formatter(record):
 def initialize(level="INFO", **kw):
     logger.remove()
     handler = RichHandler(
-        console=Console(stderr=True),
-        markup=True,
-        rich_tracebacks=True,
-        tracebacks_suppress=[asyncio],
-        **kw
+        console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio], **kw
     )
     handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
     logger.add(handler, format=formatter, level=level, colorize=False)

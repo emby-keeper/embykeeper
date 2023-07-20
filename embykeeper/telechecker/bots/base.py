@@ -209,7 +209,7 @@ class BotCheckin(BaseBotCheckin):
             return False
         else:
             return self._retries <= self.retries
-        
+
     async def cleanup(self):
         return True
 
@@ -315,7 +315,9 @@ class BotCheckin(BaseBotCheckin):
     async def on_text(self, message: Message, text: str):
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册")):
+        elif any(
+            s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册")
+        ):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
         elif any(s in text for s in ("已尝试", "过多")):
