@@ -11,6 +11,8 @@ from ...utils import remove_prefix
 from ..link import Link
 from .base import BaseBotCheckin
 
+__ignore__ = True
+
 
 class NebulaCheckin(BaseBotCheckin):
     name = "Nebula"
