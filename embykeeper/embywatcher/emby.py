@@ -1,5 +1,4 @@
 import asyncio
-from contextlib import asynccontextmanager
 import random
 
 import aiohttp
