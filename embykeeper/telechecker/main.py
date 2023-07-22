@@ -71,7 +71,7 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
         except ImportError:
             all_names = get_names(type)
             logger.warning(f'您配置的 "{type}" 不支持站点 "{name}", 请从以下站点中选择:')
-            logger.warning(', '.join(all_names))
+            logger.warning(", ".join(all_names))
     return results
 
 
