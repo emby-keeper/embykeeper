@@ -63,10 +63,15 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
         names = get_names(type)
     results = []
     for name in names:
-        module = import_module(f"{__name__}.{sub}.{name}")
-        for cn, cls in inspect.getmembers(module, inspect.isclass):
-            if (name.replace("_", "") + suffix).lower() == cn.lower():
-                results.append(cls)
+        try:
+            module = import_module(f"{__name__}.{sub}.{name.lower()}")
+            for cn, cls in inspect.getmembers(module, inspect.isclass):
+                if (name.lower().replace("_", "") + suffix).lower() == cn.lower():
+                    results.append(cls)
+        except ImportError:
+            all_names = get_names(type)
+            logger.warning(f'您配置的 "{type}" 不支持站点 "{name}", 请从以下站点中选择:')
+            logger.warning(', '.join(all_names))
     return results
 
 
