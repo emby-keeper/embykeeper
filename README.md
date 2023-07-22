@@ -92,7 +92,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 phone = "+8612109347899"
 
 [[emby]]
-url = "https://weiss-griffin.com/"
+url = "https://weiss-griffin.com:443"
 username = "carrie19"
 password = "s*D7MMCpS$"
 ```
@@ -119,7 +119,7 @@ scheme = "socks5"
 phone = "+8612109347899"
 
 [[emby]]
-url = "https://weiss-griffin.com/"
+url = "https://weiss-griffin.com:443"
 username = "carrie19"
 password = "s*D7MMCpS$"
 ```
@@ -307,7 +307,7 @@ $ embykeeper -h
     --public           启用在线部署模式
 ```
 
-例如:
+例如 (`$`是命令提示符, 无需输入):
 
 ```bash
 # 启动所有功能 (在各账号配置中进一步设置功能开启/关闭)
@@ -330,6 +330,27 @@ $ embykeeper config.toml --once
 
 # 启动所有功能, 不立即执行一次签到/保活
 $ embykeeper config.toml -I
+```
+
+以上命令若您使用 docker 部署, 需要修改 `embykeeper` 为 `docker run ...`, 例如:
+```bash
+# 仅启动每日签到
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
+
+# 仅启动每日 8:00 PM 签到
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper -c 8:00PM
+
+# 仅启动每日 8:00 PM - 9:00 PM 随机时间签到
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper -c <8:00PM,9:00PM>
+
+# 启动所有功能, 同时调整签到时间为 8:00 AM, 调整保活间隔天数为 14
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper -c 8:00PM -e 14 -m -s
+
+# 启动所有功能, 只运行一次
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper --once
+
+# 启动所有功能, 不立即执行一次签到/保活
+$ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper -I
 ```
 
 ## 配置项
@@ -357,6 +378,7 @@ $ embykeeper config.toml -I
 注意, 当您未曾与站点机器人对话, 该站点签到将不会运行.
 若您需要禁用部分签到站点, 您可以在列表中删除对应的名称.
 若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
+若您设置错误, 程序将跳过并提示您所有可选的站点名.
 当前支持的名称包括:
 
 | 站点        | 名称         |  | 站点        | 名称            |
