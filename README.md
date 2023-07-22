@@ -92,7 +92,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 phone = "+8612109347899"
 
 [[emby]]
-url = "https://weiss-griffin.com/"
+url = "https://weiss-griffin.com:443"
 username = "carrie19"
 password = "s*D7MMCpS$"
 ```
@@ -119,7 +119,7 @@ scheme = "socks5"
 phone = "+8612109347899"
 
 [[emby]]
-url = "https://weiss-griffin.com/"
+url = "https://weiss-griffin.com:443"
 username = "carrie19"
 password = "s*D7MMCpS$"
 ```
@@ -332,6 +332,9 @@ $ embykeeper config.toml --once
 $ embykeeper config.toml -I
 ```
 
+以上命令若您使用 docker 部署, 需要修改 `embykeeper` 为 `docker run ...`, 例如仅启动每日 8:00 PM 签到:
+`docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper -c 8:00PM`
+
 ## 配置项
 
 | 设置项         | 值类型                   | 简介                                         | 默认值    |
@@ -357,6 +360,7 @@ $ embykeeper config.toml -I
 注意, 当您未曾与站点机器人对话, 该站点签到将不会运行.
 若您需要禁用部分签到站点, 您可以在列表中删除对应的名称.
 若您需要使用默认禁用的签到站点, 您可以在列表中增加对应的名称.
+若您设置错误, 程序将跳过并提示您所有可选的站点名.
 当前支持的名称包括:
 
 | 站点        | 名称         |  | 站点        | 名称            |
