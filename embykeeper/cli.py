@@ -34,6 +34,7 @@ async def main(
         None,
         dir_okay=False,
         allow_dash=True,
+        envvar=f"{__name__.upper()}_CONFIG",
         rich_help_panel="参数",
         help="配置文件 (置空以生成)",
     ),
