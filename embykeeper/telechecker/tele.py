@@ -417,10 +417,12 @@ class ClientsSession:
                 try:
                     client = Client(
                         app_version=f"{__name__.capitalize()} {__version__}",
-                        name=account["phone"],
+                        name=account['phone'],
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
-                        phone_number=account["phone"],
+                        phone_number=account['phone'],
+                        session_string=account.get('session', None),
+                        in_memory=bool('session' in account),
                         proxy=proxy,
                         lang_code="zh",
                         workdir=self.basedir,
@@ -429,16 +431,16 @@ class ClientsSession:
                 except Unauthorized:
                     await client.storage.delete()
                 except KeyError as e:
-                    logger.warning(f'登录账号 "{client.phone_number}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
+                    logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     await asyncio.sleep(3)
                 else:
                     break
         except asyncio.CancelledError:
             raise
         except RPCError as e:
-            logger.error(f'登录账号 "{client.phone_number}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
+            logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
         except Exception as e:
-            logger.opt(exception=e).error(f'登录账号 "{client.phone_number}" 时发生异常, 将被跳过:')
+            logger.opt(exception=e).error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过:')
         else:
             logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client

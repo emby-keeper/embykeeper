@@ -50,6 +50,7 @@ def check_config(config):
                         Optional("send"): bool,
                         Optional("api_id"): Regex(r"^\d+$"),
                         Optional("api_hash"): Regex(r"^[a-z0-9]+$"),
+                        Optional("session"): str,
                     }
                 )
             ],
@@ -71,6 +72,7 @@ def check_config(config):
     )
     try:
         schema.validate(config)
+        
     except SchemaError as e:
         return e
     else:
