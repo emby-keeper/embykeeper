@@ -174,7 +174,7 @@ async def checkiner(config: dict, instant=False):
             names = []
             for c in checkiners:
                 names.append(c.name)
-                wait = 0 if instant else random.randint(0, 60 * config.get("random", 15))
+                wait = 0 if instant else random.randint(0, int(config.get("random", 15)))
                 task = asyncio.create_task(checkin_task(c, sem, wait))
                 tasks.append(task)
             coros.append(asyncio.ensure_future(gather_task(tasks, username=tg.me.name)))
