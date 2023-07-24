@@ -72,7 +72,7 @@ def check_config(config):
     )
     try:
         schema.validate(config)
-        
+
     except SchemaError as e:
         return e
     else:

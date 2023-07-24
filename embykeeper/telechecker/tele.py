@@ -417,12 +417,12 @@ class ClientsSession:
                 try:
                     client = Client(
                         app_version=f"{__name__.capitalize()} {__version__}",
-                        name=account['phone'],
+                        name=account["phone"],
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
-                        phone_number=account['phone'],
-                        session_string=account.get('session', None),
-                        in_memory=bool('session' in account),
+                        phone_number=account["phone"],
+                        session_string=account.get("session", None),
+                        in_memory=bool("session" in account),
                         proxy=proxy,
                         lang_code="zh",
                         workdir=self.basedir,
