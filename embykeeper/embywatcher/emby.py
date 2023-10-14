@@ -12,6 +12,7 @@ from .. import __version__
 
 
 class Connector(_Connector):
+    '''重写的 Emby 连接器, 以支持代理.'''
     def __init__(self, url, proxy=None, **kargs):
         super().__init__(url, **kargs)
         self.proxy = proxy
@@ -74,6 +75,7 @@ class Connector(_Connector):
 
 class Emby(_Emby):
     def __init__(self, url, **kargs):
+        '''重写的 Emby 类, 以支持代理.'''
         connector = Connector(url, **kargs)
         EmbyObject.__init__(self, {"ItemId": "", "Name": ""}, connector)
         self._partial_cache = {}

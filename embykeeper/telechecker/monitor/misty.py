@@ -82,7 +82,7 @@ class MistyMonitor(Monitor):
                 self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
                 return False
 
-    async def on_trigger(self, message: Message, keys, reply):
+    async def on_trigger(self, message: Message, key, reply):
         wr = async_partial(self.client.wait_reply, self.bot_username)
         misty_locks.setdefault(self.client.me.id, asyncio.Lock())
         lock = misty_locks.get(self.client.me.id, None)

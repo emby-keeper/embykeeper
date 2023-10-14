@@ -6,8 +6,19 @@ from rich.logging import Console, RichHandler
 
 from .utils import to_iterable
 
+scheme_names = {
+    "telegram": "Telegram",
+    "telechecker": "每日签到",
+    "telemonitor": "消息监控",
+    "telemessager": "定时水群",
+    "telelink": "账号服务",
+    "telenotifier": "消息推送",
+    "embywatcher": "Emby保活",
+    "datamanager": "下载器",
+}
 
 def formatter(record):
+    '''根据日志器的 scheme 属性配置输出格式.'''
     extra = record["extra"]
     scheme = extra.get("scheme", None)
 
@@ -17,17 +28,6 @@ def formatter(record):
             return pattern.format(*[f"{{extra[{k}]}}" for k in keys])
         else:
             return ""
-
-    scheme_names = {
-        "telegram": "Telegram",
-        "telechecker": "每日签到",
-        "telemonitor": "消息监控",
-        "telemessager": "定时水群",
-        "telelink": "账号服务",
-        "telenotifier": "消息推送",
-        "embywatcher": "Emby保活",
-        "datamanager": "下载器",
-    }
 
     if scheme in ("telegram", "telechecker", "telemonitor", "telemessager", "telelink"):
         username = ifextra("username", " ([cyan]{}[/])")
@@ -43,6 +43,7 @@ def formatter(record):
 
 
 def initialize(level="INFO", **kw):
+    '''初始化日志配置.'''
     logger.remove()
     handler = RichHandler(
         console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio], **kw

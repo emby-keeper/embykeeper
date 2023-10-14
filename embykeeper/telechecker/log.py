@@ -11,6 +11,7 @@ logger = logger.bind(scheme="telenotifier")
 
 
 class TelegramStream(io.TextIOWrapper):
+    '''消息推送处理器类'''
     def __init__(self, account, proxy=None, basedir=None):
         super().__init__(io.BytesIO(), line_buffering=True)
         self.account = account

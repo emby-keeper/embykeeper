@@ -11,8 +11,8 @@ from importlib import import_module
 
 from dateutil import parser
 from pyrogram.enums import ChatType
-from pyrogram.handlers import MessageHandler
-from pyrogram.types import Message
+from pyrogram.handlers import MessageHandler, EditedMessageHandler
+from pyrogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from rich import box
 from rich.live import Live
 from rich.panel import Panel
@@ -31,6 +31,7 @@ logger = logger.bind(scheme="telegram")
 
 
 def get_spec(type: str):
+    '''服务模块路径解析.'''
     if type == "checkiner":
         sub = "bots"
         suffix = "checkin"
@@ -47,6 +48,7 @@ def get_spec(type: str):
 
 @lru_cache
 def get_names(type: str) -> List[str]:
+    '''列出服务中所有可用站点.'''
     sub, _ = get_spec(type)
     results = []
     typemodule = import_module(f"{__name__}.{sub}")
@@ -58,6 +60,7 @@ def get_names(type: str) -> List[str]:
 
 
 def get_cls(type: str, names: List[str] = None) -> List[Type]:
+    '''获得服务特定站点的所有类.'''
     sub, suffix = get_spec(type)
     if names == None:
         names = get_names(type)
@@ -76,6 +79,7 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
 
 
 def extract(clss: List[Type]) -> List[Type]:
+    '''对于嵌套类, 展开所有子类.'''
     extracted = []
     for cls in clss:
         ncs = [c for c in cls.__dict__.values() if inspect.isclass(c)]
@@ -87,6 +91,7 @@ def extract(clss: List[Type]) -> List[Type]:
 
 
 async def dump_message(client: Client, message: Message, table: Table):
+    '''消息调试工具, 将消息更新列到 table 中.'''
     text = message.text or message.caption
     if text:
         text = text.replace("\n", " ")
@@ -121,6 +126,16 @@ async def dump_message(client: Client, message: Message, table: Table):
         chat_icon = "🤖"
     else:
         chat = chat_icon = None
+    others = []
+    if message.photo:
+        others.append(f'照片: {message.photo.file_unique_id}')
+    if message.reply_markup:
+        if isinstance(message.reply_markup, InlineKeyboardMarkup):
+            key_info = '|'.join([k.text for r in message.reply_markup.inline_keyboard for k in r])
+            others.append(f'按钮: {key_info}')
+        elif isinstance(message.reply_markup, ReplyKeyboardMarkup):
+            key_info = '|'.join([k.text for r in message.reply_markup.keyboard for k in r])
+            others.append(f'按钮: {key_info}')
     return table.add_row(
         f"{client.me.name}",
         "│",
@@ -133,10 +148,13 @@ async def dump_message(client: Client, message: Message, table: Table):
         sender_id,
         "│",
         text,
+        "|",
+        '; '.join(others)
     )
 
 
 async def checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
+    '''签到器壳, 用于随机等待开始.'''
     if wait > 0:
         checkiner.log.debug(f"随机启动等待: 将等待 {wait} 分钟以启动.")
     await asyncio.sleep(wait * 60)
@@ -149,6 +167,7 @@ async def gather_task(tasks, username):
 
 
 async def checkiner(config: dict, instant=False):
+    '''签到器入口函数.'''
     logger.debug("正在启动每日签到模块, 请等待登录.")
     async with ClientsSession.from_config(config) as clients:
         coros = []
@@ -212,6 +231,7 @@ async def checkiner(config: dict, instant=False):
 
 
 async def checkiner_schedule(config: dict, start_time=None, end_time=None, instant=False):
+    '''签到器计划任务.'''
     dt = next_random_datetime(start_time, end_time, 0)
     while True:
         logger.bind(scheme="telechecker").info(f"下一次签到将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
@@ -220,6 +240,7 @@ async def checkiner_schedule(config: dict, start_time=None, end_time=None, insta
 
 
 async def monitorer(config: dict):
+    '''监控器入口函数.'''
     logger.debug("正在启动消息监控模块.")
     jobs = []
     async with ClientsSession.from_config(config, monitor=True) as clients:
@@ -250,6 +271,7 @@ async def monitorer(config: dict):
 
 
 async def messager(config: dict):
+    '''自动回复器入口函数.'''
     logger.debug("正在启动自动水群模块.")
     messagers = []
     async with ClientsSession.from_config(config, send=True) as clients:
@@ -273,28 +295,35 @@ async def messager(config: dict):
 
 
 async def follower(config: dict):
+    '''消息调试工具入口函数.'''
     columns = [
         Column("用户", style="cyan", justify="center"),
         Column("", max_width=1, style="white"),
         Column("", max_width=2, overflow="crop"),
         Column("会话", style="bright_blue", no_wrap=True, justify="right", max_width=15),
-        Column("(ChatID)", style="gray50", min_width=14, max_width=20),
+        Column("(ChatID)", style="gray50", no_wrap=True, max_width=20),
         Column("", max_width=1, style="white"),
         Column("", max_width=2, overflow="crop"),
         Column("发信人", style="green", no_wrap=True, max_width=15, justify="right"),
-        Column("(UserID)", style="gray50", min_width=10, max_width=15),
+        Column("(UserID)", style="gray50", no_wrap=True, max_width=15),
         Column("", max_width=1, style="white"),
-        Column("信息", no_wrap=True, min_width=40, max_width=60),
+        Column("信息", no_wrap=False, min_width=30, max_width=50),
+        Column("", max_width=1, style="white"),
+        Column("其他", no_wrap=False, min_width=30, max_width=50),
     ]
     async with ClientsSession.from_config(config) as clients:
         table = Table(*columns, header_style="bold magenta", box=box.SIMPLE)
+        func = async_partial(dump_message, table=table)
         async for tg in clients:
-            tg.add_handler(MessageHandler(async_partial(dump_message, table=table)))
+            tg.add_handler(MessageHandler(func))
+            tg.add_handler(EditedMessageHandler(func))
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
 
 async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
+    '''历史消息分析工具入口函数.'''
+    
     from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
 
     def render_page(progress, texts):
@@ -357,6 +386,8 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
 
 
 async def notifier(config: dict):
+    '''消息通知初始化函数.'''
+    
     def _filter(record):
         notify = record.get("extra", {}).get("notify", None)
         if notify or record["level"].no == logging.ERROR:

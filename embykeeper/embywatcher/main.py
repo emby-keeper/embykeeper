@@ -23,6 +23,7 @@ def _gen_random_device_id():
 
 
 def is_ok(co):
+    '''判定返回来自 emby 的响应为成功.'''
     if isinstance(co, tuple):
         co, *_ = co
     if 200 <= co < 300:
@@ -30,6 +31,7 @@ def is_ok(co):
 
 
 async def get_latest(emby: Emby):
+    '''获取最新视频.'''
     while True:
         items = await emby.get_items(["Movie", "Episode"], limit=10, sort="DateCreated", ascending=False)
         i: Union[Movie, Episode]
@@ -38,21 +40,25 @@ async def get_latest(emby: Emby):
 
 
 async def set_played(obj: EmbyObject):
+    '''设定已播放.'''
     c: Connector = obj.connector
     return is_ok(await c.post(f"/Users/{{UserId}}/PlayedItems/{obj.id}"))
 
 
 async def hide_from_resume(obj: EmbyObject):
+    '''从首页的"继续收看"部分隐藏.'''
     c: Connector = obj.connector
     return is_ok(await c.post(f"/Users/{{UserId}}/Items/{obj.id}/HideFromResume", hide=True))
 
 
 def get_last_played(obj: EmbyObject):
+    '''获取上次播放时间.'''
     last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
     return datetime.fromisoformat(last_played[:-2]) if last_played else None
 
 
 async def send_playing(obj: EmbyObject, playing_info: dict):
+    '''向服务器发送播放状态更新.'''
     c: Connector = obj.connector
     try:
         while True:
@@ -68,6 +74,7 @@ async def send_playing(obj: EmbyObject, playing_info: dict):
 
 
 async def play(obj: EmbyObject, time=10, progress=1000):
+    '''模拟播放视频.'''
     c: Connector = obj.connector
     # 检查
     totalticks = obj.object_dict.get("RunTimeTicks")
@@ -112,6 +119,7 @@ async def play(obj: EmbyObject, time=10, progress=1000):
 
 
 async def login(config):
+    '''登录账号.'''
     for a in config.get("emby", ()):
         logger.info(f'登录账号: {a["username"]} @ {a["url"]}')
         emby = Emby(
@@ -137,6 +145,15 @@ async def login(config):
 
 
 async def watch(emby, time, progress, logger, retries=5):
+    '''
+    主执行函数.
+    参数:
+        emby: Emby 客户端
+        time: 模拟播放时间
+        progress: 播放后设定的观看进度
+        logger: 日志器
+        retries: 最大重试次数
+    '''
     retry = 0
     while True:
         try:
@@ -196,6 +213,7 @@ async def watch(emby, time, progress, logger, retries=5):
 
 
 async def watcher(config: dict):
+    '''入口函数.'''
     async def wrapper(emby, time, progress, logger):
         try:
             return await asyncio.wait_for(watch(emby, time, progress, logger), max(time * 3, 180))
@@ -213,6 +231,7 @@ async def watcher(config: dict):
 
 
 async def watcher_schedule(config: dict, days: int = 7):
+    '''计划任务.'''
     dt = next_random_datetime(time(11, 0), time(23, 0), interval_days=days)
     while True:
         logger.bind(scheme="embywatcher").info(f"下一次保活将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")

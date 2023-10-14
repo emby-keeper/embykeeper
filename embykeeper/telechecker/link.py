@@ -15,6 +15,8 @@ from .tele import Client
 
 
 class Link:
+    '''云服务类, 用于认证和高级权限任务通讯.'''
+    
     bot = "embykeeper_auth_bot"
 
     def __init__(self, client: Client):
@@ -23,11 +25,13 @@ class Link:
 
     @property
     def instance(self):
+        '''当前设备识别码.'''
         rd = random.Random()
         rd.seed(uuid.getnode())
         return uuid.UUID(int=rd.getrandbits(128))
 
     async def delete_messages(self, messages: List[Message]):
+        '''删除一系列消息.'''
         async def delete(m: Message):
             try:
                 await m.delete(revoke=True)
@@ -42,6 +46,15 @@ class Link:
     async def post(
         self, cmd, condition: Callable = None, timeout: int = 5, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
+        '''
+        向机器人发送请求.
+        参数:
+            cmd: 命令字符串
+            condition: 布尔或函数, 参数为响应 toml 的字典形式, 决定该响应是否为有效响应.
+            timeout: 超时 (s)
+            retries: 最大重试次数
+            name: 请求名称, 用于用户提示
+        '''
         for r in range(retries):
             self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
             await self.client.mute_chat(self.bot, time.time() + timeout + 5)
@@ -125,10 +138,12 @@ class Link:
                 message.continue_propagation()
 
     async def auth(self, service: str):
+        '''向机器人发送授权请求.'''
         results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.capitalize()} 认证")
         return bool(results)
 
     async def captcha(self):
+        '''向机器人发送 Cloudflare 验证码解析请求.'''
         results = await self.post(f"/captcha {self.instance}", timeout=240, name="请求跳过验证码")
         if results:
             return [results.get(p, None) for p in ("token", "proxy", "useragent")]
@@ -136,10 +151,12 @@ class Link:
             return None, None, None
 
     async def answer(self, question: str):
+        '''向机器人发送问题回答请求.'''
         results = await self.post(f"/answer {self.instance} {question}", timeout=10, name="请求问题回答")
         if results:
             return results.get("answer", None)
 
     async def send_log(self, message):
+        '''向机器人发送日志记录请求.'''
         results = await self.post(f"/log {self.instance} {message}", name="发送日志到 Telegram")
         return bool(results)
