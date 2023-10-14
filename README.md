@@ -39,12 +39,14 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 剧狗: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)
   - Temby: [频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)
   - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
-  - 其他非 Emby 相关:
-    - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
+  - 魔法Emby: [频道](https://t.me/Magic_EmbyChannel) [群组](https://t.me/Magicemby) [机器人](https://t.me/Magic_EmbyBot)
   - 默认禁用:
     - ~~BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~ (关服)
     - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~ (关服)
     - ~~Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot)~~ (关服)
+    - 其他非 Emby 相关:
+      - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
+      - 纸片 DDoS: [频道](https://t.me/PaperBotnet) [机器人](https://t.me/zhipianbot)
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
@@ -383,13 +385,15 @@ $ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 | 站点        | 名称         |  | 站点        | 名称            |
 | ----------- | ------------ | - | ----------- | --------------- |
-| 垃圾影音    | `ljyy`     |  | 搜书神器    | `sosdbot`     |
+| 垃圾影音    | `ljyy`     |  | 搜书神器    | `sssq`     |
 | 卷毛鼠 IPTV | `jms_iptv` |  | 终点站      | `terminus`    |
 | Pornemby    | `pornemby` |  | Singularity | `singularity` |
 | Peach       | `peach`    |  | Nebula      | `nebula`      |
 | Bluesea     | `bluesea`  |  | Embyhub     | `embyhub`     |
 | 卷毛鼠      | `jms`      |  | 卡戎        | `charon`      |
 | Temby      | `temby`    |  | 剧狗        | `judog`       |
+| 魔法 emby  | `magic`    |  | Misty        | `misty`       |
+| 纸片  | `zhipian`    |
 
 `proxy` 设置可以为:
 
