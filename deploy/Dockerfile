@@ -1,1 +1,1 @@
-FROM embykeeper/embykeeper:v2.3.4
+FROM embykeeper/embykeeper:v2.3.5
