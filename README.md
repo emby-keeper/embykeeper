@@ -36,7 +36,9 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
   - 卡戎: [频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)
   - Misty: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)
-  - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)~~
+  - 剧狗: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)
+  - Temby: [频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)
+  - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - 其他非 Emby 相关:
     - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
   - 默认禁用:
@@ -55,6 +57,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - Viper 抢邀请码: [频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)
   - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - Misty 开注自动注册: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)
+  - 剧狗 开注自动注册: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)
   - 默认禁用:
     - ~~Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~ (公益服关闭)
 
@@ -386,6 +389,7 @@ $ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 | Peach       | `peach`    |  | Nebula      | `nebula`      |
 | Bluesea     | `bluesea`  |  | Embyhub     | `embyhub`     |
 | 卷毛鼠      | `jms`      |  | 卡戎        | `charon`      |
+| Temby      | `temby`    |  | 剧狗        | `judog`       |
 
 `proxy` 设置可以为:
 
