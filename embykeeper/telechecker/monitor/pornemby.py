@@ -11,6 +11,14 @@ from .base import Monitor
 
 
 class PornembyMonitor:
+    class PornembyRegisterMonitor(Monitor):
+        name = "Pornemby 抢注"
+        chat_name = "Pornemby"
+        chat_keyword = "开 放 注 册"
+
+        async def on_trigger(self, message: Message, key, reply):
+            await message.click(0)
+
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
         chat_name = ["Pornemby", "PornembyFun"]
