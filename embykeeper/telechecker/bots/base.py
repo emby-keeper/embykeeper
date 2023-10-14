@@ -33,12 +33,12 @@ class MessageType(Flag):
 
 
 class BaseBotCheckin(ABC):
-    '''基础签到类.'''
-    
+    """基础签到类."""
+
     name = None
 
     def __init__(self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None):
-        '''
+        """
         基础签到类.
         参数:
             client: Pyrogram 客户端
@@ -47,18 +47,18 @@ class BaseBotCheckin(ABC):
             nofail: 启用错误处理外壳, 当错误时报错但不退出
             basedir: 文件存储默认位置
             proxy: 代理配置
-        '''
+        """
         self.client = client
         self.retries = retries
         self.timeout = timeout
         self.nofail = nofail
         self.basedir = basedir or user_data_dir(__name__)
         self.proxy = proxy
-        self.finished = asyncio.Event() # 签到完成事件
-        self.log = logger.bind(scheme="telechecker", name=self.name, username=client.me.name) # 日志组件
+        self.finished = asyncio.Event()  # 签到完成事件
+        self.log = logger.bind(scheme="telechecker", name=self.name, username=client.me.name)  # 日志组件
 
     async def _start(self):
-        '''签到器的入口函数的错误处理外壳.'''
+        """签到器的入口函数的错误处理外壳."""
         try:
             return await self.start()
         except asyncio.CancelledError:
@@ -96,12 +96,12 @@ class BotCheckin(BaseBotCheckin):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self._is_archived = False # 签到前处于收纳状态
-        self._retries = 0 # 当前重试次数
-        self._waiting = {} # 当前等待的消息
+        self._is_archived = False  # 签到前处于收纳状态
+        self._retries = 0  # 当前重试次数
+        self._waiting = {}  # 当前等待的消息
 
     def get_filter(self):
-        '''设定要签到的目标.'''
+        """设定要签到的目标."""
         filter = filters.user(self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
@@ -110,7 +110,7 @@ class BotCheckin(BaseBotCheckin):
         return filter
 
     def get_handlers(self):
-        '''设定要监控的更新的类型.'''
+        """设定要监控的更新的类型."""
         return [
             MessageHandler(self._message_handler, self.get_filter()),
             EditedMessageHandler(self._message_handler, self.get_filter()),
@@ -118,7 +118,7 @@ class BotCheckin(BaseBotCheckin):
 
     @asynccontextmanager
     async def listener(self):
-        '''执行监控上下文.'''
+        """执行监控上下文."""
         group = await self.group_pool.append(self)
         handlers = self.get_handlers()
         for h in handlers:
@@ -132,7 +132,7 @@ class BotCheckin(BaseBotCheckin):
 
     @cached(ttl=60, noself=True)
     async def get_ocr(self, ocr: str = None):
-        '''加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型.'''
+        """加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型."""
         if not ocr:
             return DdddOcr(beta=True, show_ad=False)
         else:
@@ -147,7 +147,7 @@ class BotCheckin(BaseBotCheckin):
             return DdddOcr(show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1]))
 
     async def start(self):
-        '''签到器的入口函数.'''
+        """签到器的入口函数."""
         ident = self.chat_name or self.bot_username
         while True:
             try:
@@ -224,7 +224,7 @@ class BotCheckin(BaseBotCheckin):
         else:
             self.log.warning(f"初始化错误.")
             return False
-        
+
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
@@ -232,25 +232,23 @@ class BotCheckin(BaseBotCheckin):
             return self._retries <= self.retries
 
     async def init(self):
-        '''可重写的初始化函数, 在读取聊天后运行, 在执行签到前运行, 返回 False 将视为初始化错误.'''
+        """可重写的初始化函数, 在读取聊天后运行, 在执行签到前运行, 返回 False 将视为初始化错误."""
         return True
 
     async def cleanup(self):
-        '''可重写的签到结束后的清理函数, 执行签到成功或失败后运行, 返回 False 将视为清理错误.'''
+        """可重写的签到结束后的清理函数, 执行签到成功或失败后运行, 返回 False 将视为清理错误."""
         return True
 
     async def walk_history(self, limit=0):
-        '''处理 limit 条历史消息, 并检测是否有验证码.'''
-        async for m in self.client.get_chat_history(
-            self.chat_name or self.bot_username, limit=limit
-        ):
+        """处理 limit 条历史消息, 并检测是否有验证码."""
+        async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
             if MessageType.CAPTCHA in self.message_type(m):
                 await self.on_photo(m)
                 return True
         return False
 
     async def send(self, cmd):
-        '''向机器人发送命令.'''
+        """向机器人发送命令."""
         if self.chat_name:
             bot = await self.client.get_users(self.bot_username)
             await self.client.send_message(self.chat_name, f"{cmd}@{bot.username}")
@@ -258,7 +256,7 @@ class BotCheckin(BaseBotCheckin):
             await self.client.send_message(self.bot_username, cmd)
 
     async def send_checkin(self, retry=False):
-        '''发送签到命令, 或依次发送签到命令序列.'''
+        """发送签到命令, 或依次发送签到命令序列."""
         cmds = to_iterable(self.bot_checkin_cmd)
         for i, cmd in enumerate(cmds):
             if retry and not i:
@@ -268,7 +266,7 @@ class BotCheckin(BaseBotCheckin):
             await self.send(cmd)
 
     async def _message_handler(self, client: Client, message: Message):
-        '''消息处理入口函数的错误处理外壳.'''
+        """消息处理入口函数的错误处理外壳."""
         try:
             await self.message_handler(client, message)
         except OSError as e:
@@ -289,7 +287,7 @@ class BotCheckin(BaseBotCheckin):
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message, type=None):
-        '''消息处理入口函数.'''
+        """消息处理入口函数."""
         text = message.text or message.caption
         if text:
             for p, k in self._waiting.items():
@@ -305,7 +303,7 @@ class BotCheckin(BaseBotCheckin):
             await self.on_photo(message)
 
     def message_type(self, message: Message):
-        '''分析传入消息的类型为验证码或文字.'''
+        """分析传入消息的类型为验证码或文字."""
         if message.photo:
             if message.caption:
                 if self.bot_checkin_caption_pat:
@@ -321,7 +319,7 @@ class BotCheckin(BaseBotCheckin):
             return MessageType.TEXT
 
     async def on_photo(self, message: Message):
-        '''分析分析传入的验证码图片并返回验证码.'''
+        """分析分析传入的验证码图片并返回验证码."""
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
         captcha = (
@@ -343,15 +341,15 @@ class BotCheckin(BaseBotCheckin):
             await self.retry()
 
     async def on_captcha(self, message: Message, captcha: str):
-        '''
+        """
         可修改的回调函数.
             message: 包含验证码图片的消息
             captcha: OCR 识别的验证码
-        '''
+        """
         await message.reply(captcha)
 
     async def on_text(self, message: Message, text: str):
-        '''接收非验证码消息时, 检测关键词并确认签到成功或失败, 发送用户提示.'''
+        """接收非验证码消息时, 检测关键词并确认签到成功或失败, 发送用户提示."""
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
         elif any(
@@ -386,7 +384,7 @@ class BotCheckin(BaseBotCheckin):
             self.log.warning(f"接收到异常返回信息: {text}")
 
     async def retry(self):
-        '''执行重试, 重新发送签到指令.'''
+        """执行重试, 重新发送签到指令."""
         self._retries += 1
         if self._retries <= self.retries:
             await asyncio.sleep(self.bot_retry_wait)
@@ -396,12 +394,12 @@ class BotCheckin(BaseBotCheckin):
             self.finished.set()
 
     async def fail(self):
-        '''设定签到器失败.'''
+        """设定签到器失败."""
         self.finished.set()
         self._retries = float("inf")
 
     async def wait_until(self, pattern: str = ".", timeout: float = None):
-        '''等待特定消息出现.'''
+        """等待特定消息出现."""
         self._waiting[pattern] = e = asyncio.Event()
         try:
             await asyncio.wait_for(e.wait(), timeout)
@@ -419,18 +417,16 @@ class AnswerBotCheckin(BotCheckin):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.mutex = asyncio.Lock() # 实例变量异步锁
-        self.operable = asyncio.Condition(self.mutex) # 当 message 被设定时提醒等待的异步线程.
-        self.message: Message = None # 存储可用于回复的带按钮的消息.
+        self.mutex = asyncio.Lock()  # 实例变量异步锁
+        self.operable = asyncio.Condition(self.mutex)  # 当 message 被设定时提醒等待的异步线程.
+        self.message: Message = None  # 存储可用于回复的带按钮的消息.
 
     async def walk_history(self, limit=0):
-        '''处理 limit 条历史消息, 并检测是否有验证码或按钮.'''
+        """处理 limit 条历史消息, 并检测是否有验证码或按钮."""
         try:
             answer = None
             captcha = None
-            async for m in self.client.get_chat_history(
-                self.chat_name or self.bot_username, limit=limit
-            ):
+            async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
                 if MessageType.ANSWER in self.message_type(m):
                     answer = answer or m
                 if MessageType.CAPTCHA in self.message_type(m):
@@ -446,7 +442,7 @@ class AnswerBotCheckin(BotCheckin):
             print(e)
 
     def get_keys(self, message: Message):
-        '''获得所有按钮信息.'''
+        """获得所有按钮信息."""
         reply_markup = message.reply_markup
         if isinstance(reply_markup, InlineKeyboardMarkup):
             return [k.text for r in reply_markup.inline_keyboard for k in r]
@@ -454,7 +450,7 @@ class AnswerBotCheckin(BotCheckin):
             return [k.text for r in reply_markup.keyboard for k in r]
 
     def is_valid_answer(self, message: Message):
-        '''确认消息是回复按钮消息.'''
+        """确认消息是回复按钮消息."""
         if not message.reply_markup:
             return False
         if self.bot_checkin_button_pat:
@@ -464,21 +460,21 @@ class AnswerBotCheckin(BotCheckin):
         return True
 
     def message_type(self, message: Message):
-        '''分析传入消息的类型为验证码或文字.'''
+        """分析传入消息的类型为验证码或文字."""
         if self.is_valid_answer(message):
             return MessageType.ANSWER | super().message_type(message)
         else:
             return super().message_type(message)
 
     async def message_handler(self, client: Client, message: Message, type=None):
-        '''消息处理入口函数.'''
+        """消息处理入口函数."""
         type = type or self.message_type(message)
         if MessageType.ANSWER in type:
             await self.on_answer(message)
         await super().message_handler(client, message, type=type)
 
     async def on_answer(self, message: Message):
-        '''当检测到带按钮的用于回答的消息时保存其信息.'''
+        """当检测到带按钮的用于回答的消息时保存其信息."""
         async with self.mutex:
             if self.message:
                 if self.message.date > message.date:
@@ -490,12 +486,12 @@ class AnswerBotCheckin(BotCheckin):
                 self.operable.notify()
 
     async def on_captcha(self, message: Message, captcha: str):
-        '''
+        """
         可修改的回调函数.
         参数:
             message: 包含验证码图片的消息
             captcha: OCR 识别的验证码
-        '''
+        """
         async with self.operable:
             if not self.message:
                 await self.operable.wait()

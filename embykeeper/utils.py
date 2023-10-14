@@ -23,7 +23,8 @@ def fail_message(e):
 
 
 class AsyncTyper(Typer):
-    '''Typer 的异步版本, 所有命令函数都将以异步形式调用.'''
+    """Typer 的异步版本, 所有命令函数都将以异步形式调用."""
+
     def async_command(self, *args, **kwargs):
         def decorator(async_func):
             @wraps(async_func)
@@ -47,7 +48,8 @@ class AsyncTyper(Typer):
 
 
 class FlagValueCommand(TyperCommand):
-    '''允许在命令行参数中使用"=".'''
+    """允许在命令行参数中使用"="."""
+
     def parse_args(self, ctx, args):
         long = {}
         short = {}
@@ -82,7 +84,8 @@ class FlagValueCommand(TyperCommand):
 
 
 class AsyncTaskPool:
-    '''一个用于批量等待异步任务的管理器, 支持在等待时添加任务.'''
+    """一个用于批量等待异步任务的管理器, 支持在等待时添加任务."""
+
     def __init__(self):
         self.waiter = asyncio.Condition()
         self.tasks = []
@@ -110,18 +113,19 @@ class AsyncTaskPool:
 
 
 class AsyncCountPool(dict):
-    '''
+    """
     一个异步安全的 ID 分配器.
     参数:
         base: ID 起始数
-    '''
+    """
+
     def __init__(self, *args, base=1000, **kw):
         super().__init__(*args, **kw)
         self.lock = asyncio.Lock()
         self.next = base + 1
 
     async def append(self, value):
-        '''输入一个值, 该值将被存储并分配一个 ID.'''
+        """输入一个值, 该值将被存储并分配一个 ID."""
         async with self.lock:
             key = self.next
             self[key] = value
@@ -130,13 +134,13 @@ class AsyncCountPool(dict):
 
 
 def to_iterable(var: Union[Iterable, Any]):
-    '''
+    """
     将任何变量变为可迭代变量.
     说明:
         None 将变为空数组.
         非可迭代变量将变为仅有该元素的长度为 1 的数组.
         可迭代变量将保持不变.
-    '''
+    """
     if var is None:
         return ()
     if isinstance(var, str) or not isinstance(var, Iterable):
@@ -146,17 +150,17 @@ def to_iterable(var: Union[Iterable, Any]):
 
 
 def remove_prefix(text: str, prefix: str):
-    '''从字符串头部去除前缀.'''
+    """从字符串头部去除前缀."""
     return text[text.startswith(prefix) and len(prefix) :]
 
 
 def truncate_str(text: str, length: int):
-    '''将字符串截断到特定长度, 并增加"..."后缀.'''
+    """将字符串截断到特定长度, 并增加"..."后缀."""
     return f"{text[:length + 3]}..." if len(text) > length else text
 
 
 def time_in_range(start, end, x):
-    '''判定时间在特定范围内.'''
+    """判定时间在特定范围内."""
     if start <= end:
         return start <= x <= end
     else:
@@ -164,19 +168,20 @@ def time_in_range(start, end, x):
 
 
 def batch(iterable, n=1):
-    '''将数组分成 N 份.'''
+    """将数组分成 N 份."""
     l = len(iterable)
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
 
 def flatten(l):
-    '''将二维数组变为一维数组.'''
+    """将二维数组变为一维数组."""
     return [item for sublist in l for item in sublist]
 
 
 def async_partial(f, *args1, **kw1):
-    '''Partial 函数的异步形式.'''
+    """Partial 函数的异步形式."""
+
     async def func(*args2, **kw2):
         return await f(*args1, *args2, **kw1, **kw2)
 
@@ -184,12 +189,12 @@ def async_partial(f, *args1, **kw1):
 
 
 async def idle():
-    '''异步无限等待函数.'''
+    """异步无限等待函数."""
     await asyncio.Event().wait()
 
 
 def random_time(start_time: time = None, end_time: time = None):
-    '''在特定的开始和结束时间之间生成时间, 如果开始时间晚于结束时间, 视为过夜.'''
+    """在特定的开始和结束时间之间生成时间, 如果开始时间晚于结束时间, 视为过夜."""
     start_datetime = datetime.combine(date.today(), start_time or time(0, 0))
     end_datetime = datetime.combine(date.today(), end_time or time(23, 59, 59))
     if end_datetime < start_datetime:
@@ -201,7 +206,7 @@ def random_time(start_time: time = None, end_time: time = None):
 
 
 def next_random_datetime(start_time: time = None, end_time: time = None, interval_days=1):
-    '''在特定的开始和结束时间之间生成时间, 并设定最小间隔天数.'''
+    """在特定的开始和结束时间之间生成时间, 并设定最小间隔天数."""
     min_datetime = datetime.now() + timedelta(days=interval_days)
     target_time = random_time(start_time, end_time)
     offset_date = 0
@@ -214,7 +219,7 @@ def next_random_datetime(start_time: time = None, end_time: time = None, interva
 
 
 def humanbytes(B: float):
-    '''将字节数转换为人类可读形式.'''
+    """将字节数转换为人类可读形式."""
     """Return the given bytes as a human friendly KB, MB, GB, or TB string."""
     B = float(B)
     KB = float(1024)

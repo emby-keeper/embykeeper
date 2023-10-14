@@ -14,14 +14,14 @@ logger = logger.bind(scheme="datamanager")
 
 
 async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict = None, caller: str = None):
-    '''
+    """
     获取额外数据.
     参数:
         basedir: 文件存储默认位置
         names: 要下载的路径列表
         proxy: 代理配置
         caller: 请求下载的模块名, 用于消息提示
-    '''
+    """
     basedir.mkdir(parents=True, exist_ok=True)
 
     existing = {}
@@ -95,6 +95,5 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
 
 
 async def get_data(basedir: Path, name: str, proxy: dict = None, caller: str = None):
-    
     async for data in get_datas(basedir, name, proxy, caller):
         return data

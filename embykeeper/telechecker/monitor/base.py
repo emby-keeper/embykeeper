@@ -22,7 +22,8 @@ __ignore__ = True
 
 
 class Session:
-    '''回复检测会话, 用于检测跟随回复.'''
+    """回复检测会话, 用于检测跟随回复."""
+
     def __init__(self, reply, follows=None, delays=None):
         self.reply = reply
         self.follows = follows
@@ -67,7 +68,8 @@ class Session:
 
 
 class UniqueUsername(dict):
-    '''独特名称类, 用于抢注.'''
+    """独特名称类, 用于抢注."""
+
     def __getitem__(self, user: User):
         if not user.id in self:
             self[user.id] = self.get_unique(user)
@@ -75,7 +77,7 @@ class UniqueUsername(dict):
 
     @staticmethod
     def get_unique(user: User):
-        '''获得一个独特名称, 该名称将在程序运行全周期一致.'''
+        """获得一个独特名称, 该名称将在程序运行全周期一致."""
         log = logger.bind(scheme="telemonitor", username=user.name)
         if user.username:
             unique = user.username
@@ -91,8 +93,8 @@ class UniqueUsername(dict):
 
 
 class Monitor:
-    '''监控器类, 可以检测某个人在某个群中发送了某种模式的信息, 并触发特定的动作 (回复/向机器人注册) 等, 用于答题/抢注等.'''
-    
+    """监控器类, 可以检测某个人在某个群中发送了某种模式的信息, 并触发特定的动作 (回复/向机器人注册) 等, 用于答题/抢注等."""
+
     group_pool = AsyncCountPool(base=1000)
     unique_cache = UniqueUsername()
 
@@ -104,12 +106,14 @@ class Monitor:
     chat_probability: float = 1.0  # 发信概率 (0最低, 1最高)
     chat_delay: int = 0  # 发信延迟 (s)
     chat_follow_user: int = 0  # 需要等待 N 个用户发送 {chat_reply} 方可回复
-    chat_reply: Union[str, Callable[[Message, Union[str, List[str]]], Union[str, Awaitable[str]]]] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
+    chat_reply: Union[
+        str, Callable[[Message, Union[str, List[str]]], Union[str, Awaitable[str]]]
+    ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
     allow_edit: bool = True  # 编辑消息内容后也触发
 
     def __init__(self, client: Client, nofail=True, basedir=None, proxy=None, config: dict = {}):
-        '''
+        """
         监控器类.
         参数:
             client: Pyrogram 客户端
@@ -117,7 +121,7 @@ class Monitor:
             basedir: 文件存储默认位置
             proxy: 代理配置
             config: 当前签到器的特定配置
-        '''
+        """
         self.client = client
         self.nofail = nofail
         self.basedir = basedir or user_data_dir(__name__)
@@ -128,7 +132,7 @@ class Monitor:
         self.failed = asyncio.Event()
 
     def get_filter(self):
-        '''设定要监控的目标.'''
+        """设定要监控的目标."""
         filter = filters.caption | filters.text
         if self.chat_name:
             filter = filter & filters.chat(to_iterable(self.chat_name))
@@ -137,7 +141,7 @@ class Monitor:
         return filter
 
     def get_handlers(self):
-        '''设定要监控的更新的类型.'''
+        """设定要监控的更新的类型."""
         handlers = [MessageHandler(self._message_handler, self.get_filter())]
         if self.allow_edit:
             handlers.append(EditedMessageHandler(self._message_handler, self.get_filter()))
@@ -145,7 +149,7 @@ class Monitor:
 
     @asynccontextmanager
     async def listener(self):
-        '''执行监控上下文.'''
+        """执行监控上下文."""
         group = await self.group_pool.append(self)
         handlers = self.get_handlers()
         for h in handlers:
@@ -158,7 +162,7 @@ class Monitor:
                 pass
 
     async def _start(self):
-        '''监控器的入口函数的错误处理外壳.'''
+        """监控器的入口函数的错误处理外壳."""
         try:
             return await self.start()
         except asyncio.CancelledError:
@@ -171,7 +175,7 @@ class Monitor:
                 raise
 
     async def start(self):
-        '''监控器的入口函数.'''
+        """监控器的入口函数."""
         chat_ids = []
         for cn in to_iterable(self.chat_name):
             while True:
@@ -212,12 +216,12 @@ class Monitor:
             return False
 
     async def init(self):
-        '''可重写的初始化函数, 在读取聊天后运行, 在执行监控前运行, 返回 False 将视为初始化错误.'''
+        """可重写的初始化函数, 在读取聊天后运行, 在执行监控前运行, 返回 False 将视为初始化错误."""
         return True
 
     @classmethod
     def keys(cls, message: Message):
-        '''提取信息中的 keys.'''
+        """提取信息中的 keys."""
         sender = message.from_user
         if (
             sender
@@ -234,7 +238,7 @@ class Monitor:
             return text
 
     async def get_reply(self, message: Message, key: Union[str, List[str]]):
-        '''根据 keys 生成回复内容.'''
+        """根据 keys 生成回复内容."""
         if callable(self.chat_reply):
             result = self.chat_reply(message, key)
             if asyncio.iscoroutinefunction(self.chat_reply):
@@ -246,13 +250,13 @@ class Monitor:
 
     @staticmethod
     def get_spec(keys):
-        '''返回 keys 的简要表示.'''
+        """返回 keys 的简要表示."""
         if isinstance(keys, Iterable) and not isinstance(keys, str):
             keys = " ".join([str(k).strip() for k in keys])
         return truncate_str(keys.replace("\n", " ").strip(), 30)
 
     async def _message_handler(self, client: Client, message: Message):
-        '''消息处理入口函数的错误处理外壳.'''
+        """消息处理入口函数的错误处理外壳."""
         try:
             await self.message_handler(client, message)
         except OSError as e:
@@ -269,7 +273,7 @@ class Monitor:
             message.continue_propagation()
 
     async def message_handler(self, client: Client, message: Message):
-        '''消息处理入口函数, 控制是否回复以及等待回复.'''
+        """消息处理入口函数, 控制是否回复以及等待回复."""
         for key in self.keys(message):
             spec = self.get_spec(key)
             self.log.debug(f"监听到关键信息: {spec}.")
@@ -295,7 +299,7 @@ class Monitor:
                     )
 
     async def on_trigger(self, message: Message, key: Union[List[str], str], reply: str):
-        '''
+        """
         可修改的回调函数.
         参数:
             message: 引发回复的消息
@@ -303,12 +307,12 @@ class Monitor:
                 当 chat_keyword 没有 capturing groups 时, 类型为 str, 内容为 regex 的 match
                 当 chat_keyword 仅有一个 capturing groups 时, 类型为 str, 内容为 regex 的唯一一个 capturing groups 的对应值
                 当 chat_keyword 有多个 capturing groups 时, 类型为 list(str), 内容为 regex 的各个 capturing groups 的对应值
-        '''
+        """
         if reply:
             return await self.client.send_message(message.chat.id, reply)
 
     def get_unique_name(self):
-        '''获取唯一性用户名, 用于注册.'''
+        """获取唯一性用户名, 用于注册."""
         unique_name = self.config.get("unique_name", None)
         if unique_name:
             self.log.info(f'根据您的设置, 当监控到开注时, 该站点将以用户名 "{unique_name}" 注册.')

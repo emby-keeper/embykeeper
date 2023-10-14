@@ -16,8 +16,9 @@ PUBLISHED_API = {
     "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
 }
 
+
 def check_config(config):
-    '''验证配置文件格式'''
+    """验证配置文件格式"""
     PositiveInt = lambda: And(int, lambda n: n > 0)
     schema = Schema(
         {
@@ -81,7 +82,7 @@ def check_config(config):
 
 
 def write_faked_config(path):
-    '''生成配置文件骨架, 并填入生成的信息.'''
+    """生成配置文件骨架, 并填入生成的信息."""
     from tomlkit import document, nl, comment, item, dump
     from faker import Faker
     from faker.providers import internet, profile
@@ -179,7 +180,7 @@ def write_faked_config(path):
 
 
 def encrypt(data: str, password: str):
-    '''对数据进行密码加密.'''
+    """对数据进行密码加密."""
     from Crypto.Cipher import AES
     from Crypto import Random
 
@@ -194,8 +195,8 @@ def encrypt(data: str, password: str):
 
 
 def decrypt(data: bytes, password: str):
-    '''对数据进行密码解密.'''
-    
+    """对数据进行密码解密."""
+
     from Crypto.Cipher import AES
 
     bs = AES.block_size
@@ -210,8 +211,8 @@ def decrypt(data: bytes, password: str):
 
 
 def interactive_config(config: dict = {}):
-    '''交互式配置生成器.'''
-    
+    """交互式配置生成器."""
+
     from tomlkit import item
     from rich import get_console
     from rich.prompt import Prompt, IntPrompt, Confirm
@@ -304,7 +305,7 @@ def interactive_config(config: dict = {}):
 
 
 def load_env_config(data: str):
-    '''从来自环境变量的加密数据读入配置.'''
+    """从来自环境变量的加密数据读入配置."""
     from rich.prompt import Prompt
 
     data = base64.b64decode(re.sub(r"\s+", "", data).encode())
@@ -327,12 +328,12 @@ def load_env_config(data: str):
 
 
 def prepare_config(config_file=None, public=False):
-    '''
+    """
     准备配置
     参数:
         config_file: 配置文件
         public: 公共服务器模式, 将提示交互式配置生成
-    '''
+    """
     env_config = os.environ.get(f"EK_CONFIG", None)
     if env_config:
         config = load_env_config(env_config)

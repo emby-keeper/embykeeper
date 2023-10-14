@@ -17,8 +17,9 @@ scheme_names = {
     "datamanager": "下载器",
 }
 
+
 def formatter(record):
-    '''根据日志器的 scheme 属性配置输出格式.'''
+    """根据日志器的 scheme 属性配置输出格式."""
     extra = record["extra"]
     scheme = extra.get("scheme", None)
 
@@ -43,7 +44,7 @@ def formatter(record):
 
 
 def initialize(level="INFO", **kw):
-    '''初始化日志配置.'''
+    """初始化日志配置."""
     logger.remove()
     handler = RichHandler(
         console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio], **kw

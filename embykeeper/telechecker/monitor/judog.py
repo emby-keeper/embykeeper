@@ -4,6 +4,7 @@ from pyrogram.types import Message
 from .base import Monitor
 from ...utils import async_partial
 
+
 class JudogMonitor(Monitor):
     name = "剧狗"
     chat_name = "Mulgoreemby"
@@ -11,7 +12,7 @@ class JudogMonitor(Monitor):
     bot_username = "mulgorebot"
     notify_create_name = True
     allow_edit = False
-    
+
     async def init(self):
         channel = await self.client.get_chat("Mulgoreemby")
         self.chat_name = channel.linked_chat.id
@@ -30,4 +31,4 @@ class JudogMonitor(Monitor):
         if "目前已无可注册资格" in (msg.caption or msg.text):
             return
         else:
-            self.log.bind(notify=True).info(f'已在{self.name}抢注成功, 请及时登录查看.')
+            self.log.bind(notify=True).info(f"已在{self.name}抢注成功, 请及时登录查看.")
