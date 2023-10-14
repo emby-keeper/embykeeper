@@ -449,7 +449,6 @@ only_history = true # 仅当问题历史中找到答案时自动回答
 3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
 
 ## TODO
-- 没有配置代理时自动识别国内外, 选择资源库下载的国内外链接
 - 尝试 Fly.io 部署
 - 一个新的机器人, 实现免服务器云自动签到
 - 等待注册 Pornemby 并检查为什么 Emby 无法连接
