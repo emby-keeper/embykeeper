@@ -14,6 +14,7 @@ __ignore__ = True
 
 misty_monitor_pool = {}
 
+
 class MistyMonitor(Monitor):
     ocr = "digit5-teko@v1"
     lock = asyncio.Lock()

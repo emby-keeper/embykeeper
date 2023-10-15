@@ -187,7 +187,7 @@ async def checkiner(config: dict, instant=False):
                     nofail=config.get("nofail", True),
                     basedir=config.get("basedir", None),
                     proxy=config.get("proxy", None),
-                    config=config.get("checkiner", {}).get(cls.__module__.rsplit(".", 1)[-1], {})
+                    config=config.get("checkiner", {}).get(cls.__module__.rsplit(".", 1)[-1], {}),
                 )
                 for cls in clses
             ]
@@ -324,9 +324,11 @@ async def follower(config: dict):
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
+
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):
         return super().increase_indent(flow, False)
+
 
 async def analyzer(config: dict, chats, keywords, timerange, limit=10000, outputs=1000):
     """历史消息分析工具入口函数."""
@@ -386,11 +388,18 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=10000, output
                     p.update(pmsgs, visible=False)
                     p.advance(pchats)
             with open(target, "w+") as f:
-                yaml.dump({
-                    'messages': [
-                        str(t) for t, _ in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
-                    ][:outputs]
-                }, f, default_flow_style=False, encoding='utf-8', allow_unicode=True, Dumper=IndentDumper)
+                yaml.dump(
+                    {
+                        "messages": [
+                            str(t) for t, _ in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
+                        ][:outputs]
+                    },
+                    f,
+                    default_flow_style=False,
+                    encoding="utf-8",
+                    allow_unicode=True,
+                    Dumper=IndentDumper,
+                )
 
 
 async def notifier(config: dict):

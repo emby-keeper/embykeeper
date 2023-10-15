@@ -37,7 +37,9 @@ class BaseBotCheckin(ABC):
 
     name = None
 
-    def __init__(self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None, config: dict={}):
+    def __init__(
+        self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None, config: dict = {}
+    ):
         """
         基础签到类.
         参数:

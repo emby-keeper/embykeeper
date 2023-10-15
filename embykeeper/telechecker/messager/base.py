@@ -19,10 +19,11 @@ from ..tele import ClientsSession
 
 __ignore__ = True
 
+
 @dataclass(eq=False)
 class MessageSchedule:
-    '''定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送.'''
-    
+    """定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送."""
+
     messages: Iterable[str]
     at: Union[Iterable[Union[str, time]], Union[str, time]] = ("0:00", "23:59")
     days: int = 0
@@ -31,13 +32,13 @@ class MessageSchedule:
     only: str = None
 
     def next_time(self, days=None):
-        '''生成下一个发送时间'''
+        """生成下一个发送时间"""
         days = days if days is not None else self.days
         rtime = datetime.combine(datetime.today() + timedelta(days=days), random_time(*self.at))
         if rtime < datetime.now():
             rtime += timedelta(days=1)
         return rtime
-    
+
     def roll(self, days=None):
         skip = False
         if random.random() >= self.possibility:
@@ -49,29 +50,28 @@ class MessageSchedule:
             if self.only.startswith("weekend") and today.weekday() < 5:
                 skip = True
         return MessagePlan(
-            message=random.choice(self.messages),
-            at=self.next_time(days=days),
-            schedule=self,
-            skip=skip
+            message=random.choice(self.messages), at=self.next_time(days=days), schedule=self, skip=skip
         )
-    
+
+
 @dataclass(eq=False)
 class MessagePlan:
-    '''定义一个发送计划, 即在某事件发送某个消息.'''
-    
+    """定义一个发送计划, 即在某事件发送某个消息."""
+
     message: str
     at: datetime
     schedule: MessageSchedule
     skip: bool = False
 
+
 class Messager:
-    '''自动水群类.'''
-    
+    """自动水群类."""
+
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
     default_messages: List[str] = []  # 默认的话术列表资源名
 
-    def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None, config: dict=None):
+    def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None, config: dict = None):
         """
         自动水群类.
         参数:
@@ -87,32 +87,34 @@ class Messager:
         self.proxy = proxy
         self.basedir = basedir
         self.config = config
-        
-        self.interval = timedelta(seconds=config.get('interval', 1800)) # 两条消息间的最小间隔时间
+
+        self.interval = timedelta(seconds=config.get("interval", 1800))  # 两条消息间的最小间隔时间
 
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
-        self.timeline: List[MessagePlan] = [] # 消息计划序列
+        self.timeline: List[MessagePlan] = []  # 消息计划序列
 
     def parse_message_yaml(self, file):
         with open(file, "r") as f:
             data = yaml.safe_load(f)
-        schema = Schema({
-            "messages": [str],
-            Optional("at"): [str],
-            Optional("days"): int,
-            Optional("possibility"): float,
-            Optional("only"): str
-        })
+        schema = Schema(
+            {
+                "messages": [str],
+                Optional("at"): [str],
+                Optional("days"): int,
+                Optional("possibility"): float,
+                Optional("only"): str,
+            }
+        )
         schema.validate(data)
-        at = data.get('at', ('10:00', '23:00'))
+        at = data.get("at", ("10:00", "23:00"))
         assert len(at) == 2
         at = [parser.parse(t).time() for t in at]
         return MessageSchedule(
-            messages=data.get('messages'),
+            messages=data.get("messages"),
             at=at,
-            days=data.get('days', 0),
-            possibility=data.get('possibility', 1.0),
-            only=data.get('only', None)
+            days=data.get("days", 0),
+            possibility=data.get("possibility", 1.0),
+            only=data.get("only", None),
         )
 
     def add(self, schedule: MessageSchedule):
@@ -131,7 +133,7 @@ class Messager:
 
     async def get_spec_path(self, spec):
         if not Path(spec).exists():
-            return await get_data(self.basedir, spec, proxy=self.proxy, caller=f'{self.name}水群')
+            return await get_data(self.basedir, spec, proxy=self.proxy, caller=f"{self.name}水群")
         else:
             return spec
 
@@ -147,13 +149,13 @@ class Messager:
             return None
 
     async def start(self):
-        messages = self.config.get('messages', [])
+        messages = self.config.get("messages", [])
         if not messages:
             messages = self.default_messages
-        
+
         schedules = []
         for m in messages:
-            match = re.match(r'(.*)\*\s?(\d+)', m)
+            match = re.match(r"(.*)\*\s?(\d+)", m)
             if match:
                 multiply = int(match.group(2))
                 spec = match.group(1).strip()
@@ -164,12 +166,12 @@ class Messager:
             if schedule:
                 schedule.multiply = multiply
                 schedules.append(schedule)
-        
+
         self.log.info(f"共启用 {len(schedules)} 个消息规划.")
         for s in schedules:
             for _ in range(s.multiply):
                 self.add(s)
-        
+
         if self.timeline:
             last_valid_p = None
             while True:
@@ -179,7 +181,9 @@ class Messager:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
                     if not next_valid_p == last_valid_p:
                         last_valid_p = next_valid_p
-                        self.log.info(f"下一次发送将在 [blue]{next_valid_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行: {truncate_str(next_valid_p.message, 20)}.")
+                        self.log.info(
+                            f"下一次发送将在 [blue]{next_valid_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行: {truncate_str(next_valid_p.message, 20)}."
+                        )
                 else:
                     self.log.info(f"下一次发送被跳过.")
                 next_p = min(self.timeline, key=lambda x: x.at)
@@ -189,7 +193,6 @@ class Messager:
                     await self._send(next_p.message)
                 self.timeline.remove(next_p)
                 self.add(next_p.schedule)
-                
 
     async def _send(self, *args, **kw):
         try:
