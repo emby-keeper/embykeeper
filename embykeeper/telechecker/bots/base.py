@@ -37,7 +37,7 @@ class BaseBotCheckin(ABC):
 
     name = None
 
-    def __init__(self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None):
+    def __init__(self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None, config: dict={}):
         """
         基础签到类.
         参数:
@@ -47,6 +47,7 @@ class BaseBotCheckin(ABC):
             nofail: 启用错误处理外壳, 当错误时报错但不退出
             basedir: 文件存储默认位置
             proxy: 代理配置
+            config: 当前签到器的特定配置
         """
         self.client = client
         self.retries = retries
@@ -54,6 +55,7 @@ class BaseBotCheckin(ABC):
         self.nofail = nofail
         self.basedir = basedir or user_data_dir(__name__)
         self.proxy = proxy
+        self.config = config
         self.finished = asyncio.Event()  # 签到完成事件
         self.log = logger.bind(scheme="telechecker", name=self.name, username=client.me.name)  # 日志组件
 

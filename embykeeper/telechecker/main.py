@@ -186,6 +186,7 @@ async def checkiner(config: dict, instant=False):
                     nofail=config.get("nofail", True),
                     basedir=config.get("basedir", None),
                     proxy=config.get("proxy", None),
+                    config=config.get("checkiner", {}).get(cls.__module__.rsplit(".", 1)[-1], {})
                 )
                 for cls in clses
             ]
@@ -282,6 +283,7 @@ async def messager(config: dict):
                 continue
             clses = extract(get_cls("messager", names=config.get("service", {}).get("messager", None)))
             for cls in clses:
+                cls_config = config.get("messager", {}).get(cls.__module__.rsplit(".", 1)[-1], {})
                 messagers.append(
                     cls(
                         {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
@@ -289,6 +291,7 @@ async def messager(config: dict):
                         nofail=config.get("nofail", True),
                         proxy=config.get("proxy", None),
                         basedir=config.get("basedir", None),
+                        config=cls_config,
                     )
                 )
     await asyncio.gather(*[m.start() for m in messagers])

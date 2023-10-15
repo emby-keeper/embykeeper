@@ -120,7 +120,7 @@ class Monitor:
             nofail: 启用错误处理外壳, 当错误时报错但不退出
             basedir: 文件存储默认位置
             proxy: 代理配置
-            config: 当前签到器的特定配置
+            config: 当前监控器的特定配置
         """
         self.client = client
         self.nofail = nofail
