@@ -24,6 +24,13 @@ from ..tele import Client
 
 __ignore__ = True
 
+default_keywords = {
+    'account_fail': ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册", "不存在"),
+    'too_many_tries_fail': ("已尝试", "过多"),
+    'checked': ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到"),
+    'fail': ("失败", "错误", "超时"),
+    'success': ("成功", "通过", "完成", "获得"),
+}
 
 class MessageType(Flag):
     TEXT = auto()
@@ -89,13 +96,18 @@ class BotCheckin(BaseBotCheckin):
     bot_username: Union[int, str] = None  # Bot 的 UserID 或 用户名 (不带 @ 或 https://t.me/)
     bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
     bot_send_interval: int = 1  # 签到命令间等待的秒数
-    bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码
-    bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息
-    bot_captcha_len: Iterable = None  # 验证码的可能范围
+    bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码, 置空不限制
+    bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息, 置空不限制
+    bot_captcha_len: Union[int, Iterable[int]] = []  # 验证码的可能范围, 例如 [1, 2, 3], 置空不限制
     bot_success_pat: str = r"(\d+)[^\d]*(\d+)"  # 当接收到成功消息后, 从消息中提取数字的模式
     bot_retry_wait: int = 2  # 失败时等待的秒数
-    bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条
+    bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条, 置空禁用
     bot_allow_from_scratch: bool = False  # 允许从未聊天情况下启动
+    bot_success_keywords: Union[str, List[str]] = [] # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_checked_keywords: Union[str, List[str]] = [] # 今日已签到时检测的关键词, 置空使用内置关键词表
+    bot_account_fail_keywords: Union[str, List[str]] = [] # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_too_many_tries_fail_keywords: Union[str, List[str]] = [] # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_fail_keywords: Union[str, List[str]] = [] # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
 
     def __init__(self, *args, **kw):
@@ -356,21 +368,19 @@ class BotCheckin(BaseBotCheckin):
         """接收非验证码消息时, 检测关键词并确认签到成功或失败, 发送用户提示."""
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(
-            s in text for s in ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册")
-        ):
+        elif any(s in text for s in self.bot_account_fail_keywords or default_keywords['account_fail']):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
-        elif any(s in text for s in ("已尝试", "过多")):
+        elif any(s in text for s in self.bot_too_many_tries_fail_keywords or default_keywords['too_many_tries_fail']):
             self.log.warning(f"签到失败: 尝试次数过多.")
             await self.fail()
-        elif any(s in text for s in ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到")):
+        elif any(s in text for s in self.bot_checked_keywords or default_keywords['checked']):
             self.log.info(f"今日已经签到过了.")
             self.finished.set()
-        elif any(s in text for s in ("失败", "错误", "超时")):
+        elif any(s in text for s in self.bot_fail_keywords or default_keywords['fail']):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
-        elif any(s in text for s in ("成功", "通过", "完成", "获得")):
+        elif any(s in text for s in self.bot_success_keywords or default_keywords['success']):
             matches = re.search(self.bot_success_pat, text)
             if matches:
                 try:
