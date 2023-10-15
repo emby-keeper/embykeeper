@@ -12,7 +12,11 @@ from .utils import to_iterable, humanbytes
 
 logger = logger.bind(scheme="datamanager")
 
-data_url = "https://cdn.jsdelivr.net/gh/embykeeper/embykeeper-data/data"
+data_urls = [
+    "https://raw.githubusercontent.com/embykeeper/embykeeper-data/main/data",
+    "https://raw.staticdn.net/embykeeper/embykeeper-data/main/data",
+    "https://cdn.jsdelivr.net/gh/embykeeper/embykeeper-data/data",
+]
 
 
 async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict = None, caller: str = None):
@@ -43,8 +47,8 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
             yield existing[name]
         else:
             try:
-                url = f"{data_url}/{name}"
-                for retries in range(3):
+                for data_url in data_urls:
+                    url = f"{data_url}/{name}"
                     if proxy:
                         connector = ProxyConnector(
                             proxy_type=ProxyType[proxy["scheme"].upper()],
