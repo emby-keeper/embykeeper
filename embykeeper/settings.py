@@ -9,14 +9,6 @@ from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
 
-# 已公开的密钥信息
-PUBLISHED_API = {
-    "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
-    "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-}
-
-
 def check_config(config):
     """验证配置文件格式"""
     PositiveInt = lambda: And(int, lambda n: n > 0)
@@ -379,7 +371,4 @@ def prepare_config(config_file=None, public=False):
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
         proxy.setdefault("port", 1080)
-    for tg in config.get("telegram", []):
-        if tg.get("api_id", None) is None and tg.get("api_hash", None) is None:
-            tg.update(PUBLISHED_API["nicegram"])
     return config

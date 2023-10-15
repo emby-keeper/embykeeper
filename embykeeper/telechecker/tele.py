@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 import asyncio
 import inspect
+import random
 from typing import AsyncGenerator, Optional, Union
 
 from rich.prompt import Prompt
@@ -16,6 +17,7 @@ from pyrogram.enums import SentCodeType
 from pyrogram.errors import (
     BadRequest,
     RPCError,
+    ApiIdPublishedFlood,
     Unauthorized,
     SessionPasswordNeeded,
     CodeInvalid,
@@ -30,6 +32,17 @@ from ..utils import async_partial, to_iterable
 
 logger = logger.bind(scheme="telegram")
 
+# 已公开的密钥信息
+PUBLISHED_API = {
+    "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+    "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
+    "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+    "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
+    "ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
+    "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
+    "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
+    "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
+}
 
 def _name(self: Union[types.User, types.Chat]):
     return " ".join([n for n in (self.first_name, self.last_name) if n])
@@ -413,7 +426,9 @@ class ClientsSession:
         try:
             if not self.quiet:
                 logger.info(f'登录至账号 "{account["phone"]}".')
-            while True:
+            for _ in range(3):
+                if account.get("api_id", None) is None or account.get("api_hash", None) is None:
+                    account.update(random.choice(list(PUBLISHED_API.values())))
                 try:
                     client = Client(
                         app_version=f"{__name__.capitalize()} {__version__}",
@@ -428,6 +443,8 @@ class ClientsSession:
                         workdir=self.basedir,
                     )
                     await client.start()
+                except ApiIdPublishedFlood:
+                    await asyncio.sleep(1)
                 except Unauthorized:
                     await client.storage.delete()
                 except KeyError as e:
@@ -435,6 +452,8 @@ class ClientsSession:
                     await asyncio.sleep(3)
                 else:
                     break
+            else:
+                logger.error(f'登录账号 "{account["phone"]}" 失败次数超限, 将被跳过.')
         except asyncio.CancelledError:
             raise
         except RPCError as e:
