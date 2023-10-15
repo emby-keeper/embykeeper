@@ -32,6 +32,7 @@ classifiers = [
 ]
 requires-python = ">=3.8,<3.11"
 dependencies = [
+    "pyyaml",
     "tomli",
     "tomlkit",
     "rich",
@@ -53,12 +54,13 @@ dependencies = [
     "aiocache",
     "fake_useragent",
     "pycryptodome",
-    "flask",
+    "flask<3",
     "flask_socketio",
     "flask_login",
     "simple-websocket",
     "eventlet",
     "cryptography",
+    "werkzeug<3",
 ]
 
 [project.urls]
