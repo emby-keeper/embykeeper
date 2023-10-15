@@ -207,6 +207,21 @@ docker-compose up -d
 
 您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
 
+当您需要更新版本时, 您需要执行:
+
+```bash
+docker-compose up -d
+```
+
+此时被 `watchtower` 更新的容器将自动重新创建并启动.
+
+如果您没有使用 `watchtower`, 您需要执行:
+
+```bash
+docker pull embykeeper/embykeeper
+docker-compose up -d
+```
+
 ### 从 PyPi 安装
 
 Embykeeper 可以通过 `python >= 3.8, < 3.11` 运行, 您可以通过 [virtualvenv](https://virtualenv.pypa.io/) 进行环境的管理:
