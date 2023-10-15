@@ -131,7 +131,7 @@ class PornembyMonitor:
             try:
                 while True:
                     secs = 3600 * 12
-                    self.log.debug(f'等待 {secs} 秒后进行缓存更新.')
+                    self.log.debug(f"等待 {secs} 秒后进行缓存更新.")
                     await asyncio.sleep(secs)
                     await self.update()
             except asyncio.CancelledError:

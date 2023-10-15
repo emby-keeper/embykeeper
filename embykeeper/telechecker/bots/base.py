@@ -25,12 +25,13 @@ from ..tele import Client
 __ignore__ = True
 
 default_keywords = {
-    'account_fail': ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册", "不存在"),
-    'too_many_tries_fail': ("已尝试", "过多"),
-    'checked': ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到"),
-    'fail': ("失败", "错误", "超时"),
-    'success': ("成功", "通过", "完成", "获得"),
+    "account_fail": ("拉黑", "黑名单", "冻结", "未找到用户", "无资格", "退出群", "退群", "加群", "加入群聊", "请先关注", "注册", "不存在"),
+    "too_many_tries_fail": ("已尝试", "过多"),
+    "checked": ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到"),
+    "fail": ("失败", "错误", "超时"),
+    "success": ("成功", "通过", "完成", "获得"),
 }
+
 
 class MessageType(Flag):
     TEXT = auto()
@@ -103,11 +104,11 @@ class BotCheckin(BaseBotCheckin):
     bot_retry_wait: int = 2  # 失败时等待的秒数
     bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条, 置空禁用
     bot_allow_from_scratch: bool = False  # 允许从未聊天情况下启动
-    bot_success_keywords: Union[str, List[str]] = [] # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_checked_keywords: Union[str, List[str]] = [] # 今日已签到时检测的关键词, 置空使用内置关键词表
-    bot_account_fail_keywords: Union[str, List[str]] = [] # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_too_many_tries_fail_keywords: Union[str, List[str]] = [] # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_fail_keywords: Union[str, List[str]] = [] # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_success_keywords: Union[str, List[str]] = []  # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_checked_keywords: Union[str, List[str]] = []  # 今日已签到时检测的关键词, 置空使用内置关键词表
+    bot_account_fail_keywords: Union[str, List[str]] = []  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_too_many_tries_fail_keywords: Union[str, List[str]] = []  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_fail_keywords: Union[str, List[str]] = []  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
 
     def __init__(self, *args, **kw):
@@ -368,19 +369,22 @@ class BotCheckin(BaseBotCheckin):
         """接收非验证码消息时, 检测关键词并确认签到成功或失败, 发送用户提示."""
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in self.bot_account_fail_keywords or default_keywords['account_fail']):
+        elif any(s in text for s in self.bot_account_fail_keywords or default_keywords["account_fail"]):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
-        elif any(s in text for s in self.bot_too_many_tries_fail_keywords or default_keywords['too_many_tries_fail']):
+        elif any(
+            s in text
+            for s in self.bot_too_many_tries_fail_keywords or default_keywords["too_many_tries_fail"]
+        ):
             self.log.warning(f"签到失败: 尝试次数过多.")
             await self.fail()
-        elif any(s in text for s in self.bot_checked_keywords or default_keywords['checked']):
+        elif any(s in text for s in self.bot_checked_keywords or default_keywords["checked"]):
             self.log.info(f"今日已经签到过了.")
             self.finished.set()
-        elif any(s in text for s in self.bot_fail_keywords or default_keywords['fail']):
+        elif any(s in text for s in self.bot_fail_keywords or default_keywords["fail"]):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
-        elif any(s in text for s in self.bot_success_keywords or default_keywords['success']):
+        elif any(s in text for s in self.bot_success_keywords or default_keywords["success"]):
             matches = re.search(self.bot_success_pat, text)
             if matches:
                 try:

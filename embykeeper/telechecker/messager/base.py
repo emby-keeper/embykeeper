@@ -215,6 +215,5 @@ class Messager:
                     await tg.send_message(self.chat_name, message)
                 except RPCError as e:
                     self.log.warning(f"发送失败: {e}.")
-                except 
                 except KeyError as e:
                     self.log.warning(f"发送失败, 您可能已被封禁: {e}.")

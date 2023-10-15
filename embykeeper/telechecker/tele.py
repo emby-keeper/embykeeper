@@ -37,10 +37,10 @@ logger = logger.bind(scheme="telegram")
 # 已公开的密钥信息
 PUBLISHED_API = {
     "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    #"android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
-    #"ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    #"desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
-    #"ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
+    # "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
+    # "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+    # "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
+    # "ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
     "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
     "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
     "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
@@ -455,13 +455,13 @@ class ClientsSession:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     await asyncio.sleep(3)
                 except OperationalError as e:
-                    if 'database is locked' in str(e):
+                    if "database is locked" in str(e):
                         session_file = Path(self.basedir) / f'{account["phone"]}.session'
                         proc = get_file_users(str(session_file.absolute()))
                         if proc:
-                            spec = f'进程 {proc.name()}({proc.pid}) '
+                            spec = f"进程 {proc.name()}({proc.pid}) "
                         else:
-                            spec = f'未知进程可能'
+                            spec = f"未知进程可能"
                         logger.warning(f'{spec}正在使用账号 "{account["phone"]}", 本次登录将不会存储.')
                         in_memory = True
                     else:

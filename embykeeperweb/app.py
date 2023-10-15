@@ -33,7 +33,8 @@ app.config["faillog"] = []
 
 lock = threading.Lock()
 
-version = f'V{__version__}'
+version = f"V{__version__}"
+
 
 class DummyUser:
     def is_authenticated(self):

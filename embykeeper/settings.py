@@ -11,13 +11,15 @@ from schema import And, Optional, Or, Regex, Schema, SchemaError
 
 from .telechecker.tele import ClientsSession
 
+
 async def convert_session(accounts):
     results = []
     for a in accounts:
-        async with ClientsSession.from_config({'telegram': [a]}) as clients:
+        async with ClientsSession.from_config({"telegram": [a]}) as clients:
             async for tg in clients:
-                results.append({**a, 'session': tg.session_string})
+                results.append({**a, "session": tg.session_string})
     return results
+
 
 def check_config(config):
     """验证配置文件格式"""
