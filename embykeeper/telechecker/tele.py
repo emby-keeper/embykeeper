@@ -41,9 +41,9 @@ PUBLISHED_API = {
     # "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
     # "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
     # "ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
-    "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
-    "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
-    "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
+    # "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
+    # "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
+    # "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
 }
 
 
