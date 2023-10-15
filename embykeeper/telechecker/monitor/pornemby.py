@@ -129,7 +129,7 @@ class PornembyMonitor:
         async def cache_watchdog(self):
             try:
                 while True:
-                    await asyncio.sleep(24 * 3600)
+                    await asyncio.sleep(12 * 3600)
                     await self.update()
             except asyncio.CancelledError:
                 raise
