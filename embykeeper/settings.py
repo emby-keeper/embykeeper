@@ -62,7 +62,9 @@ def check_config(config):
                     }
                 )
             ],
+            Optional("checkiner"): Schema({str: Schema({}, ignore_extra_keys=True)}),
             Optional("monitor"): Schema({str: Schema({}, ignore_extra_keys=True)}),
+            Optional("messager"): Schema({str: Schema({}, ignore_extra_keys=True)}),
         }
     )
     try:
