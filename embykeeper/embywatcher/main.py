@@ -132,8 +132,8 @@ async def login(config):
         )
         try:
             info = await emby.info()
-        except (ConnectionError, RuntimeError, ClientConnectionError):
-            logger.error(f'Emby ({a["url"]}) 连接错误, 请重新检查配置.')
+        except (ConnectionError, RuntimeError, ClientConnectionError) as e:
+            logger.error(f'Emby ({a["url"]}) 连接错误, 请重新检查配置: {e}')
             continue
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])

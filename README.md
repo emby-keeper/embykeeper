@@ -50,8 +50,6 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-  - 当前不支持的站点:
-    - Pornemby
 - Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)

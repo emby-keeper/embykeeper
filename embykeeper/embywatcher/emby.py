@@ -7,8 +7,12 @@ from embypy.emby import Emby as _Emby
 from embypy.objects import EmbyObject
 from embypy.utils.asyncio import async_func
 from embypy.utils.connector import Connector as _Connector
+from fake_useragent import UserAgent
+from loguru import logger
 
 from .. import __version__
+
+logger = logger.bind(scheme="embywatcher")
 
 
 class Connector(_Connector):
@@ -26,7 +30,11 @@ class Connector(_Connector):
         )
         if self.token:
             auth_header += f',Token="{self.token}"'
-        headers = {"Authorization": auth_header, "X-Emby-Authorization": auth_header}
+        headers = {
+            "User-Agent": UserAgent().random,
+            "Authorization": auth_header,
+            "X-Emby-Authorization": auth_header,
+        }
         if self.token:
             headers.update({"X-MediaBrowser-Token": self.token})
 
@@ -56,12 +64,14 @@ class Connector(_Connector):
             url = self.get_url(path, **query)
             try:
                 resp = await method(url, timeout=self.timeout, **params)
-                if await self._process_resp(resp):
-                    return resp
-                await asyncio.sleep(random.random() * i + 0.2)
             except (aiohttp.ClientConnectionError, OSError, asyncio.TimeoutError) as e:
-                pass
-        raise aiohttp.ClientConnectionError("Emby server is probably down")
+                logger.debug(f'连接 "{url}" 失败: {e.__class__.__name__}: {e}')
+            if self.attempt_login and resp.status == 401:
+                raise aiohttp.ClientConnectionError("用户名密码错误")
+            if await self._process_resp(resp):
+                return resp
+            await asyncio.sleep(random.random() * i + 0.2)
+        raise aiohttp.ClientConnectionError("无法连接到服务器.")
 
     @async_func
     async def get_stream_noreturn(self, path, **query):
