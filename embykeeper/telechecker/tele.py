@@ -44,6 +44,7 @@ PUBLISHED_API = {
     "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
 }
 
+
 def _name(self: Union[types.User, types.Chat]):
     return " ".join([n for n in (self.first_name, self.last_name) if n])
 

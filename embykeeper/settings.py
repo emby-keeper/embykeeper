@@ -9,6 +9,7 @@ from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
 
+
 def check_config(config):
     """验证配置文件格式"""
     PositiveInt = lambda: And(int, lambda n: n > 0)
