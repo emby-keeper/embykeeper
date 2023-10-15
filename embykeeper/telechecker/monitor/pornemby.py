@@ -53,6 +53,7 @@ class PornembyMonitor:
         def __init__(self, *args, **kw):
             super().__init__(*args, **kw)
             self.cache_file = Path(self.basedir) / "pornemby_question.csv"
+            self.update_task = None
 
         async def update_cache(self, to_date=None):
             cache_timestamp = self.cache_file.with_name("pornemby_question.timestamp")
@@ -129,13 +130,15 @@ class PornembyMonitor:
         async def cache_watchdog(self):
             try:
                 while True:
-                    await asyncio.sleep(12 * 3600)
+                    secs = 30
+                    self.log.debug(f'等待 {secs} 秒后进行缓存更新.')
+                    await asyncio.sleep(secs)
                     await self.update()
             except asyncio.CancelledError:
                 raise
 
         async def init(self):
-            t = asyncio.create_task(self.cache_watchdog())
+            self.update_task = asyncio.create_task(self.cache_watchdog())
             return await self.update()
 
         async def on_trigger(self, message: Message, key, reply):
