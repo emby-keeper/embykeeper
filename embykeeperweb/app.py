@@ -15,6 +15,8 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, a
 from flask_socketio import SocketIO
 from flask_login import LoginManager, login_user, login_required, current_user
 
+from . import __version__
+
 cli = typer.Typer()
 app = Flask(__name__, static_folder="templates/assets")
 app.config["SECRET_KEY"] = os.urandom(24)
@@ -31,6 +33,7 @@ app.config["faillog"] = []
 
 lock = threading.Lock()
 
+version = f'V{__version__}'
 
 class DummyUser:
     def is_authenticated(self):
@@ -59,12 +62,12 @@ def index():
 @app.route("/console")
 @login_required
 def console():
-    return render_template("console.html")
+    return render_template("console.html", version=version)
 
 
 @app.route("/login", methods=["GET"])
 def login():
-    return render_template("login.html")
+    return render_template("login.html", version=version)
 
 
 @app.route("/login", methods=["POST"])
@@ -82,7 +85,7 @@ def login_submit():
         else:
             emsg = "Wrong password."
             app.config["faillog"].append(time.time())
-    return render_template("login.html", emsg=emsg)
+    return render_template("login.html", emsg=emsg, version=version)
 
 
 @app.route("/healthz")
@@ -108,7 +111,7 @@ def heartbeat():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html"), 404
+    return render_template("404.html", version=version), 404
 
 
 @socketio.on("pty-input", namespace="/pty")
