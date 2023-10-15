@@ -9,6 +9,15 @@ from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
 
+from .telechecker.tele import ClientsSession
+
+async def convert_session(accounts):
+    results = []
+    for a in accounts:
+        async with ClientsSession.from_config({'telegram': [a]}) as clients:
+            async for tg in clients:
+                results.append({**a, 'session': tg.session_string})
+    return results
 
 def check_config(config):
     """验证配置文件格式"""
@@ -231,6 +240,9 @@ def interactive_config(config: dict = {}):
         phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]")
         monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False)
         telegrams.append({"phone": phone, "send": False, "monitor": monitor})
+    if telegrams:
+        logger.info(f"即将尝试登录各账户并存储凭据, 请耐心等待.")
+        telegrams = convert_session(telegrams)
     embies = config.get("emby", [])
     while True:
         if len(embies) > 0:

@@ -5,7 +5,9 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 import asyncio
 import inspect
+from pathlib import Path
 import random
+from sqlite3 import OperationalError
 from typing import AsyncGenerator, Optional, Union
 
 from rich.prompt import Prompt
@@ -28,17 +30,17 @@ from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
 from .. import __name__, __version__
-from ..utils import async_partial, to_iterable
+from ..utils import async_partial, to_iterable, get_file_users
 
 logger = logger.bind(scheme="telegram")
 
 # 已公开的密钥信息
 PUBLISHED_API = {
     "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
-    "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
-    "ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
+    #"android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
+    #"ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+    #"desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
+    #"ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
     "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
     "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
     "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
@@ -427,6 +429,7 @@ class ClientsSession:
         try:
             if not self.quiet:
                 logger.info(f'登录至账号 "{account["phone"]}".')
+            in_memory = False
             for _ in range(3):
                 if account.get("api_id", None) is None or account.get("api_hash", None) is None:
                     account.update(random.choice(list(PUBLISHED_API.values())))
@@ -438,7 +441,7 @@ class ClientsSession:
                         api_hash=account["api_hash"],
                         phone_number=account["phone"],
                         session_string=account.get("session", None),
-                        in_memory=bool("session" in account),
+                        in_memory=in_memory or bool("session" in account),
                         proxy=proxy,
                         lang_code="zh",
                         workdir=self.basedir,
@@ -451,6 +454,19 @@ class ClientsSession:
                 except KeyError as e:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     await asyncio.sleep(3)
+                except OperationalError as e:
+                    if 'database is locked' in str(e):
+                        session_file = Path(self.basedir) / f'{account["phone"]}.session'
+                        proc = get_file_users(str(session_file.absolute()))
+                        if proc:
+                            spec = f'进程 {proc.name()}({proc.pid}) '
+                        else:
+                            spec = f'未知进程可能'
+                        logger.warning(f'{spec}正在使用账号 "{account["phone"]}", 本次登录将不会存储.')
+                        in_memory = True
+                    else:
+                        logger.warning(f'登录账号 "{account["phone"]}" 时发生数据库异常, 将被跳过.')
+                        break
                 else:
                     break
             else:
