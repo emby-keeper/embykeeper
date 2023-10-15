@@ -231,13 +231,6 @@ def interactive_config(config: dict = {}):
             more = Confirm.ask(pad + "是否继续添加?", default=False)
         else:
             more = Confirm.ask(pad + "是否添加 Telegram 账号?", default=True)
-            if more:
-                logger.info(
-                    f"为了使用 {__name__.capitalize()} 需要您开启您 Telegram 账号的 API 功能, 您可以从 Telegram 官网 (https://my.telegram.org/) 申请."
-                )
-                logger.info(
-                    "(登陆后选择 API development tools, 随后应用信息可以随意填写, 若提示Error您可能需要再次多次点击提交, 或等待新账户脱离风控期/更换代理/清除浏览器记录并重试)"
-                )
         if not more:
             break
         phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]")
