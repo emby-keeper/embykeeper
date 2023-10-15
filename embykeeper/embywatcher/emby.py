@@ -66,8 +66,9 @@ class Connector(_Connector):
                 resp = await method(url, timeout=self.timeout, **params)
             except (aiohttp.ClientConnectionError, OSError, asyncio.TimeoutError) as e:
                 logger.debug(f'连接 "{url}" 失败: {e.__class__.__name__}: {e}')
-            if self.attempt_login and resp.status == 401:
-                raise aiohttp.ClientConnectionError("用户名密码错误")
+            else:
+                if self.attempt_login and resp.status == 401:
+                    raise aiohttp.ClientConnectionError("用户名密码错误")
             if await self._process_resp(resp):
                 return resp
             await asyncio.sleep(random.random() * i + 0.2)
