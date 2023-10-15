@@ -1,61 +1,195 @@
 import asyncio
+from collections import Counter
+from pathlib import Path
 import random
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
-from typing import Dict, Iterable, List, Union
+import re
+from typing import Iterable, List, Union
 
+import yaml
 from loguru import logger
 from pyrogram.errors import BadRequest
+from schema import Optional, Schema, SchemaError
+from dateutil import parser
 
-from ...utils import random_time
+from ...utils import random_time, time_in_range, truncate_str
+from ...data import get_data
 from ..tele import ClientsSession
 
 __ignore__ = True
 
-
-@dataclass(frozen=True)
+@dataclass(eq=False)
 class MessageSchedule:
-    message: str
+    '''定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送.'''
+    
+    messages: Iterable[str]
     at: Union[Iterable[Union[str, time]], Union[str, time]] = ("0:00", "23:59")
-    days: int = 1
+    days: int = 0
     possibility: float = 1.0
+    multiply: int = 1
     only: str = None
 
     def next_time(self, days=None):
+        '''生成下一个发送时间'''
         days = days if days is not None else self.days
-        if days:
-            rtime = random_time(*self.at)
-        else:
-            start, end = self.at
-            rtime = random_time(max(start, datetime.now().time()), end)
-        return datetime.combine(datetime.today() + timedelta(days=days), rtime)
-
+        rtime = datetime.combine(datetime.today() + timedelta(days=days), random_time(*self.at))
+        if rtime < datetime.now():
+            rtime += timedelta(days=1)
+        return rtime
+    
+    def roll(self, days=None):
+        skip = False
+        if random.random() >= self.possibility:
+            skip = True
+        if self.only:
+            today = datetime.today()
+            if self.only.startswith("weekday") and today.weekday() > 4:
+                skip = True
+            if self.only.startswith("weekend") and today.weekday() < 5:
+                skip = True
+        return MessagePlan(
+            message=random.choice(self.messages),
+            at=self.next_time(days=days),
+            schedule=self,
+            skip=skip
+        )
+    
+@dataclass(eq=False)
+class MessagePlan:
+    '''定义一个发送计划, 即在某事件发送某个消息.'''
+    
+    message: str
+    at: datetime
+    schedule: MessageSchedule
+    skip: bool = False
 
 class Messager:
+    '''自动水群类.'''
+    
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
-    messages: List[MessageSchedule] = []  # 可用的话术列表
+    default_messages: List[str] = []  # 默认的话术列表资源名
 
-    def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None):
+    def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None, config: dict=None):
+        """
+        自动水群类.
+        参数:
+            account: 账号登录信息
+            username: 用户名, 仅用于在登录前的日志输出
+            nofail: 启用错误处理外壳, 当错误时报错但不退出
+            basedir: 文件存储默认位置
+            proxy: 代理配置
+            config: 当前水群器的特定配置
+        """
         self.account = account
         self.nofail = nofail
         self.proxy = proxy
         self.basedir = basedir
+        self.config = config
+        
+        self.interval = timedelta(seconds=config.get('interval', 1800)) # 两条消息间的最小间隔时间
 
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
-        self.timeline: Dict[Messager, datetime] = {}
+        self.timeline: List[MessagePlan] = [] # 消息计划序列
+
+    def parse_message_yaml(self, file):
+        with open(file, "r") as f:
+            data = yaml.safe_load(f)
+        schema = Schema({
+            "messages": [str],
+            Optional("at"): [str],
+            Optional("days"): int,
+            Optional("possibility"): float,
+            Optional("only"): str
+        })
+        schema.validate(data)
+        at = data.get('at', ('10:00', '23:00'))
+        assert len(at) == 2
+        at = [parser.parse(t).time() for t in at]
+        return MessageSchedule(
+            messages=data.get('messages'),
+            at=at,
+            days=data.get('days', 0),
+            possibility=data.get('possibility', 1.0),
+            only=data.get('only', None)
+        )
+
+    def add(self, schedule: MessageSchedule):
+        for _ in range(10):
+            plan = schedule.roll()
+            for p in self.timeline:
+                if time_in_range(p.at - self.interval, p.at + self.interval, plan.at):
+                    break
+            else:
+                self.timeline.append(plan)
+                return
+        else:
+            plan.skip = True
+            self.timeline.append(plan)
+            return
+
+    async def get_spec_path(self, spec):
+        if not Path(spec).exists():
+            return await get_data(self.basedir, spec, proxy=self.proxy, caller=f'{self.name}水群')
+        else:
+            return spec
+
+    async def get_spec_schedule(self, spec):
+        file = await self.get_spec_path(spec)
+        if not file:
+            self.log.warning(f'话术文件 "{spec}" 无法下载或不存在, 将被跳过.')
+            return None
+        try:
+            return self.parse_message_yaml(file)
+        except (OSError, yaml.YAMLError, SchemaError) as e:
+            self.log.warning(f'话术文件 "{spec}" 错误, 将被跳过: {e}')
+            return None
 
     async def start(self):
-        for i, m in enumerate(self.messages):
-            if isinstance(m, MessageSchedule):
-                self.timeline[i] = m.next_time(days=0)
-        while True:
-            next_i = min(self.timeline, key=self.timeline.get)
-            next_m = self.messages[next_i]
-            self.log.info(f"下一次发送将在 [blue]{self.timeline[next_i].strftime('%m-%d %H:%M:%S %p')}[/] 进行.")
-            await asyncio.sleep((self.timeline[next_i] - datetime.now()).seconds)
-            await self._send(next_m.message, next_m.possibility, next_m.only)
-            self.timeline[next_i] = next_m.next_time()
+        messages = self.config.get('messages', [])
+        if not messages:
+            messages = self.default_messages
+        
+        schedules = []
+        for m in messages:
+            match = re.match(r'(.*)\*\s?(\d+)', m)
+            if match:
+                multiply = int(match.group(2))
+                spec = match.group(1).strip()
+            else:
+                multiply = 1
+                spec = m
+            schedule = await self.get_spec_schedule(spec)
+            if schedule:
+                schedule.multiply = multiply
+                schedules.append(schedule)
+        
+        self.log.info(f"共启用 {len(schedules)} 个消息规划.")
+        for s in schedules:
+            for _ in range(s.multiply):
+                self.add(s)
+        
+        if self.timeline:
+            last_valid_p = None
+            while True:
+                self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划.")
+                valid_p = [p for p in self.timeline if not p.skip]
+                if valid_p:
+                    next_valid_p = min(valid_p, key=lambda x: x.at)
+                    if not next_valid_p == last_valid_p:
+                        last_valid_p = next_valid_p
+                        self.log.info(f"下一次发送将在 [blue]{next_valid_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行: {truncate_str(next_valid_p.message, 20)}.")
+                else:
+                    self.log.info(f"下一次发送被跳过.")
+                next_p = min(self.timeline, key=lambda x: x.at)
+                self.log.debug(f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行.")
+                await asyncio.sleep((next_p.at - datetime.now()).seconds)
+                if not next_p.skip:
+                    await self._send(next_p.message)
+                self.timeline.remove(next_p)
+                self.add(next_p.schedule)
+                
 
     async def _send(self, *args, **kw):
         try:
@@ -70,19 +204,10 @@ class Messager:
             else:
                 raise
 
-    async def send(self, messages, possibility=1.0, only=None):
-        if random.random() >= possibility:
-            return self.log.info(f"由于概率设置, 本次发送被跳过.")
-        if only:
-            today = datetime.today()
-            if only.startswith("weekday") and today.weekday() > 4:
-                return self.log.info(f"由于非周末, 本次发送被跳过.")
-            if only.startswith("weekend") and today.weekday() < 5:
-                return self.log.info(f"由于非工作日, 本次发送被跳过.")
+    async def send(self, message):
         async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
-                message = random.choice(messages)
                 self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: [gray50]{message}[/]')
                 try:
                     await tg.send_message(self.chat_name, message)

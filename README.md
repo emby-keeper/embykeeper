@@ -51,6 +51,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
+  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
 - Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
@@ -449,6 +450,35 @@ unique_name = "your_username_for_registeration" # 自动抢注时使用的用户
 
 [monitor.pornemby]
 only_history = true # 仅当问题历史中找到答案时自动回答
+
+[messager.pornemby]
+messages = ['pornemby.yaml'] # 读取外部话术列表用于自动水群
+interval = 1800 # 两次水群之间最小间隔 (s)
+```
+
+用于自动水群的话术列表文件可以通过以下命令生成:
+
+```bash
+embykeeper config.toml -a
+```
+
+其生成的格式为:
+
+```yaml
+# 话术列表, 每行一条
+messages:
+  - Message A
+  - Message B
+  - ...
+
+# 发送概率
+possibility: 1.0
+
+# 发送时间区间限制
+at: ["7:00", "9:00"]
+
+# 发送星期几限制, 可选 weekdays / weekends
+only: weekdays
 ```
 
 ## 消息推送与高级用户

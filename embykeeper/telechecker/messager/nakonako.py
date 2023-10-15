@@ -1,5 +1,4 @@
 from .base import Messager
-from .common import GOOD_DAY_NIGHT, WATERY
 
 __ignore__ = True
 
@@ -7,4 +6,10 @@ __ignore__ = True
 class NakonakoMessager(Messager):
     name = "NakoNako"
     chat_name = "NakoNetwork"
-    messages = [*GOOD_DAY_NIGHT]
+    default_messages = [
+        'watery-wl@v1.yaml * 10',
+        'goodday-wl@v1.yaml',
+        'goodnoon-wl@v1.yaml',
+        'goodeve-wl@v1.yaml',
+        'goodnight-wl@v1.yaml',
+    ]

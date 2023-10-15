@@ -389,7 +389,7 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=10000, output
                 yaml.dump({
                     'messages': [
                         str(t) for t, _ in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
-                    ]
+                    ][:outputs]
                 }, f, default_flow_style=False, encoding='utf-8', allow_unicode=True, Dumper=IndentDumper)
 
 
