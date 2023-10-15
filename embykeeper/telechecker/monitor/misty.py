@@ -10,8 +10,9 @@ from ...data import get_datas
 from ..lock import misty_locks
 from .base import Monitor
 
-misty_monitor_pool = {}
+__ignore__ = True
 
+misty_monitor_pool = {}
 
 class MistyMonitor(Monitor):
     ocr = "digit5-teko@v1"
