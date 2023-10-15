@@ -1,5 +1,4 @@
 import asyncio
-from collections import Counter
 from pathlib import Path
 import random
 from dataclasses import dataclass
@@ -9,7 +8,7 @@ from typing import Iterable, List, Union
 
 import yaml
 from loguru import logger
-from pyrogram.errors import BadRequest
+from pyrogram.errors import RPCError
 from schema import Optional, Schema, SchemaError
 from dateutil import parser
 
@@ -214,7 +213,8 @@ class Messager:
                 self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: [gray50]{message}[/]')
                 try:
                     await tg.send_message(self.chat_name, message)
-                except BadRequest as e:
+                except RPCError as e:
                     self.log.warning(f"发送失败: {e}.")
+                except 
                 except KeyError as e:
                     self.log.warning(f"发送失败, 您可能已被封禁: {e}.")

@@ -1,7 +1,7 @@
 from .base import AnswerBotCheckin
 
 from pyrogram.types import Message
-from pyrogram.errors import BadRequest
+from pyrogram.errors import RPCError
 from thefuzz import fuzz
 
 
@@ -18,7 +18,7 @@ class LJYYCheckin(AnswerBotCheckin):
         if self.message:
             try:
                 await self.message.click()
-            except (BadRequest, TimeoutError):
+            except (RPCError, TimeoutError):
                 pass
         await super().retry()
 
