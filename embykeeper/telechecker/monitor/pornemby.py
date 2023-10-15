@@ -1,8 +1,10 @@
 import asyncio
 import csv
 from datetime import datetime
-from pyrogram.types import Message
 from pathlib import Path
+
+from pyrogram.types import Message
+from pyrogram.errors import RPCError
 
 from ...utils import truncate_str
 from ..link import Link
@@ -17,7 +19,10 @@ class PornembyMonitor:
         chat_keyword = "开 放 注 册"
 
         async def on_trigger(self, message: Message, key, reply):
-            await message.click(0)
+            try:
+                await message.click(0)
+            except RPCError:
+                pass
 
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
