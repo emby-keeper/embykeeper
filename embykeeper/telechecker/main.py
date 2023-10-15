@@ -9,6 +9,7 @@ import random
 from typing import List, Type
 from importlib import import_module
 
+import yaml
 from dateutil import parser
 from pyrogram.enums import ChatType
 from pyrogram.handlers import MessageHandler, EditedMessageHandler
@@ -323,8 +324,11 @@ async def follower(config: dict):
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
+class IndentDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super().increase_indent(flow, False)
 
-async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
+async def analyzer(config: dict, chats, keywords, timerange, limit=10000, outputs=1000):
     """历史消息分析工具入口函数."""
 
     from rich.progress import MofNCompleteColumn, Progress, SpinnerColumn
@@ -353,7 +357,7 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
         start, end = (parser.parse(t).time() for t in timerange)
     async with ClientsSession.from_config(config) as clients:
         async for tg in clients:
-            target = f"{tg.me.name}.msgs"
+            target = f"{tg.me.name}.msgs.yaml"
             logger.info(f'开始分析账号: "{tg.me.name}", 结果将写入"{target}".')
             pcs = list(Progress.get_default_columns())
             pcs.insert(0, SpinnerColumn())
@@ -365,27 +369,28 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=2000):
                 for c in chats:
                     c = c.rsplit("/", 1)[-1]
                     pmsgs = p.add_task("[red]记录: ", total=limit)
+                    m: Message
                     async for m in tg.get_chat_history(c, limit=limit):
                         if m.text:
-                            if (not keywords) or any(s in m.text for s in keywords):
-                                if (not timerange) or time_in_range(start, end, m.date.time()):
-                                    if m.text in texts:
-                                        texts[m.text] += 1
-                                    else:
-                                        texts[m.text] = 1
-                                    updates += 1
-                                    if updates % 200 == 0:
-                                        live.update(render_page(p, texts))
+                            if m.from_user and not m.from_user.is_bot:
+                                if (not keywords) or any(s in m.text for s in keywords):
+                                    if (not timerange) or time_in_range(start, end, m.date.time()):
+                                        if m.text in texts:
+                                            texts[m.text] += 1
+                                        else:
+                                            texts[m.text] = 1
+                                        updates += 1
+                                        if updates % 200 == 0:
+                                            live.update(render_page(p, texts))
                         p.advance(pmsgs)
                     p.update(pmsgs, visible=False)
                     p.advance(pchats)
             with open(target, "w+") as f:
-                f.writelines(
-                    [
-                        f"{t}\t{c}\n"
-                        for t, c in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
+                yaml.dump({
+                    'messages': [
+                        str(t) for t, _ in sorted(texts.items(), key=operator.itemgetter(1), reverse=True)
                     ]
-                )
+                }, f, default_flow_style=False, encoding='utf-8', allow_unicode=True, Dumper=IndentDumper)
 
 
 async def notifier(config: dict):

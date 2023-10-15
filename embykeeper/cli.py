@@ -140,8 +140,9 @@ async def main(
         keywords = keywords.split() if keywords else []
         timerange = typer.prompt(indent + '请输入时间范围 (以"-"分割)', default="", show_default=False)
         timerange = timerange.split("-") if timerange else []
-        limit = typer.prompt(indent + "请输入各群组最大获取数量", default=1000, type=int)
-        return await analyzer(config, chats, keywords, timerange, limit)
+        limit = typer.prompt(indent + "请输入各群组最大获取数量", default=10000, type=int)
+        outputs = typer.prompt(indent + "请输入最大输出数量", default=1000, type=int)
+        return await analyzer(config, chats, keywords, timerange, limit, outputs)
 
     if instant and not debug_cron:
         instants = []
