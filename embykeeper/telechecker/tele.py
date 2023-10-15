@@ -448,7 +448,8 @@ class ClientsSession:
                     )
                     await client.start()
                 except ApiIdPublishedFlood:
-                    await asyncio.sleep(1)
+                    logger.warning(f'登录账号 "{account["phone"]}" 时发生服务端限制, 请等待 20 秒.')
+                    await asyncio.sleep(20)
                 except Unauthorized:
                     await client.storage.delete()
                 except KeyError as e:
