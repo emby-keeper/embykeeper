@@ -39,20 +39,20 @@ async def main(
         help="配置文件 (置空以生成)",
     ),
     checkin: str = typer.Option(
-        Flagged("", "<10:00AM,9:00PM>"),
+        Flagged('', '-'),
         "--checkin",
         "-c",
         rich_help_panel="模块开关",
-        show_default="不指定值时默认为6:00PM",
+        show_default="不指定值时默认为6:00PM-10:00PM之间随机时间",
         help="启用每日指定时间签到",
     ),
     emby: int = typer.Option(
-        Flagged(0, 7),
+        Flagged(0, 10000),
         "--emby",
         "-e",
         rich_help_panel="模块开关",
         help="启用每隔天数Emby自动保活",
-        show_default="不指定值时默认为每7天",
+        show_default="不指定值时默认为每3天",
     ),
     monitor: bool = typer.Option(False, "--monitor", "-m", rich_help_panel="模块开关", help="启用群聊监视"),
     send: bool = typer.Option(False, "--send", "-s", rich_help_panel="模块开关", help="启用自动水群"),
@@ -99,15 +99,25 @@ async def main(
         logger.warning("您当前处于调试模式, 错误将会导致程序停止运行.")
     if debug_cron:
         logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
+        
+    default_time = config.get('time', "<6:00PM,10:00PM>")
+    default_interval = config.get('interval', 3)
+    logger.debug(f'采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.')
 
-    if emby < 0:
-        emby = -emby
-
+    if checkin == '-':
+        checkin = default_time
+        
+    if emby == 10000:
+        emby = default_interval
+    
     if not checkin and not monitor and not emby and not send:
-        checkin = "<5:00PM,8:00PM>"
-        emby = 7
+        checkin = default_time
+        emby = default_interval
         monitor = True
         send = True
+    
+    if emby < 0:
+        emby = -emby
 
     basedir = Path(basedir or user_data_dir(__name__))
     basedir.mkdir(parents=True, exist_ok=True)
@@ -195,4 +205,5 @@ async def main(
 
 
 if __name__ == "__main__":
+    app()
     app()

@@ -26,6 +26,8 @@ def check_config(config):
     PositiveInt = lambda: And(int, lambda n: n > 0)
     schema = Schema(
         {
+            Optional("time"): str,
+            Optional("interval"): PositiveInt(),
             Optional("timeout"): PositiveInt(),
             Optional("retries"): PositiveInt(),
             Optional("concurrent"): PositiveInt(),
@@ -108,7 +110,13 @@ def write_faked_config(path):
     doc.add(comment("Please fill in your account information."))
     doc.add(comment(f"See details: {__url__}#安装与使用"))
     doc.add(nl())
-    doc.add(comment("将关键信息发送到第一个 Telegram 账号, 设为N以发送到第 N 个."))
+    doc.add(comment('每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.'))
+    doc["time"] = "<6:00PM,10:00PM>"
+    doc.add(nl())
+    doc.add(comment('每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.'))
+    doc["interval"] = 3
+    doc.add(nl())
+    doc.add(comment("将关键信息发送到第一个 Telegram 账号, 设为 N 以发送到第 N 个."))
     doc["notifier"] = True
     doc.add(nl())
     doc.add(comment("每个 Telegram Bot 签到的最大尝试时间 (秒)."))
