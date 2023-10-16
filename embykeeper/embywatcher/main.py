@@ -30,10 +30,10 @@ def is_ok(co):
         return True
 
 
-async def get_latest(emby: Emby):
-    """获取最新视频."""
+async def get_media(emby: Emby):
+    """获取最高播放的视频."""
     while True:
-        items = await emby.get_items(["Movie", "Episode"], limit=10, sort="DateCreated", ascending=False)
+        items = await emby.get_items(["Movie", "Episode"], limit=10, sort="PlayCount", ascending=False)
         i: Union[Movie, Episode]
         for i in items:
             yield i
@@ -157,7 +157,7 @@ async def watch(emby, time, progress, logger, retries=5):
     retry = 0
     while True:
         try:
-            async for obj in get_latest(emby):
+            async for obj in get_media(emby):
                 logger.info(f'开始尝试播放 "{obj.name}" ({time} 秒).')
                 while True:
                     try:
