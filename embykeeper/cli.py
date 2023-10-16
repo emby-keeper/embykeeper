@@ -39,7 +39,7 @@ async def main(
         help="配置文件 (置空以生成)",
     ),
     checkin: str = typer.Option(
-        Flagged('', '-'),
+        Flagged("", "-"),
         "--checkin",
         "-c",
         rich_help_panel="模块开关",
@@ -99,23 +99,23 @@ async def main(
         logger.warning("您当前处于调试模式, 错误将会导致程序停止运行.")
     if debug_cron:
         logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
-        
-    default_time = config.get('time', "<6:00PM,10:00PM>")
-    default_interval = config.get('interval', 3)
-    logger.debug(f'采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.')
 
-    if checkin == '-':
+    default_time = config.get("time", "<6:00PM,10:00PM>")
+    default_interval = config.get("interval", 3)
+    logger.debug(f"采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.")
+
+    if checkin == "-":
         checkin = default_time
-        
+
     if emby == 10000:
         emby = default_interval
-    
+
     if not checkin and not monitor and not emby and not send:
         checkin = default_time
         emby = default_interval
         monitor = True
         send = True
-    
+
     if emby < 0:
         emby = -emby
 
