@@ -448,8 +448,9 @@ class ClientsSession:
                     )
                     await client.start()
                 except ApiIdPublishedFlood:
-                    logger.warning(f'登录账号 "{account["phone"]}" 时发生服务端限制, 请等待 20 秒.')
-                    await asyncio.sleep(20)
+                    logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
+                    logger.warning(f'请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.')
+                    break
                 except Unauthorized:
                     await client.storage.delete()
                 except KeyError as e:
