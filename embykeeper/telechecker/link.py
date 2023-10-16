@@ -9,6 +9,7 @@ from loguru import logger
 from pyrogram import filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
+from pyrogram.raw.functions.messages import DeleteHistory
 
 from ..utils import async_partial, truncate_str
 from .tele import Client
@@ -140,6 +141,8 @@ class Link:
 
     async def auth(self, service: str):
         """向机器人发送授权请求."""
+        self.log.debug('清空机器人日志记录.')
+        await self.client.invoke(DeleteHistory(max_id=0, peer=await self.client.resolve_peer(self.bot)))
         results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.capitalize()} 认证")
         return bool(results)
 
