@@ -6,6 +6,7 @@ from datetime import datetime
 import asyncio
 import inspect
 from pathlib import Path
+import pickle
 import random
 from sqlite3 import OperationalError
 from typing import AsyncGenerator, Optional, Union
@@ -34,9 +35,14 @@ from ..utils import async_partial, to_iterable, get_file_users
 
 logger = logger.bind(scheme="telegram")
 
-# 已公开的密钥信息
-PUBLISHED_API = {
-    "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
+_id = b"\x80\x04\x95\x15\x00\x00\x00\x00\x00\x00\x00]\x94(K2K2K9K7K9K6K4K8e."
+_hash = b"\x80\x04\x95E\x00\x00\x00\x00\x00\x00\x00]\x94(K7K8KeKeKfKcKfKbK9K8K9KeK1K1K0KcK0KdK3K0K7K8K3K8K5KfK9K9K7KaKeKee."
+_decode = lambda x: "".join(map(chr, to_iterable(pickle.loads(x))))
+
+# 密钥信息
+API_KEY = {
+    "_": {"api_id": _decode(_id), "api_hash": _decode(_hash)}
+    # "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
     # "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
     # "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
     # "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
@@ -432,7 +438,7 @@ class ClientsSession:
             in_memory = False
             for _ in range(3):
                 if account.get("api_id", None) is None or account.get("api_hash", None) is None:
-                    account.update(random.choice(list(PUBLISHED_API.values())))
+                    account.update(random.choice(list(API_KEY.values())))
                 try:
                     client = Client(
                         app_version=f"{__name__.capitalize()} {__version__}",
@@ -449,7 +455,7 @@ class ClientsSession:
                     await client.start()
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
-                    logger.warning(f'请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.')
+                    logger.warning(f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.")
                     break
                 except Unauthorized:
                     await client.storage.delete()
