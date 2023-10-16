@@ -92,7 +92,7 @@ async def main(
     logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
     logger.debug(f'命令行参数: "{" ".join(sys.argv[1:])}".')
 
-    config: dict = prepare_config(config, public=public)
+    config: dict = await prepare_config(config, public=public)
 
     if debug:
         config["nofail"] = False

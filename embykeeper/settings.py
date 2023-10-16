@@ -1,3 +1,4 @@
+import asyncio
 import os
 from pathlib import Path
 import re
@@ -224,7 +225,7 @@ def decrypt(data: bytes, password: str):
     return data.decode()
 
 
-def interactive_config(config: dict = {}):
+async def interactive_config(config: dict = {}):
     """交互式配置生成器."""
 
     from tomlkit import item
@@ -252,7 +253,7 @@ def interactive_config(config: dict = {}):
         telegrams.append({"phone": phone, "send": False, "monitor": monitor})
     if telegrams:
         logger.info(f"即将尝试登录各账户并存储凭据, 请耐心等待.")
-        telegrams = convert_session(telegrams)
+        telegrams = await convert_session(telegrams)
     embies = config.get("emby", [])
     while True:
         if len(embies) > 0:
@@ -337,7 +338,7 @@ def load_env_config(data: str):
     return config
 
 
-def prepare_config(config_file=None, public=False):
+async def prepare_config(config_file=None, public=False):
     """
     准备配置
     参数:
@@ -360,7 +361,7 @@ def prepare_config(config_file=None, public=False):
                     sys.exit(252)
                 else:
                     logger.info(f"将以 {Path(config_file).name} 为基础生成配置.")
-            config = interactive_config(config)
+            config = await interactive_config(config)
             if not config:
                 sys.exit(250)
         else:
