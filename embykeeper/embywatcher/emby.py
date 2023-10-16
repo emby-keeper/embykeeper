@@ -69,8 +69,8 @@ class Connector(_Connector):
             else:
                 if self.attempt_login and resp.status == 401:
                     raise aiohttp.ClientConnectionError("用户名密码错误")
-            if await self._process_resp(resp):
-                return resp
+                if await self._process_resp(resp):
+                    return resp
             await asyncio.sleep(random.random() * i + 0.2)
         raise aiohttp.ClientConnectionError("无法连接到服务器.")
 
