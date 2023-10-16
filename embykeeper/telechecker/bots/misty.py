@@ -6,6 +6,8 @@ from pyrogram.types import Message
 from ...utils import async_partial
 from ..lock import misty_monitors, misty_locks
 
+__ignore__ = True
+
 
 class MistyCheckin(BotCheckin):
     ocr = "digit5-teko@v1"
