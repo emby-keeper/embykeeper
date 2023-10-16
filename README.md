@@ -88,7 +88,7 @@ Embykeeper 可以通过 `docker` 部署, 您需 [安装 docker](https://yeasy.gi
 docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
 
-命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件, 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考, 若您只需要进行机器人签到或 Emby 模拟观看, 您也可以只填写 `telegram` 部分或 `emby` 部分):
+命令将会在 `embykeeper` 目录下生成[模板](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml) `config.toml` [文件](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml), 您需要配置您的账户信息, 您也可以使用最小配置 (以下敏感信息为生成, 仅做参考, 若您只需要进行机器人签到或 Emby 模拟观看, 您也可以只填写 `telegram` 部分或 `emby` 部分):
 
 ```toml
 [[telegram]]
@@ -239,7 +239,7 @@ pip install embykeeper
 embykeeper
 ```
 
-命令将会在当前目录生成模板 `config.toml` 文件, 您需要配置您的账户信息, 参见 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2).
+命令将会在当前目录生成[模板](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml) `config.toml` [文件](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml), 您需要配置您的账户信息, 参见 [通过 Docker 部署](https://github.com/embykeeper/embykeeper#%E9%80%9A%E8%BF%87-docker-%E9%83%A8%E7%BD%B2).
 
 随后, 您需要再次执行:
 
