@@ -12,7 +12,7 @@ from importlib import import_module
 import yaml
 from dateutil import parser
 from pyrogram.enums import ChatType
-from pyrogram.handlers import MessageHandler, EditedMessageHandler
+from pyrogram.handlers import MessageHandler, EditedMessageHandler, RawUpdateHandler
 from pyrogram.types import Message, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from rich import box
 from rich.live import Live
@@ -323,6 +323,18 @@ async def follower(config: dict):
             tg.add_handler(EditedMessageHandler(func))
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
+
+
+async def dumper(config: dict):
+    async def _dumper(client, update, users, chats):
+        print("=" * 50)
+        print(update)
+
+    async with ClientsSession.from_config(config) as clients:
+        async for tg in clients:
+            tg.add_handler(RawUpdateHandler(_dumper))
+        logger.info(f'开始监控账号: "{tg.me.name}" 中的更新.')
+        await idle()
 
 
 class IndentDumper(yaml.Dumper):

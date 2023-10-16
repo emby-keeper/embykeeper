@@ -78,6 +78,7 @@ async def main(
     simple_log: bool = typer.Option(False, "--simple-log", "-L", help="简化日志输出格式"),
     follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试参数", help="仅启动消息调试"),
     analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试参数", help="仅启动历史信息分析"),
+    dump: bool = typer.Option(False, "--dump", "-D", rich_help_panel="调试参数", help="仅启动原始更新日志"),
     public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
     basedir: Path = typer.Option(None, rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
@@ -131,6 +132,7 @@ async def main(
 
     from .embywatcher.main import watcher, watcher_schedule
     from .telechecker.main import (
+        dumper,
         analyzer,
         checkiner,
         checkiner_schedule,
@@ -139,6 +141,9 @@ async def main(
         monitorer,
         notifier,
     )
+
+    if dump:
+        return await dumper(config)
 
     if follow:
         return await follower(config)
