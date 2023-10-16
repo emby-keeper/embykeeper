@@ -489,7 +489,7 @@ only: weekdays
 
 目前有三种方式成为高级用户:
 
-1. 分享 1 个邀请制 Emby 的邀请码;
+1. 分享 1-2 个邀请制 Emby 的邀请码;
 2. 为本项目提供 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 并被合并;
 3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
 
