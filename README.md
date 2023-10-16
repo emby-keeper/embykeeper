@@ -489,10 +489,10 @@ only: weekdays
 
 目前有四种方式成为高级用户:
 
-1. 在 [Bot](https://t.me/embykeeper_bot)-`/start`-`高级用户`-`分享邀请码` 分享 1-2 个邀请制 Emby 的邀请码;
-2. 在 [Bot](https://t.me/embykeeper_bot)-`/start`-`用户信息`-`新建邀请码` 生成邀请码并邀请 1-2 个用户使用;
+1. 在 [Bot](https://t.me/embykeeper_bot?start=__sharecode) 分享 1-2 个邀请制 Emby 的邀请码;
+2. 在 [Bot](https://t.me/embykeeper_bot?start=__newcode) 生成邀请码并邀请 1-2 个用户使用;
 2. 为本项目提供 [Pull Requests](https://github.com/embykeeper/embykeeper/pulls) 并被合并;
-3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs);
+3. 通过爱发电赞助一个[小包子](https://afdian.net/a/jackzzs), 然后在 [Bot](https://t.me/embykeeper_bot?start=__usecode) 使用获得的高级会员码;
 
 ## 支持 Embykeeper
 
