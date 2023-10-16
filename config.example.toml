@@ -6,7 +6,7 @@
 time = "<6:00PM,10:00PM>"
 
 # 每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.
-interval = 1
+interval = 3
 
 # 将关键信息发送到第一个 Telegram 账号, 设为 N 以发送到第 N 个.
 notifier = true
@@ -29,7 +29,7 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 2.4.4 生成的.
+# 该部分内容是根据 Embykeeper 2.4.6 生成的.
 # [service]
 # checkiner = ["charon", "embyhub", "jms", "judog", "ljyy", "magic", "misty", "peach", "pornemby", "singularity", "sssq", "temby", "terminus"]
 # monitor = ["bgk", "embyhub", "judog", "pornemby", "viper"]
@@ -38,28 +38,28 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8619263504760"
+phone = "+8610224690322"
 send = false # 启用该账号的自动水群功能 (谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8611738015926"
+phone = "+8612949938589"
 send = false # 启用该账号的自动水群功能 (谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://www.smith.com/"
-username = "joehernandez"
-password = "05BUciz5%K"
+url = "https://www.travis-thompson.net/"
+username = "laurenvazquez"
+password = "+1N&(vWjta"
 time = 10 # 模拟观看的时长 (秒)
 progress = 1000 # 模拟观看后设置的时间进度 (秒)
 
 [[emby]]
-url = "https://hall-allen.com/"
-username = "lbrewer"
-password = "nM!9m8Hgb)"
+url = "https://www.kemp.com/"
+username = "jeffreyrobinson"
+password = "%BZreYSaH5"
 time = 10 # 模拟观看的时长 (秒)
 progress = 1000 # 模拟观看后设置的时间进度 (秒)
 
@@ -70,5 +70,5 @@ unique_name = "your_username_for_registeration" # 自动抢注时使用的用户
 only_history = true # 仅当问题历史中找到答案时自动回答
 
 [messager.pornemby]
-messages = ["pornemby-common-wl@v1.yaml * 200"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
+messages = ["pornemby-common-wl@v1.yaml * 100"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
 interval = 1800 # 两次水群之间最小间隔 (s)
