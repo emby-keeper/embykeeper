@@ -1,5 +1,6 @@
 # Configs and outputs
 *.toml
+!/config.example.toml
 !/pyproject.toml
 *.session
 *.session-journal

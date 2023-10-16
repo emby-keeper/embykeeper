@@ -1,0 +1,74 @@
+# This is an example config file.
+# Please fill in your account information.
+# See details: https://github.com/embykeeper/embykeeper#安装与使用
+
+# 每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.
+time = "<6:00PM,10:00PM>"
+
+# 每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.
+interval = 1
+
+# 将关键信息发送到第一个 Telegram 账号, 设为 N 以发送到第 N 个.
+notifier = true
+
+# 每个 Telegram Bot 签到的最大尝试时间 (秒).
+timeout = 120
+
+# 每个 Telegram Bot 签到的最大尝试次数.
+retries = 4
+
+# 最大可同时进行的 Telegram Bot 签到.
+concurrent = 1
+
+# 计划任务时, 各站点之间签到的随机时间差异 (分钟).
+random = 15
+
+# 代理设置, Emby 和 Telegram 均将通过此代理连接, 服务器位于国内时请配置代理并取消注释.
+# hostname = "127.0.0.1"
+# port = 1080
+# scheme = "socks5" # 可选: http / socks5
+
+# 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
+# 该部分内容是根据 Embykeeper 2.4.4 生成的.
+# [service]
+# checkiner = ["charon", "embyhub", "jms", "judog", "ljyy", "magic", "misty", "peach", "pornemby", "singularity", "sssq", "temby", "terminus"]
+# monitor = ["bgk", "embyhub", "judog", "pornemby", "viper"]
+# messager = []
+
+# Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
+
+[[telegram]]
+phone = "+8619263504760"
+send = false # 启用该账号的自动水群功能 (谨慎使用)
+monitor = false # 启用该账号的自动监控功能 (需要高级账号)
+
+[[telegram]]
+phone = "+8611738015926"
+send = false # 启用该账号的自动水群功能 (谨慎使用)
+monitor = false # 启用该账号的自动监控功能 (需要高级账号)
+
+# Emby 账号设置, 您可以重复该片段多次以增加多个账号.
+
+[[emby]]
+url = "https://www.smith.com/"
+username = "joehernandez"
+password = "05BUciz5%K"
+time = 10 # 模拟观看的时长 (秒)
+progress = 1000 # 模拟观看后设置的时间进度 (秒)
+
+[[emby]]
+url = "https://hall-allen.com/"
+username = "lbrewer"
+password = "nM!9m8Hgb)"
+time = 10 # 模拟观看的时长 (秒)
+progress = 1000 # 模拟观看后设置的时间进度 (秒)
+
+[monitor.bgk] # 支持 bgk, embyhub, polo
+unique_name = "your_username_for_registeration" # 自动抢注时使用的用户名
+
+[monitor.pornemby]
+only_history = true # 仅当问题历史中找到答案时自动回答
+
+[messager.pornemby]
+messages = ["pornemby-common-wl@v1.yaml * 200"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
+interval = 1800 # 两次水群之间最小间隔 (s)
