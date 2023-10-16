@@ -51,7 +51,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
-  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
+  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
 - Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
@@ -452,7 +452,7 @@ unique_name = "your_username_for_registeration" # 自动抢注时使用的用户
 only_history = true # 仅当问题历史中找到答案时自动回答
 
 [messager.pornemby]
-messages = ['pornemby.yaml'] # 读取外部话术列表用于自动水群
+messages = ["pornemby-common-wl@v1.yaml * 100"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
 interval = 1800 # 两次水群之间最小间隔 (s)
 ```
 
