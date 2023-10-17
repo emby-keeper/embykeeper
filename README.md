@@ -55,12 +55,16 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
 - Telegram 自动监控信息 (需要[超级用户](https://t.me/embykeeper_bot?start=__prime))
-  - Pornemby 科举考试: [活动频道](https://t.me/PornembyFun) (由于需要使用 OpenAI API 进行回答, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 回答准确率一般请谨慎使用)
+  - Pornemby:
+    - 科举考试: [活动频道](https://t.me/PornembyFun) (由于需要使用 OpenAI API 进行回答, 需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 回答准确率一般请谨慎使用)
+    - 自动抢注: [群组](https://t.me/Pornemby)
+    - 自动抢红包雨: [群组](https://t.me/Pornemby)
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
   - Viper 抢邀请码: [频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)
   - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - 剧狗 开注自动注册: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)
   - 默认禁用:
+    - ~~全局自动从众: 当在任何群组中发现 5 分钟内 5 条一样内容的消息, 会自动跟一句~~ (影响范围大默认禁用)
     - ~~Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~ (公益服关闭)
     - ~~Misty 开注自动注册: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~ (无响应)
 
@@ -409,7 +413,7 @@ $ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 | 卷毛鼠      | `jms`      |  | 卡戎        | `charon`      |
 | Temby      | `temby`    |  | 剧狗        | `judog`       |
 | 魔法 emby  | `magic`    |  | Misty        | `misty`       |
-| 纸片  | `zhipian`    |
+| 纸片  | `zhipian`    |   |全局从众    | `follow` |
 
 `proxy` 设置可以为:
 
