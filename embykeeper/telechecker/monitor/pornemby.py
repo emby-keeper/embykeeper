@@ -3,19 +3,35 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup
 from pyrogram.errors import RPCError
 
-from ...utils import truncate_str
+from ...utils import truncate_str, flatten
 from ..link import Link
 
 from .base import Monitor
 
 
 class PornembyMonitor:
+    class PornembyDragonRainMonitor(Monitor):
+        name = "Pornemby 红包雨"
+        chat_user = "PronembyTGBot2_bot"
+
+        async def on_trigger(self, message: Message, key, reply):
+            if message.reply_markup:
+                if isinstance(message.reply_markup, InlineKeyboardMarkup):
+                    buttons = flatten(message.reply_markup.inline_keyboard)
+                    for b in buttons:
+                        if "红包奖励" in b.text:
+                            try:
+                                return await message.click(0)
+                            except RPCError:
+                                pass
+
     class PornembyRegisterMonitor(Monitor):
         name = "Pornemby 抢注"
         chat_name = "Pornemby"
+        chat_user = "PornembyTGBot_bot"
         chat_keyword = "开 放 注 册"
 
         async def on_trigger(self, message: Message, key, reply):
