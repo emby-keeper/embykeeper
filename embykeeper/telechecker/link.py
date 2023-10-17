@@ -139,10 +139,12 @@ class Link:
             finally:
                 message.continue_propagation()
 
-    async def auth(self, service: str):
-        """向机器人发送授权请求."""
+    async def delete_history(self):
         self.log.debug("清空机器人日志记录.")
         await self.client.invoke(DeleteHistory(max_id=0, peer=await self.client.resolve_peer(self.bot)))
+
+    async def auth(self, service: str):
+        """向机器人发送授权请求."""
         results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.capitalize()} 认证")
         return bool(results)
 
