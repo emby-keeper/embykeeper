@@ -8,7 +8,7 @@ import aiohttp
 import aiofiles
 from aiohttp_socks import ProxyConnector, ProxyType
 
-from .utils import to_iterable, humanbytes
+from .utils import show_exception, to_iterable, humanbytes
 
 logger = logger.bind(scheme="datamanager")
 
@@ -83,12 +83,13 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                                     break
                         except aiohttp.ClientConnectorError as e:
                             (basedir / name).unlink(missing_ok=True)
-                            logger.warning(f"下载失败: {name}, 将在 3 秒后重试.")
+                            logger.warning(f"下载失败: {name}, 将在 3 秒后重试 ({e})")
                             await asyncio.sleep(3)
                             continue
                         except Exception as e:
                             (basedir / name).unlink(missing_ok=True)
                             logger.warning(f"下载失败: {name} ({e})")
+                            show_exception(e)
                             yield None
                             break
                 else:

@@ -15,7 +15,7 @@ from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message, User
 
-from ...utils import to_iterable, truncate_str, AsyncCountPool
+from ...utils import show_exception, to_iterable, truncate_str, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
@@ -169,7 +169,8 @@ class Monitor:
             raise
         except Exception as e:
             if self.nofail:
-                self.log.opt(exception=e).warning(f"初始化错误:")
+                self.log.warning(f"发生初始化错误, 监控停止.")
+                show_exception(e, regular=False)
                 return False
             else:
                 raise
@@ -186,11 +187,16 @@ class Monitor:
                     self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
                     return False
                 except KeyError as e:
-                    self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
+                    self.log.info(f"初始化错误: 无法访问, 您可能已被封禁.")
+                    show_exception(e)
                     return False
                 except FloodWait as e:
                     self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                    await asyncio.sleep(e.value)
+                    if e.value < 360:
+                        await asyncio.sleep(e.value)
+                    else:
+                        self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 监控器将停止.")
+                        return False
                 else:
                     break
         self.chat_name = chat_ids
@@ -266,7 +272,8 @@ class Monitor:
         except Exception as e:
             self.failed.set()
             if self.nofail:
-                self.log.opt(exception=e).warning(f"发生错误:")
+                self.log.warning(f"发生错误, 监控器将停止.")
+                show_exception(e, regular=False)
             else:
                 raise
         finally:

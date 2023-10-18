@@ -44,8 +44,10 @@ class FollowMonitor(Monitor):
                 if self.cache[ident] == self.chat_follow_user:
                     try:
                         chat_id, text = ident
-                        return await self.client.send_message(chat_id, text)
+                        await self.client.send_message(chat_id, text)
                     except RPCError as e:
                         self.log.warning(f"发送从众信息到群组 {message.chat.title} 失败: {e}.")
+                    else:
+                        self.log.info(f"已发送从众信息到群组 {message.chat.title}.")
             else:
                 self.cache[ident] = 1

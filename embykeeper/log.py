@@ -2,8 +2,9 @@ from logging import Formatter
 import asyncio
 
 from loguru import logger
-from rich.logging import Console, RichHandler
+from rich.logging import RichHandler
 
+from . import var
 from .utils import to_iterable
 
 scheme_names = {
@@ -47,7 +48,7 @@ def initialize(level="INFO", **kw):
     """初始化日志配置."""
     logger.remove()
     handler = RichHandler(
-        console=Console(stderr=True), markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio], **kw
+        console=var.console, markup=True, rich_tracebacks=True, tracebacks_suppress=[asyncio], **kw
     )
     handler.setFormatter(Formatter(None, "[%m/%d %H:%M]"))
     logger.add(handler, format=formatter, level=level, colorize=False)

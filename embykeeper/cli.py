@@ -8,12 +8,12 @@ import asyncio
 from appdirs import user_data_dir
 from dateutil import parser
 
-from . import __author__, __name__, __url__, __version__
-from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool
+from . import var, __author__, __name__, __url__, __version__
+from .utils import Flagged, FlagValueCommand, AsyncTyper, AsyncTaskPool, show_exception
 from .settings import prepare_config
 
 app = AsyncTyper(
-    pretty_exceptions_show_locals=False,
+    pretty_exceptions_enable=False,
     rich_markup_mode="rich",
     add_completion=False,
     context_settings={"help_option_names": ["-h", "--help"]},
@@ -69,8 +69,15 @@ async def main(
         True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
     ),
     once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
-    debug: bool = typer.Option(
-        False, "--debug", "-d", envvar="EK_DEBUG", show_envvar=False, rich_help_panel="调试参数", help="开启调试模式"
+    verbosity: int = typer.Option(
+        False,
+        "--debug",
+        "-d",
+        count=True,
+        envvar="EK_DEBUG",
+        show_envvar=False,
+        rich_help_panel="调试参数",
+        help="开启调试模式",
     ),
     debug_cron: bool = typer.Option(
         False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
@@ -84,9 +91,12 @@ async def main(
 ):
     from .log import logger, initialize
 
-    initialize(
-        level="DEBUG" if debug else "INFO", show_path=debug and (not simple_log), show_time=not simple_log
-    )
+    var.debug = verbosity
+    if verbosity >= 1:
+        level = "DEBUG"
+    else:
+        level = "INFO"
+    initialize(level=level, show_path=verbosity and (not simple_log), show_time=not simple_log)
 
     msg = " 您可以通过 Ctrl+C 以结束运行." if not public else ""
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等.{msg}")
@@ -95,9 +105,13 @@ async def main(
 
     config: dict = await prepare_config(config, public=public)
 
-    if debug:
+    if verbosity:
+        logger.warning(f"您当前处于调试模式: 日志等级 {verbosity}.")
+        app.pretty_exceptions_enable = True
+    if verbosity >= 2:
         config["nofail"] = False
-        logger.warning("您当前处于调试模式, 错误将会导致程序停止运行.")
+    if not config.get("nofail", True):
+        logger.warning(f"您当前处于调试模式: 错误将会导致程序停止运行.")
     if debug_cron:
         logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
 
@@ -203,12 +217,11 @@ async def main(
             try:
                 await t
             except Exception as e:
-                if debug:
+                logger.error("出现错误, 模块可能停止运行.")
+                show_exception(e, regular=False)
+                if not config.get("nofail", True):
                     raise
-                else:
-                    logger.opt(exception=e).error("出现错误, 模块可能停止运行:")
 
 
 if __name__ == "__main__":
-    app()
     app()

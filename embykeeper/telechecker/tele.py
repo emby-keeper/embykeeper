@@ -31,7 +31,7 @@ from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
 from .. import __name__, __version__
-from ..utils import async_partial, to_iterable, get_file_users
+from ..utils import async_partial, format_exception, show_exception, to_iterable, get_file_users
 
 logger = logger.bind(scheme="telegram")
 
@@ -128,7 +128,7 @@ class Dispatcher(dispatcher.Dispatcher):
                                 if await handler.check(self.client, parsed_update):
                                     args = (parsed_update,)
                             except Exception as e:
-                                logger.warning(f"Telegram Error: {e}")
+                                logger.warning(f"Telegram 错误: {e}")
                                 continue
 
                         elif isinstance(handler, RawUpdateHandler):
@@ -149,12 +149,14 @@ class Dispatcher(dispatcher.Dispatcher):
                         except pyrogram.ContinuePropagation:
                             continue
                         except Exception as e:
-                            logger.opt(exception=e).error("更新回调函数内发生错误:")
+                            logger.error(f"更新回调函数内发生错误.")
+                            show_exception(e, regular=False)
                         break
             except pyrogram.StopPropagation:
                 pass
             except Exception as e:
-                logger.opt(exception=e).error("更新控制器错误:")
+                logger.error("更新控制器错误.")
+                show_exception(e, regular=False)
 
 
 class Client(pyrogram.Client):
@@ -461,6 +463,7 @@ class ClientsSession:
                     await client.storage.delete()
                 except KeyError as e:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
+                    show_exception(e)
                     await asyncio.sleep(3)
                 except OperationalError as e:
                     if "database is locked" in str(e):
@@ -474,6 +477,7 @@ class ClientsSession:
                         in_memory = True
                     else:
                         logger.warning(f'登录账号 "{account["phone"]}" 时发生数据库异常, 将被跳过.')
+                        show_exception(e, regular=False)
                         break
                 else:
                     break
@@ -484,7 +488,8 @@ class ClientsSession:
         except RPCError as e:
             logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
         except Exception as e:
-            logger.opt(exception=e).error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过:')
+            logger.error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过.')
+            show_exception(e, regular=False)
         else:
             logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client

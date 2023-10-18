@@ -12,7 +12,7 @@ from pyrogram.errors import RPCError
 from schema import Optional, Schema, SchemaError
 from dateutil import parser
 
-from ...utils import random_time, time_in_range, truncate_str
+from ...utils import random_time, show_exception, time_in_range, truncate_str
 from ...data import get_data
 from ..tele import ClientsSession
 
@@ -145,6 +145,7 @@ class Messager:
             return self.parse_message_yaml(file)
         except (OSError, yaml.YAMLError, SchemaError) as e:
             self.log.warning(f'话术文件 "{spec}" 错误, 将被跳过: {e}')
+            show_exception(e)
             return None
 
     async def start(self):
@@ -198,11 +199,13 @@ class Messager:
             return await self.send(*args, **kw)
         except OSError as e:
             self.log.info(f'出现错误: "{e}", 忽略.')
+            show_exception(e)
         except asyncio.CancelledError:
             raise
         except Exception as e:
             if self.nofail:
-                self.log.opt(exception=e).warning(f"发生错误:")
+                self.log.warning(f"发生错误, 自动水群将停止.")
+                show_exception(e, regular=False)
             else:
                 raise
 
@@ -216,4 +219,5 @@ class Messager:
                 except RPCError as e:
                     self.log.warning(f"发送失败: {e}.")
                 except KeyError as e:
-                    self.log.warning(f"发送失败, 您可能已被封禁: {e}.")
+                    self.log.warning(f"发送失败, 您可能已被封禁.")
+                    show_exception(e)

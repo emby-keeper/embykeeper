@@ -2,8 +2,11 @@ import asyncio
 from collections import namedtuple
 from datetime import date, datetime, time, timedelta
 from functools import wraps
+from pathlib import Path
 import random
 import sys
+import site
+import traceback
 from typing import Any, Coroutine, Iterable, Union
 
 import psutil
@@ -12,15 +15,70 @@ from loguru import logger
 from typer import Typer
 from typer.core import TyperCommand
 
-from . import __url__, __name__
+from . import var, __url__, __name__
 
 Flagged = namedtuple("Flagged", ("noflag", "flag"))
 
 
-def fail_message(e):
-    logger.opt(exception=e).critical(
-        f"发生关键错误, {__name__.capitalize()} 将退出, 请在 '{__url__}/issues/new' 提供反馈以帮助作者修复该问题:"
-    )
+def get_path_frame(e, path):
+    try:
+        tb = traceback.extract_tb(e.__traceback__)
+        for frame in reversed(tb):
+            if Path(path) in Path(frame.filename).parents:
+                return frame
+        else:
+            return None
+    except AttributeError:
+        return None
+
+
+def get_last_frame(e):
+    try:
+        tb = traceback.extract_tb(e.__traceback__)
+        for frame in reversed(tb):
+            return frame
+    except AttributeError:
+        return None
+
+
+def get_cls_fullpath(c):
+    module = c.__module__
+    if module == "builtins":
+        return c.__qualname__
+    return module + "." + c.__qualname__
+
+
+def format_exception(e, regular=True):
+    if regular:
+        prompt = "请在 Github 或交流群反馈下方错误详情以帮助开发者修复该问题:\n"
+    else:
+        prompt = ""
+    proj_path = Path(__file__).parent.absolute()
+    proj_frame = get_path_frame(e, proj_path)
+    if proj_frame:
+        proj_frame_path = Path(proj_frame.filename).relative_to(proj_path)
+        prompt += f"\n  P {proj_frame_path}, L {proj_frame.lineno}, F {proj_frame.name}:"
+        prompt += f"\n    {proj_frame.line.strip()}"
+    last_frame = get_last_frame(e)
+    if last_frame:
+        last_frame_path = last_frame.filename
+        for p in site.getsitepackages():
+            if Path(p) in Path(last_frame.filename).parents:
+                last_frame_path = "<SP>/" + str(Path(last_frame.filename).relative_to(p))
+                break
+        prompt += f"\n  S {last_frame_path}, L {last_frame.lineno}, F {last_frame.name}:"
+        prompt += f"\n    {last_frame.line.strip()}"
+    prompt += f"\n    E {get_cls_fullpath(type(e))}: {e}\n"
+    return prompt
+
+
+def show_exception(e, regular=True):
+    if (regular and 1 < var.debug < 2) or (not regular and var.debug < 2):
+        var.console.rule()
+        print(f"\n{format_exception(e, regular=regular)}", flush=True)
+        var.console.rule()
+    else:
+        logger.opt(exception=e).debug("错误详情:")
 
 
 class AsyncTyper(Typer):
@@ -37,7 +95,8 @@ class AsyncTyper(Typer):
                     logger.info(f"所有客户端已停止, 欢迎您再次使用 {__name__.capitalize()}.")
                 except Exception as e:
                     print("\r", end="", flush=True)
-                    fail_message(e)
+                    logger.critical(f"发生关键错误, {__name__.capitalize()} 将退出.")
+                    show_exception(e, regular=False)
                     sys.exit(1)
                 else:
                     logger.info(f"所有任务已完成, 欢迎您再次使用 {__name__.capitalize()}.")
@@ -251,4 +310,5 @@ def get_file_users(path):
         except psutil.NoSuchProcess:
             pass
     else:
+        return None
         return None

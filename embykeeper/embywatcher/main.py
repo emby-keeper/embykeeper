@@ -8,7 +8,7 @@ from aiohttp import ClientError, ClientConnectionError
 from loguru import logger
 from embypy.objects import Episode, Movie
 
-from ..utils import next_random_datetime
+from ..utils import show_exception, next_random_datetime
 from .emby import Emby, Connector, EmbyObject
 
 logger = logger.bind(scheme="embywatcher")
@@ -208,7 +208,8 @@ async def watch(emby, time, progress, logger, retries=5):
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            logger.opt(exception=e).warning("发生错误:")
+            logger.warning(f"发生错误, 保活失败.")
+            show_exception(e, regular=False)
             return False
 
 

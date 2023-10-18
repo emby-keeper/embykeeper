@@ -19,7 +19,7 @@ from thefuzz import fuzz
 from aiocache import cached
 
 from ...data import get_datas
-from ...utils import to_iterable, AsyncCountPool
+from ...utils import show_exception, to_iterable, AsyncCountPool
 from ..tele import Client
 
 __ignore__ = True
@@ -77,7 +77,8 @@ class BaseBotCheckin(ABC):
             raise
         except Exception as e:
             if self.nofail:
-                self.log.opt(exception=e).warning(f"初始化错误:")
+                self.log.warning(f"初始化错误, 签到器将停止.")
+                show_exception(e, regular=False)
                 return False
             else:
                 raise
@@ -174,10 +175,15 @@ class BotCheckin(BaseBotCheckin):
                 return False
             except KeyError as e:
                 self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
+                show_exception(e)
                 return False
             except FloodWait as e:
                 self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                await asyncio.sleep(e.value)
+                if e.value < 360:
+                    await asyncio.sleep(e.value)
+                else:
+                    self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 签到器将停止.")
+                    return False
             else:
                 break
         async for d in self.client.get_dialogs(folder_id=1):
@@ -234,7 +240,8 @@ class BotCheckin(BaseBotCheckin):
                                 except asyncio.TimeoutError:
                                     self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
             except OSError as e:
-                self.log.warning(f'初始化错误: "{e}".')
+                self.log.warning(f'初始化错误: "{e}", 签到器将停止.')
+                show_exception(e)
                 return False
             except asyncio.TimeoutError:
                 pass
@@ -258,11 +265,16 @@ class BotCheckin(BaseBotCheckin):
 
     async def walk_history(self, limit=0):
         """处理 limit 条历史消息, 并检测是否有验证码."""
-        async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
-            if MessageType.CAPTCHA in self.message_type(m):
-                await self.on_photo(m)
-                return True
-        return False
+        try:
+            async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
+                if MessageType.CAPTCHA in self.message_type(m):
+                    await self.on_photo(m)
+                    return True
+            return False
+        except Exception as e:
+            self.log.warning("读取历史消息失败, 将不再读取历史消息.")
+            show_exception(e)
+            return False
 
     async def send(self, cmd):
         """向机器人发送命令."""
@@ -297,7 +309,8 @@ class BotCheckin(BaseBotCheckin):
                 await self.fail()
                 raise
             else:
-                self.log.opt(exception=e).warning(f"发生错误:")
+                self.log.warning(f"发生错误, 签到器将停止.")
+                show_exception(e, regular=False)
                 await self.fail()
                 message.continue_propagation()
         else:
@@ -457,7 +470,9 @@ class AnswerBotCheckin(BotCheckin):
             await self.on_photo(captcha)
             return True
         except Exception as e:
-            print(e)
+            self.log.warning("读取历史消息失败, 将不再读取历史消息.")
+            show_exception(e)
+            return False
 
     def get_keys(self, message: Message):
         """获得所有按钮信息."""
