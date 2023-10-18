@@ -6,6 +6,7 @@ import logging
 import operator
 import pkgutil
 import random
+import sys
 from typing import List, Type
 from importlib import import_module
 
@@ -327,8 +328,8 @@ async def follower(config: dict):
 
 async def dumper(config: dict):
     async def _dumper(client, update, users, chats):
-        print("=" * 50)
-        print(update)
+        print("=" * 50, flush=True, file=sys.stderr)
+        print(update, flush=True, file=sys.stderr)
 
     async with ClientsSession.from_config(config) as clients:
         async for tg in clients:

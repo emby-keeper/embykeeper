@@ -9,6 +9,7 @@ from pathlib import Path
 import pickle
 import random
 from sqlite3 import OperationalError
+import sys
 from typing import AsyncGenerator, Optional, Union
 
 from rich.prompt import Prompt
@@ -401,7 +402,7 @@ class ClientsSession:
 
     @classmethod
     async def shutdown(cls):
-        print("\r正在停止...\r", end="", flush=True)
+        print("\r正在停止...\r", end="", flush=True, file=sys.stderr)
         for v in cls.pool.values():
             if isinstance(v, asyncio.Task):
                 v.cancel()
@@ -415,7 +416,7 @@ class ClientsSession:
                         pass
         while len(asyncio.all_tasks()) > 1:
             await asyncio.sleep(0.1)
-        print(f"Telegram 账号池停止.\r", end="")
+        print(f"Telegram 账号池停止.\r", end="", file=sys.stderr)
         for v in cls.pool.values():
             if isinstance(v, tuple):
                 client: Client = v[0]
@@ -460,7 +461,10 @@ class ClientsSession:
                     logger.warning(f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.")
                     break
                 except Unauthorized:
-                    await client.storage.delete()
+                    try:
+                        await client.storage.delete()
+                    except:
+                        pass
                 except KeyError as e:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     show_exception(e)
@@ -476,7 +480,7 @@ class ClientsSession:
                         logger.warning(f'{spec}正在使用账号 "{account["phone"]}", 本次登录将不会存储.')
                         in_memory = True
                     else:
-                        logger.warning(f'登录账号 "{account["phone"]}" 时发生数据库异常, 将被跳过.')
+                        logger.warning(f'登录账号 "{account["phone"]}" 时发生数据库异常, 将被跳过: {e}.')
                         show_exception(e, regular=False)
                         break
                 else:

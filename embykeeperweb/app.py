@@ -4,6 +4,7 @@ import select
 import fcntl
 import struct
 import subprocess
+import sys
 import termios
 import threading
 import time

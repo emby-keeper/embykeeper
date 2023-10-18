@@ -50,7 +50,7 @@ def get_cls_fullpath(c):
 
 def format_exception(e, regular=True):
     if regular:
-        prompt = "请在 Github 或交流群反馈下方错误详情以帮助开发者修复该问题:\n"
+        prompt = "\n请在 Github 或交流群反馈下方错误详情以帮助开发者修复该问题:\n"
     else:
         prompt = ""
     proj_path = Path(__file__).parent.absolute()
@@ -75,7 +75,7 @@ def format_exception(e, regular=True):
 def show_exception(e, regular=True):
     if (regular and 1 < var.debug < 2) or (not regular and var.debug < 2):
         var.console.rule()
-        print(f"\n{format_exception(e, regular=regular)}", flush=True)
+        print(format_exception(e, regular=regular), flush=True, file=sys.stderr)
         var.console.rule()
     else:
         logger.opt(exception=e).debug("错误详情:")
