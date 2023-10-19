@@ -5,6 +5,7 @@ import re
 import sys
 import base64
 import hashlib
+import readline
 
 from loguru import logger
 import tomli as tomllib

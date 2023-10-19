@@ -11,6 +11,7 @@ import random
 from sqlite3 import OperationalError
 import sys
 from typing import AsyncGenerator, Optional, Union
+import readline
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
