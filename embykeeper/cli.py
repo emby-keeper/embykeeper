@@ -106,14 +106,15 @@ async def main(
     if verbosity:
         logger.warning(f"您当前处于调试模式: 日志等级 {verbosity}.")
         app.pretty_exceptions_enable = True
+
+    config: dict = await prepare_config(config, public=public)
+    
     if verbosity >= 2:
         config["nofail"] = False
     if not config.get("nofail", True):
         logger.warning(f"您当前处于调试模式: 错误将会导致程序停止运行.")
     if debug_cron:
         logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
-
-    config: dict = await prepare_config(config, public=public)
 
     default_time = config.get("time", "<6:00PM,10:00PM>")
     default_interval = config.get("interval", 3)
