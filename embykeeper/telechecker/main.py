@@ -49,14 +49,14 @@ def get_spec(type: str):
 
 
 @lru_cache
-def get_names(type: str) -> List[str]:
+def get_names(type: str, allow_ignore=False) -> List[str]:
     """列出服务中所有可用站点."""
     sub, _ = get_spec(type)
     results = []
     typemodule = import_module(f"{__name__}.{sub}")
     for _, mn, _ in pkgutil.iter_modules(typemodule.__path__):
         module = import_module(f"{__name__}.{sub}.{mn}")
-        if not getattr(module, "__ignore__", False):
+        if allow_ignore or (not getattr(module, "__ignore__", False)):
             results.append(mn)
     return results
 

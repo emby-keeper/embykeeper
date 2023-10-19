@@ -108,9 +108,9 @@ def write_faked_config(path):
     fake.add_provider(profile)
 
     doc = document()
-    doc.add(comment("This is an example config file."))
-    doc.add(comment("Please fill in your account information."))
-    doc.add(comment(f"See details: {__url__}#安装与使用"))
+    doc.add(comment("这是一个配置文件范例."))
+    doc.add(comment("所有账户信息为生成, 请填写您的账户信息."))
+    doc.add(comment(f"查看帮助与详情: {__url__}#安装与使用"))
     doc.add(nl())
     doc.add(comment('每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.'))
     doc["time"] = "<6:00PM,10:00PM>"
@@ -147,6 +147,7 @@ def write_faked_config(path):
     doc.add(nl())
     doc.add(comment(f"服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改."))
     doc.add(comment(f"该部分内容是根据 {__name__.capitalize()} {__version__} 生成的."))
+    doc.add(nl())
     service = item(
         {
             "service": {
@@ -156,7 +157,21 @@ def write_faked_config(path):
             }
         }
     )
+    doc.add(comment(f"默认启用站点:"))
     for line in service.as_string().strip().split("\n"):
+        doc.add(comment(line))
+    doc.add(nl())
+    service_all = item(
+        {
+            "service": {
+                "checkiner": get_names("checkiner", allow_ignore=True),
+                "monitor": get_names("monitor", allow_ignore=True),
+                "messager": get_names("messager", allow_ignore=True),
+            }
+        }
+    )
+    doc.add(comment(f"全部可用站点:"))
+    for line in service_all.as_string().strip().split("\n"):
         doc.add(comment(line))
     doc.add(nl())
     doc.add(comment("Telegram 账号设置, 您可以重复该片段多次以增加多个账号."))
