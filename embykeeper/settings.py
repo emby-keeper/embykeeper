@@ -19,7 +19,8 @@ async def convert_session(accounts):
     for a in accounts:
         async with ClientsSession.from_config({"telegram": [a]}, in_memory=True) as clients:
             async for tg in clients:
-                results.append({**a, "session": tg.session_string})
+                session_string = await tg.export_session_string()
+                results.append({**a, "session": session_string})
     return results
 
 
