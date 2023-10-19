@@ -84,7 +84,7 @@ async def play(obj: EmbyObject, time=10, progress=1000):
         raise PlayError("视频长度低于观看进度所需")
     # 获取播放源
     resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
-    if not resp["MediaSources"]:
+    if not resp.get("MediaSources", None):
         raise PlayError("无视频源")
     else:
         play_session_id = resp["PlaySessionId"]
