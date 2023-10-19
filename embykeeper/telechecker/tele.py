@@ -356,7 +356,12 @@ class ClientsSession:
         accounts = config.get("telegram", [])
         for k, v in kw.items():
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
-        return cls(accounts=accounts, proxy=config.get("proxy", None), basedir=config.get("basedir", None), in_memory=in_memory)
+        return cls(
+            accounts=accounts,
+            proxy=config.get("proxy", None),
+            basedir=config.get("basedir", None),
+            in_memory=in_memory,
+        )
 
     @classmethod
     async def watchdog(cls, timeout=120):

@@ -108,7 +108,7 @@ async def main(
         app.pretty_exceptions_enable = True
 
     config: dict = await prepare_config(config, public=public)
-    
+
     if verbosity >= 2:
         config["nofail"] = False
     if not config.get("nofail", True):
