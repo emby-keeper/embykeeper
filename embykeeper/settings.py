@@ -259,13 +259,14 @@ async def interactive_config(config: dict = {}):
             logger.info(
                 f'您当前填写了 {len(telegrams)} 个 Telegram 账号信息: {", ".join([t["phone"] for t in telegrams])}'
             )
-            more = Confirm.ask(pad + "是否继续添加?", default=False)
+            more = Confirm.ask(pad + "是否继续添加?", default=False, console=console)
         else:
-            more = Confirm.ask(pad + "是否添加 Telegram 账号?", default=True)
+            more = Confirm.ask(pad + "是否添加 Telegram 账号?", default=True, console=console)
         if not more:
             break
         phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]", console=console)
-        monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False)
+        monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False, console=console)
+        monitor = Confirm.ask(pad + "是否开启该账号的自动水群功能? (需要高级账号)", default=False, console=console)
         telegrams.append({"phone": phone, "send": False, "monitor": monitor})
     if telegrams:
         logger.info(f"即将尝试登录各账户并存储凭据, 请耐心等待.")
@@ -274,9 +275,9 @@ async def interactive_config(config: dict = {}):
     while True:
         if len(embies) > 0:
             logger.info(f"您当前填写了 {len(embies)} 个 Emby 账号信息.")
-            more = Confirm.ask(pad + "是否继续添加?", default=False)
+            more = Confirm.ask(pad + "是否继续添加?", default=False, console=console)
         else:
-            more = Confirm.ask(pad + "是否添加 Emby 账号?", default=True)
+            more = Confirm.ask(pad + "是否添加 Emby 账号?", default=True, console=console)
         if not more:
             break
         url = Prompt.ask(pad + "请输入您的 Emby 站点 URL [dark_green](https://abc.com:443)[/]", console=console)
@@ -288,7 +289,7 @@ async def interactive_config(config: dict = {}):
             {"url": url, "username": username, "password": password, "progress": progress, "time": time}
         )
     config = {"telegram": telegrams, "emby": embies}
-    advanced = Confirm.ask(pad + "是否配置高级设置", default=False)
+    advanced = Confirm.ask(pad + "是否配置高级设置", default=False, console=console)
     config.setdefault("notifier", True)
     config.setdefault("timeout", 120)
     config.setdefault("retries", 4)
@@ -319,7 +320,7 @@ async def interactive_config(config: dict = {}):
             pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True, console=console
         )
     content = item(config).as_string()
-    enc = Confirm.ask(pad + "是否生成加密配置", default=False)
+    enc = Confirm.ask(pad + "是否生成加密配置", default=False, console=console)
     if enc:
         enc_password = Prompt.ask(pad + "请输入加密密码, 程序启动时将要求输入 (不显示, 按回车确认)", password=True, console=console)
         content = encrypt(content, enc_password)
@@ -332,7 +333,7 @@ async def interactive_config(config: dict = {}):
     print(content.decode())
     get_console().rule()
     print()
-    start_now = Confirm.ask(pad + "是否立即启动?", default=True)
+    start_now = Confirm.ask(pad + "是否立即启动?", default=True, console=console)
     if start_now:
         return config
 
