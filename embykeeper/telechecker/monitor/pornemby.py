@@ -16,6 +16,7 @@ class PornembyMonitor:
     class PornembyDragonRainMonitor(Monitor):
         name = "Pornemby 红包雨"
         chat_user = "PronembyTGBot2_bot"
+        chat_name = "Pornemby"
 
         async def on_trigger(self, message: Message, key, reply):
             if message.reply_markup:
