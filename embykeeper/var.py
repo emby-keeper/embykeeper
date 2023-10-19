@@ -1,4 +1,4 @@
 from rich.console import Console
 
 debug = 0
-console = Console(stderr=True)
+console = Console(stderr=True, force_terminal=True)

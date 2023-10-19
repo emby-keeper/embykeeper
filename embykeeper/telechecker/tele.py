@@ -12,7 +12,6 @@ from sqlite3 import OperationalError
 import sys
 from typing import AsyncGenerator, Optional, Union
 
-import readline
 from rich.prompt import Prompt
 from appdirs import user_data_dir
 from loguru import logger
@@ -32,8 +31,8 @@ from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandle
 from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
-from .. import __name__, __version__
-from ..utils import async_partial, format_exception, show_exception, to_iterable, get_file_users
+from .. import var, __name__, __version__
+from ..utils import async_partial, show_exception, to_iterable, get_file_users
 
 logger = logger.bind(scheme="telegram")
 
@@ -187,7 +186,7 @@ class Client(pyrogram.Client):
                         msg = f'验证码错误, 请重新输入 "{self.phone_number}" 的登录验证码 (按回车确认)'
                     else:
                         msg = f'请从{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码 (按回车确认)'
-                    self.phone_code = Prompt.ask(" " * 23 + msg)
+                    self.phone_code = Prompt.ask(" " * 23 + msg, console=var.console)
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
             except (CodeInvalid, PhoneCodeInvalid):
                 self.phone_code = None
@@ -200,7 +199,7 @@ class Client(pyrogram.Client):
                             msg = f'密码错误, 请重新输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认)'
                         else:
                             msg = f'需要输入 "{self.phone_number}" 的两步验证密码 (不显示, 按回车确认)'
-                        self.password = Prompt.ask(" " * 23 + msg, password=True)
+                        self.password = Prompt.ask(" " * 23 + msg, password=True, console=var.console)
                     try:
                         return await self.check_password(self.password)
                     except BadRequest:
