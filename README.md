@@ -210,6 +210,31 @@ docker-compose up -d
 
 即可在后台启动 embykeeper.
 
+<details>
+<summary>查看使用更多命令行参数的配置</summary>
+
+```yaml
+version: '3'
+services:
+  embykeeper:
+    container_name: embykeeper
+    image: embykeeper/embykeeper
+    command: '-I'
+    restart: unless-stopped
+    volumes:
+      - ./embykeeper:/app
+    network_mode: host
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+```
+
+</details>
+
+
 您可以通过 `docker logs -f embykeeper` 或 `docker-compose logs -f embykeeper` 以查看最新日志.
 
 当您需要更新版本时, 您需要执行:
