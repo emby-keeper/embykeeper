@@ -351,11 +351,11 @@ class ClientsSession:
     watch = None
 
     @classmethod
-    def from_config(cls, config, **kw):
+    def from_config(cls, config, in_memory=False, **kw):
         accounts = config.get("telegram", [])
         for k, v in kw.items():
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
-        return cls(accounts=accounts, proxy=config.get("proxy", None), basedir=config.get("basedir", None))
+        return cls(accounts=accounts, proxy=config.get("proxy", None), basedir=config.get("basedir", None), in_memory=in_memory)
 
     @classmethod
     async def watchdog(cls, timeout=120):
@@ -424,22 +424,22 @@ class ClientsSession:
                 await client.storage.close()
                 logger.debug(f'登出账号 "{client.phone_number}".')
 
-    def __init__(self, accounts, proxy=None, basedir=None, quiet=False):
+    def __init__(self, accounts, proxy=None, basedir=None, quiet=False, in_memory=False):
         self.accounts = accounts
         self.proxy = proxy
         self.basedir = basedir or user_data_dir(__name__)
         self.phones = []
         self.done = asyncio.Queue()
         self.quiet = quiet
+        self.in_memory = in_memory
         if not self.watch:
             self.__class__.watch = asyncio.create_task(self.watchdog())
 
-    async def login(self, account, proxy):
+    async def login(self, account, proxy, in_memory=False):
         try:
             account["phone"] = "".join(account["phone"].split())
             if not self.quiet:
                 logger.info(f'登录至账号 "{account["phone"]}".')
-            in_memory = False
             for _ in range(3):
                 if account.get("api_id", None) is None or account.get("api_hash", None) is None:
                     account.update(random.choice(list(API_KEY.values())))
@@ -500,7 +500,7 @@ class ClientsSession:
             return client
 
     async def loginer(self, account):
-        client = await self.login(account, self.proxy)
+        client = await self.login(account, proxy=self.proxy, in_memory=self.in_memory)
         if isinstance(client, Client):
             async with self.lock:
                 phone = account["phone"]

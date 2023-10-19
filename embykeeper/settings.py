@@ -17,7 +17,7 @@ from .telechecker.tele import ClientsSession
 async def convert_session(accounts):
     results = []
     for a in accounts:
-        async with ClientsSession.from_config({"telegram": [a]}) as clients:
+        async with ClientsSession.from_config({"telegram": [a]}, in_memory=True) as clients:
             async for tg in clients:
                 results.append({**a, "session": tg.session_string})
     return results
@@ -266,8 +266,8 @@ async def interactive_config(config: dict = {}):
             break
         phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]", console=console)
         monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False, console=console)
-        monitor = Confirm.ask(pad + "是否开启该账号的自动水群功能? (需要高级账号)", default=False, console=console)
-        telegrams.append({"phone": phone, "send": False, "monitor": monitor})
+        send = Confirm.ask(pad + "是否开启该账号的自动水群功能? (需要高级账号)", default=False, console=console)
+        telegrams.append({"phone": phone, "send": False, "monitor": monitor, "send": send})
     if telegrams:
         logger.info(f"即将尝试登录各账户并存储凭据, 请耐心等待.")
         telegrams = await convert_session(telegrams)
