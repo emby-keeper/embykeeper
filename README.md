@@ -137,9 +137,9 @@ password = "s*D7MMCpS$"
 
 ```toml
 [service]
-checkiner = ["charon", "jms", "ljyy", "misty", "peach", "pornemby", "singularity", "terminus"]
-monitor = ["bgk", "embyhub", "misty", "pornemby", "viper"]
-messager = []
+checkiner = ["charon", "embyhub", "jms", "judog", "ljyy", "magic", "peach", "pornemby", "sssq", "temby", "terminus"]
+monitor = ["bgk", "embyhub", "judog", "pornemby", "viper"]
+messager = ["pornemby"]
 ```
 
 随后, 您需要再次执行:
