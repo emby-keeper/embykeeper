@@ -301,13 +301,19 @@ async def interactive_config(config: dict = {}):
             logger.info(f'\t{i+1}. {t["phone"]}')
         config["notifier"] = IntPrompt.ask(pad + "请选择", default=1, console=console)
         config["timeout"] = IntPrompt.ask(
-            pad + "设置每个 Telegram Bot 签到的最大尝试时间 (秒)", default=config["timeout"], show_default=True, console=console
+            pad + "设置每个 Telegram Bot 签到的最大尝试时间 (秒)",
+            default=config["timeout"],
+            show_default=True,
+            console=console,
         )
         config["retries"] = IntPrompt.ask(
             pad + "设置每个 Telegram Bot 签到的最大尝试次数", default=config["retries"], show_default=True, console=console
         )
         config["concurrent"] = IntPrompt.ask(
-            pad + "设置最大可同时进行的 Telegram Bot 签到", default=config["concurrent"], show_default=True, console=console
+            pad + "设置最大可同时进行的 Telegram Bot 签到",
+            default=config["concurrent"],
+            show_default=True,
+            console=console,
         )
         config["random"] = IntPrompt.ask(
             pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True, console=console
@@ -342,7 +348,9 @@ def load_env_config(data: str):
         try:
             logger.info("您正在使用加密配置文件作为输入 (AES).")
             config = tomllib.loads(
-                decrypt(data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True, console=console))
+                decrypt(
+                    data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True, console=console)
+                )
             )
         except (tomllib.TOMLDecodeError, UnicodeDecodeError):
             config = {}

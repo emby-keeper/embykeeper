@@ -436,7 +436,7 @@ class ClientsSession:
 
     async def login(self, account, proxy):
         try:
-            account["phone"] = ''.join(account["phone"].split())
+            account["phone"] = "".join(account["phone"].split())
             if not self.quiet:
                 logger.info(f'登录至账号 "{account["phone"]}".')
             in_memory = False
