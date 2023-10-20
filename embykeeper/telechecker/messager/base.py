@@ -213,9 +213,10 @@ class Messager:
                 raise
 
     async def send(self, message):
-        need_sec = random.randint(5, 10)
-        while self.site_last_message_time > datetime.now() - timedelta(seconds=need_sec):
-            await asyncio.sleep(1)
+        if self.site_last_message_time:
+            need_sec = random.randint(5, 10)
+            while self.site_last_message_time > datetime.now() - timedelta(seconds=need_sec):
+                await asyncio.sleep(1)
         async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
