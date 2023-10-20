@@ -31,6 +31,27 @@ class PornembyMonitor:
                             else:
                                 self.log.info('检测到 Pornemby 抢红包雨, 已点击.')
                                 return
+                            
+    class PornembyDoubleMonitor(Monitor):
+        name = "Pornemby 怪兽自动翻倍"
+        chat_user = "PronembyTGBot2_bot"
+        chat_name = "Pornemby"
+        chat_keyword = "击杀者\s+(.*)\s+是否要奖励翻倍"
+
+        async def on_trigger(self, message: Message, key, reply):
+            if self.client.me.name == key:
+                if message.reply_markup:
+                    if isinstance(message.reply_markup, InlineKeyboardMarkup):
+                        buttons = flatten(message.reply_markup.inline_keyboard)
+                        for b in buttons:
+                            if "翻倍游戏" in b.text:
+                                try:
+                                    await message.click(0)
+                                except RPCError:
+                                    pass
+                                else:
+                                    self.log.info('检测到 Pornemby 怪兽击败, 已点击翻倍.')
+                                    return
 
     class PornembyRegisterMonitor(Monitor):
         name = "Pornemby 抢注"
