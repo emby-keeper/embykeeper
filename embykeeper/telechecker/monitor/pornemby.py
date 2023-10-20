@@ -29,9 +29,9 @@ class PornembyMonitor:
                             except RPCError:
                                 pass
                             else:
-                                self.log.info('检测到 Pornemby 抢红包雨, 已点击.')
+                                self.log.info("检测到 Pornemby 抢红包雨, 已点击.")
                                 return
-                            
+
     class PornembyDoubleMonitor(Monitor):
         name = "Pornemby 怪兽自动翻倍"
         chat_user = "PronembyTGBot2_bot"
@@ -50,7 +50,7 @@ class PornembyMonitor:
                                 except RPCError:
                                     pass
                                 else:
-                                    self.log.info('检测到 Pornemby 怪兽击败, 已点击翻倍.')
+                                    self.log.info("检测到 Pornemby 怪兽击败, 已点击翻倍.")
                                     return
 
     class PornembyRegisterMonitor(Monitor):
@@ -65,7 +65,7 @@ class PornembyMonitor:
             except RPCError:
                 pass
             else:
-                self.log.info('检测到 Pornemby 抢注, 已点击.')
+                self.log.info("检测到 Pornemby 抢注, 已点击.")
 
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"

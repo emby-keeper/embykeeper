@@ -69,7 +69,7 @@ class Messager:
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
     default_messages: List[str] = []  # 默认的话术列表资源名
-    
+
     site_last_message_time = None
     site_lock = asyncio.Lock()
 
