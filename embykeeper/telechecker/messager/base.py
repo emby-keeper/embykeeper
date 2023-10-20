@@ -170,7 +170,8 @@ class Messager:
                 schedule.multiply = multiply
                 schedules.append(schedule)
 
-        self.log.info(f"共启用 {len(schedules)} 个消息规划.")
+        nmsgs = sum([s.multiply for s in schedules])
+        self.log.info(f"共启用 {len(schedules)} 个消息规划, 发送 {nmsgs} 条消息.")
         for s in schedules:
             for _ in range(s.multiply):
                 self.add(s)
