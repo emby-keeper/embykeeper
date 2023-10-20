@@ -69,6 +69,9 @@ class Messager:
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
     default_messages: List[str] = []  # 默认的话术列表资源名
+    
+    site_last_message_time = None
+    site_lock = asyncio.Lock()
 
     def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None, config: dict = None):
         """
@@ -210,6 +213,8 @@ class Messager:
                 raise
 
     async def send(self, message):
+        while self.site_last_message_time > datetime.now() - timedelta(seconds=10):
+            await asyncio.sleep(1)
         async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
             async for tg in clients:
                 chat = await tg.get_chat(self.chat_name)
@@ -221,3 +226,6 @@ class Messager:
                 except KeyError as e:
                     self.log.warning(f"发送失败, 您可能已被封禁.")
                     show_exception(e)
+                else:
+                    async with self.site_lock:
+                        self.__class__.site_last_message_time = datetime.now()
