@@ -49,7 +49,7 @@ class PornembyMonitor:
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
         chat_name = ["Pornemby", "PornembyFun"]
-        chat_keyword = r"问题\d+：(.*?)\n+A:(.*)\n+B:(.*)\n+C:(.*)\n+D:(.*)\n+答案为：([ABCD])"
+        chat_keyword = r"问题\d?：(.*?)\n+A:(.*)\n+B:(.*)\n+C:(.*)\n+D:(.*)\n+答案为：([ABCD])"
 
         key_map = {"A": 1, "B": 2, "C": 3, "D": 4}
 
@@ -61,7 +61,7 @@ class PornembyMonitor:
         name = "Pornemby 科举"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
-        chat_keyword = r"问题\d+：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
+        chat_keyword = r"问题\d?：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
         cache = {}
         lock = asyncio.Lock()
 
