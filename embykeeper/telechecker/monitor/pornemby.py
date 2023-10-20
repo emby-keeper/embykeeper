@@ -82,7 +82,7 @@ class PornembyMonitor:
         name = "Pornemby 科举"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
-        chat_keyword = r"问题\d?：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
+        chat_keyword = r"问题\d?：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)$(?!\n*答案)"
         cache = {}
         lock = asyncio.Lock()
 
