@@ -25,9 +25,12 @@ class PornembyMonitor:
                     for b in buttons:
                         if "红包奖励" in b.text:
                             try:
-                                return await message.click(0)
+                                await message.click(0)
                             except RPCError:
                                 pass
+                            else:
+                                self.log.info('检测到 Pornemby 抢红包雨, 已点击.')
+                                return
 
     class PornembyRegisterMonitor(Monitor):
         name = "Pornemby 抢注"
@@ -40,6 +43,8 @@ class PornembyMonitor:
                 await message.click(0)
             except RPCError:
                 pass
+            else:
+                self.log.info('检测到 Pornemby 抢注, 已点击.')
 
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
