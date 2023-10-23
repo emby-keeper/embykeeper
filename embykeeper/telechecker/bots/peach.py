@@ -17,4 +17,7 @@ class PeachCheckin(BotCheckin):
                 if "签到" in k:
                     await message.click(k)
                     return
+            else:
+                self.log.warning(f"签到失败: 账户错误.")
+                return await self.fail()
         await super().message_handler(client, message)

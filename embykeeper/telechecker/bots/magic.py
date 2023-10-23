@@ -2,7 +2,6 @@ from pyrogram.types import Message
 
 from .base import BotCheckin
 
-
 class MagicCheckin(BotCheckin):
     name = "魔法Emby"
     bot_username = "Magic_EmbyBot"
@@ -17,4 +16,7 @@ class MagicCheckin(BotCheckin):
                 if "签到" in k:
                     await message.click(k)
                     return
+            else:
+                self.log.warning(f"签到失败: 账户错误.")
+                return await self.fail()
         await super().message_handler(client, message)
