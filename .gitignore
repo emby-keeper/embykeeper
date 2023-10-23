@@ -4,7 +4,9 @@
 !/pyproject.toml
 *.session
 *.session-journal
-*.msgs
+*.msgs.yaml
+*.updates.json
+
 /utils/data
 
 # Test files

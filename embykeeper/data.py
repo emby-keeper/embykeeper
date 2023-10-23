@@ -72,7 +72,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
             not_existing.append(name)
 
     if not_existing:
-        logger.info(f"{caller or '该功能'} 需要下载或更新资源文件: {', '.join(not_existing)}")
+        logger.info(f"{caller or '该功能'} 正在下载或更新资源文件: {', '.join(not_existing)}")
 
     for name in to_iterable(names):
         version_matching = False

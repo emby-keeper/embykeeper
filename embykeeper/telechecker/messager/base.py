@@ -213,7 +213,13 @@ class Messager:
             else:
                 raise
 
+    def prepare_send(self, message):
+        return message
+        
     async def send(self, message):
+        message = await self.prepare_send(message)
+        if not message:
+            return
         if self.site_last_message_time:
             need_sec = random.randint(5, 10)
             while self.site_last_message_time > datetime.now() - timedelta(seconds=need_sec):

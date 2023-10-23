@@ -2,17 +2,29 @@ import asyncio
 import csv
 from datetime import datetime
 from pathlib import Path
+import random
 
 from pyrogram.types import Message, InlineKeyboardMarkup
 from pyrogram.errors import RPCError
 
 from ...utils import truncate_str, flatten
 from ..link import Link
+from ..lock import pornemby_status
 
 from .base import Monitor
 
 
 class PornembyMonitor:
+    class PornembyNoHPMonitor(Monitor):
+        name = "Pornemby 血量耗尽停止发言"
+        chat_user = "PronembyTGBot2_bot"
+        chat_name = "Pornemby"
+        chat_keyword = "(.*)血量已耗尽。"
+
+        async def on_trigger(self, message: Message, key, reply):
+            if self.client.me.name == key:
+                pornemby_status["nohp"] = datetime.today().date()
+    
     class PornembyDragonRainMonitor(Monitor):
         name = "Pornemby 红包雨"
         chat_user = "PronembyTGBot2_bot"
@@ -82,7 +94,7 @@ class PornembyMonitor:
         name = "Pornemby 科举"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
-        chat_keyword = r"问题\d?：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
+        chat_keyword = r"问题\d*：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
         cache = {}
         lock = asyncio.Lock()
 
@@ -188,6 +200,7 @@ class PornembyMonitor:
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
             result = self.cache.get(key[0], None)
             if result:
+                await asyncio.sleep(random.randint(10, 15) / 10)
                 self.log.info(f"从缓存回答问题为{result}: {spec}.")
             elif self.config.get("only_history", False):
                 self.log.info(f"未从历史缓存找到问题, 请自行回答: {spec}.")
@@ -208,3 +221,5 @@ class PornembyMonitor:
                 self.log.debug(f"回答返回值: {answer.message} {spec}.")
             except KeyError:
                 self.log.info(f"点击失败: {result} 不是可用的答案 {spec}.")
+            except RPCError:
+                self.log.info(f"点击失败: 问题已失效.")

@@ -16,6 +16,7 @@ scheme_names = {
     "telenotifier": "消息推送",
     "embywatcher": "Emby保活",
     "datamanager": "下载器",
+    "debugtool": "开发工具",
 }
 
 

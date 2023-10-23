@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import re
 import sys
+from typing import List
 
 import typer
 import asyncio
@@ -83,11 +84,12 @@ async def main(
         False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
     ),
     simple_log: bool = typer.Option(False, "--simple-log", "-L", help="简化日志输出格式"),
-    follow: bool = typer.Option(False, "--follow", "-f", rich_help_panel="调试参数", help="仅启动消息调试"),
-    analyze: bool = typer.Option(False, "--analyze", "-a", rich_help_panel="调试参数", help="仅启动历史信息分析"),
-    dump: bool = typer.Option(False, "--dump", "-D", rich_help_panel="调试参数", help="仅启动原始更新日志"),
-    public: bool = typer.Option(False, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
-    basedir: Path = typer.Option(None, rich_help_panel="调试参数", help="设定输出文件位置"),
+    follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试参数", help="仅启动消息调试"),
+    analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试参数", help="仅启动历史信息分析"),
+    dump: List[str] = typer.Option([], "--dump", "-D", rich_help_panel="调试参数", help="仅启动更新日志"),
+    save: bool = typer.Option(False, "--save", "-S", rich_help_panel="调试参数", help="记录原始更新日志"),
+    public: bool = typer.Option(False, "--public", "-P", rich_help_panel="调试参数", help="启用公共仓库部署模式"),
+    basedir: Path = typer.Option(None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
     from .log import logger, initialize
 
@@ -145,25 +147,12 @@ async def main(
     if not basedir == Path("/app"):
         logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
 
-    from .embywatcher.main import watcher, watcher_schedule
-    from .telechecker.main import (
-        dumper,
-        analyzer,
-        checkiner,
-        checkiner_schedule,
-        follower,
-        messager,
-        monitorer,
-        notifier,
-    )
-
-    if dump:
-        return await dumper(config)
-
     if follow:
+        from .telechecker.debug import follower
         return await follower(config)
 
     if analyze:
+        from .telechecker.debug import analyzer
         indent = " " * 23
         chats = typer.prompt(indent + "请输入群组用户名 (以空格分隔)").split()
         keywords = typer.prompt(indent + "请输入关键词 (以空格分隔)", default="", show_default=False)
@@ -173,19 +162,36 @@ async def main(
         limit = typer.prompt(indent + "请输入各群组最大获取数量", default=10000, type=int)
         outputs = typer.prompt(indent + "请输入最大输出数量", default=1000, type=int)
         return await analyzer(config, chats, keywords, timerange, limit, outputs)
+    
+    if dump:
+        from .telechecker.debug import dumper
+        return await dumper(config, dump)
+    
+    from .embywatcher.main import watcher, watcher_schedule
+    from .telechecker.main import (
+        checkiner,
+        checkiner_schedule,
+        messager,
+        monitorer,
+        start_notifier,
+    )
+
+    pool = AsyncTaskPool()
+
+    if save:
+        from .telechecker.debug import saver
+        asyncio.create_task(saver(config))
 
     if instant and not debug_cron:
-        instants = []
         if emby:
-            instants.append(watcher(config))
+            pool.add(watcher(config))
         if checkin:
-            instants.append(checkiner(config, instant=True))
-        await asyncio.gather(*instants)
+            pool.add(checkiner(config, instant=True))
+        await pool.wait()
         logger.debug("启动时立刻执行签到和保活: 已完成.")
 
     if not once:
-        await notifier(config)
-        pool = AsyncTaskPool()
+        await start_notifier(config)
         debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
             pool.add(watcher_schedule(config, 1 if debug_cron else emby))
