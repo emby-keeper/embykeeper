@@ -1,5 +1,6 @@
 import asyncio
 from collections import namedtuple
+from contextlib import asynccontextmanager
 from datetime import date, datetime, time, timedelta
 from functools import wraps
 from pathlib import Path
@@ -311,4 +312,18 @@ def get_file_users(path):
             pass
     else:
         return None
-        return None
+
+
+@asynccontextmanager
+async def no_waiting(lock: asyncio.Lock):
+    try:
+        await asyncio.wait_for(lock.acquire(), 0)
+    except asyncio.TimeoutError:
+        acquired = False
+    else:
+        acquired = True
+    try:
+        yield
+    finally:
+        if acquired:
+            lock.release()

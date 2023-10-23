@@ -481,7 +481,7 @@ unique_name = "your_username_for_registeration" # 自动抢注时使用的用户
 only_history = true # 仅当问题历史中找到答案时自动回答
 
 [messager.pornemby]
-messages = ["pornemby-common-wl@v1.yaml * 100"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
+messages = ["pornemby-common-wl@latest.yaml * 100"] # 读取在线或本地话术列表用于自动水群, * 代表每日时间区间内发送的条数.
 interval = 1800 # 两次水群之间最小间隔 (s)
 ```
 
