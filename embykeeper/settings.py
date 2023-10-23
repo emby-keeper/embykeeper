@@ -138,12 +138,14 @@ def write_faked_config(path):
     doc.add(comment(f"代理设置, Emby 和 Telegram 均将通过此代理连接, 服务器位于国内时请配置代理并取消注释."))
     proxy = item(
         {
-            "hostname": "127.0.0.1",
-            "port": 1080,
-            "scheme": "socks5",
+            "proxy": {
+                "hostname": "127.0.0.1",
+                "port": 1080,
+                "scheme": "socks5",
+            }
         }
     )
-    proxy["scheme"].comment("可选: http / socks5")
+    proxy["proxy"]["scheme"].comment("可选: http / socks5")
     for line in proxy.as_string().strip().split("\n"):
         doc.add(comment(line))
     doc.add(nl())

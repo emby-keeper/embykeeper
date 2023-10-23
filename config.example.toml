@@ -24,12 +24,13 @@ concurrent = 1
 random = 15
 
 # 代理设置, Emby 和 Telegram 均将通过此代理连接, 服务器位于国内时请配置代理并取消注释.
+# [proxy]
 # hostname = "127.0.0.1"
 # port = 1080
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 2.4.9 生成的.
+# 该部分内容是根据 Embykeeper 2.4.16 生成的.
 
 # 默认启用站点:
 # [service]
@@ -39,34 +40,34 @@ random = 15
 
 # 全部可用站点:
 # [service]
-# checkiner = ["base", "bluesea", "charon", "embyhub", "jms", "jms_iptv", "judog", "ljyy", "magic", "misty", "nebula", "peach", "pornemby", "singularity", "sssq", "temby", "terminus", "test", "zhipian"]
-# monitor = ["base", "bgk", "embyhub", "follow", "judog", "misty", "polo", "pornemby", "test", "viper"]
-# messager = ["base", "nakonako", "pornemby", "test"]
+# checkiner = ["bluesea", "charon", "charon", "embyhub", "embyhub", "jms", "jms", "jms_iptv", "judog", "judog", "ljyy", "ljyy", "magic", "magic", "misty", "nebula", "peach", "peach", "pornemby", "pornemby", "singularity", "sssq", "sssq", "temby", "temby", "terminus", "terminus", "zhipian"]
+# monitor = ["bgk", "bgk", "embyhub", "embyhub", "follow", "judog", "judog", "misty", "polo", "pornemby", "pornemby", "viper", "viper"]
+# messager = ["nakonako", "pornemby", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8613432467447"
+phone = "+8611395485799"
 send = false # 启用该账号的自动水群功能 (谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8618571188439"
+phone = "+8615928285523"
 send = false # 启用该账号的自动水群功能 (谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://fox.org/"
-username = "ginaholloway"
-password = "*ODzNdoG&8"
+url = "https://quinn-hernandez.com/"
+username = "ericamahoney"
+password = "d7)_2Otde#"
 time = 10 # 模拟观看的时长 (秒)
 progress = 1000 # 模拟观看后设置的时间进度 (秒)
 
 [[emby]]
-url = "https://allen.com/"
-username = "qsherman"
-password = "13GsmBB($A"
+url = "https://kaufman-jones.com/"
+username = "williamsglenn"
+password = "!Z%DA1lJz3"
 time = 10 # 模拟观看的时长 (秒)
 progress = 1000 # 模拟观看后设置的时间进度 (秒)

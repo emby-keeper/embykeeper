@@ -56,7 +56,9 @@ def get_names(type: str, allow_ignore=False) -> List[str]:
     typemodule = import_module(f"{__name__}.{sub}")
     for _, mn, _ in pkgutil.iter_modules(typemodule.__path__):
         module = import_module(f"{__name__}.{sub}.{mn}")
-        if allow_ignore or (not getattr(module, "__ignore__", False)):
+        if not getattr(module, "__ignore__", False):
+            results.append(mn)
+        if allow_ignore and (not mn == 'base') and (not mn == 'test'):
             results.append(mn)
     return results
 
