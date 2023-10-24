@@ -1,19 +1,19 @@
 import asyncio
-from pathlib import Path
 import random
+import re
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
-import re
+from pathlib import Path
 from typing import Iterable, List, Union
 
 import yaml
-from loguru import logger
-from pyrogram.errors import RPCError, ChatWriteForbidden
-from schema import Optional, Schema, SchemaError
 from dateutil import parser
+from loguru import logger
+from pyrogram.errors import ChatWriteForbidden, RPCError
+from schema import Optional, Schema, SchemaError
 
-from ...utils import random_time, show_exception, time_in_range, truncate_str
 from ...data import get_data
+from ...utils import random_time, show_exception, time_in_range, truncate_str
 from ..tele import ClientsSession
 
 __ignore__ = True
@@ -125,15 +125,21 @@ class Messager:
         )
 
     def add(self, schedule: MessageSchedule):
-        for _ in range(10):
+        for _ in range(200):
             plan = schedule.roll()
             for p in self.timeline:
                 if time_in_range(p.at - self.min_interval, p.at + self.min_interval, plan.at):
                     break
             else:
-                if self.max_interval and self.timeline:
-                    for p in self.timeline:
-                        if time_in_range(p.at - self.max_interval, p.at + self.max_interval, plan.at):
+                if self.max_interval:
+                    if self.timeline:
+                        for p in self.timeline:
+                            if time_in_range(p.at - self.max_interval, p.at + self.max_interval, plan.at):
+                                self.timeline.append(plan)
+                                return
+                    else:
+                        now = datetime.now()
+                        if time_in_range(now - self.max_interval, now + self.max_interval, plan.at):
                             self.timeline.append(plan)
                             return
                 else:
