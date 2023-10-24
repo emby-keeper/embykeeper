@@ -30,15 +30,16 @@ class MessageSchedule:
     multiply: int = 1
     only: str = None
 
-    def next_time(self, days=None):
+    def next_time(self, days=None, trange=None):
         """生成下一个发送时间"""
         days = days if days is not None else self.days
-        rtime = datetime.combine(datetime.today() + timedelta(days=days), random_time(*self.at))
+        trange = trange if trange is not None else self.at
+        rtime = datetime.combine(datetime.today() + timedelta(days=days), random_time(*trange))
         if rtime < datetime.now():
             rtime += timedelta(days=1)
         return rtime
 
-    def roll(self, days=None):
+    def roll(self, days=None, trange=None):
         skip = False
         if random.random() >= self.possibility:
             skip = True
@@ -49,7 +50,10 @@ class MessageSchedule:
             if self.only.startswith("weekend") and today.weekday() < 5:
                 skip = True
         return MessagePlan(
-            message=random.choice(self.messages), at=self.next_time(days=days), schedule=self, skip=skip
+            message=random.choice(self.messages),
+            at=self.next_time(days=days, trange=trange),
+            schedule=self,
+            skip=skip,
         )
 
 
@@ -93,9 +97,14 @@ class Messager:
         self.min_interval = timedelta(
             seconds=config.get("min_interval", config.get("interval", 1800))
         )  # 两条消息间的最小间隔时间
-        self.max_interval = timedelta(seconds=config.get("max_interval", None))  # 两条消息间的最大间隔时间
-        if self.min_interval > self.max_interval:
-            raise ValueError("最小间隔不应大于最大间隔")
+        max_interval = config.get("max_interval", None)
+        if max_interval:
+            self.max_interval = timedelta(seconds=max_interval)  # 两条消息间的最大间隔时间
+            if self.min_interval > self.max_interval:
+                raise ValueError("最小间隔不应大于最大间隔")
+        else:
+            self.max_interval = None
+        
 
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
@@ -125,7 +134,7 @@ class Messager:
         )
 
     def add(self, schedule: MessageSchedule):
-        for _ in range(200):
+        for _ in range(600):
             plan = schedule.roll()
             for p in self.timeline:
                 if time_in_range(p.at - self.min_interval, p.at + self.min_interval, plan.at):
@@ -196,19 +205,20 @@ class Messager:
         if self.timeline:
             last_valid_p = None
             while True:
-                self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划.")
                 valid_p = [p for p in self.timeline if not p.skip]
+                self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划, {len(valid_p)} 个有效.")
+                self.log.debug('时间序列: ' + ' '.join([p.at.strftime('%H%M') for p in sorted(valid_p, key=lambda x: x.at)]))
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
                     if not next_valid_p == last_valid_p:
                         last_valid_p = next_valid_p
                         self.log.info(
-                            f"下一次发送将在 [blue]{next_valid_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行: {truncate_str(next_valid_p.message, 20)}."
+                            f"下一次发送将在 [blue]{next_valid_p.at.strftime('%m-%d %H:%M:%S')}[/] 进行: {truncate_str(next_valid_p.message, 20)}."
                         )
                 else:
                     self.log.info(f"下一次发送被跳过.")
                 next_p = min(self.timeline, key=lambda x: x.at)
-                self.log.debug(f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S %p')}[/] 进行.")
+                self.log.debug(f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S')}[/] 进行 ({'跳过' if next_p.skip else '有效'}).")
                 await asyncio.sleep((next_p.at - datetime.now()).seconds)
                 if not next_p.skip:
                     await self._send(next_p.message)
