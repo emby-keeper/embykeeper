@@ -105,7 +105,6 @@ class Messager:
                 raise ValueError("最小间隔不应大于最大间隔")
         else:
             self.max_interval = None
-        
 
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
@@ -208,7 +207,9 @@ class Messager:
             while True:
                 valid_p = [p for p in self.timeline if not p.skip]
                 self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划, {len(valid_p)} 个有效.")
-                self.log.debug('时间序列: ' + ' '.join([p.at.strftime('%H%M') for p in sorted(valid_p, key=lambda x: x.at)]))
+                self.log.debug(
+                    "时间序列: " + " ".join([p.at.strftime("%H%M") for p in sorted(valid_p, key=lambda x: x.at)])
+                )
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
                     if not next_valid_p == last_valid_p:
@@ -219,7 +220,9 @@ class Messager:
                 else:
                     self.log.info(f"下一次发送被跳过.")
                 next_p = min(self.timeline, key=lambda x: x.at)
-                self.log.debug(f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S')}[/] 进行 ({'跳过' if next_p.skip else '有效'}).")
+                self.log.debug(
+                    f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S')}[/] 进行 ({'跳过' if next_p.skip else '有效'})."
+                )
                 await asyncio.sleep((next_p.at - datetime.now()).seconds)
                 if not next_p.skip:
                     await self._send(next_p.message)
