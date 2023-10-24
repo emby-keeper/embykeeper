@@ -165,10 +165,14 @@ class AsyncTaskPool:
         return t
 
     async def as_completed(self):
+        for t in self.tasks:
+            if t.done():
+                yield t
+                self.tasks.remove(t)
         while self.tasks:
             async with self.waiter:
                 await self.waiter.wait()
-                for t in self.tasks:
+                for t in self.tasks[:]:
                     if t.done():
                         yield t
                         self.tasks.remove(t)

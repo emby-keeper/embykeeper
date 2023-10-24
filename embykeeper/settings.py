@@ -76,6 +76,7 @@ def check_config(config):
                         "password": str,
                         Optional("time"): PositiveInt(),
                         Optional("progress"): PositiveInt(),
+                        Optional("continuous"): bool,
                     }
                 )
             ],

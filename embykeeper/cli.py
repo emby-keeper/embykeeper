@@ -176,7 +176,11 @@ async def main(
 
         return await dumper(config, dump)
 
-    from .embywatcher.main import watcher, watcher_schedule
+    from .embywatcher.main import (
+        watcher,
+        watcher_schedule,
+        watcher_continuous,
+    )
     from .telechecker.main import (
         checkiner,
         checkiner_schedule,
@@ -205,6 +209,7 @@ async def main(
         debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
             pool.add(watcher_schedule(config, 1 if debug_cron else emby))
+            pool.add(watcher_continuous(config))
         if checkin:
             if debug_time:
                 start_time = end_time = debug_time.time()
