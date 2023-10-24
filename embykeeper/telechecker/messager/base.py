@@ -224,7 +224,7 @@ class Messager:
             else:
                 raise
 
-    def prepare_send(self, message):
+    async def prepare_send(self, message):
         return message
 
     async def send(self, message):
