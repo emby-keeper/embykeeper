@@ -103,7 +103,7 @@ async def play(obj: EmbyObject, time=10, progress=1000):
         media_source_id = resp["MediaSources"][0]["Id"]
     else:
         media_source_id = obj.id
-        
+
     # 模拟播放
     playing_info = {
         "ItemId": obj.id,
