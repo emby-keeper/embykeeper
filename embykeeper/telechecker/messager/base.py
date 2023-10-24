@@ -266,8 +266,15 @@ class Messager:
                         else:
                             member = await chat.get_member(tg.me.id)
                             if member.status == ChatMemberStatus.RESTRICTED:
-                                delta = member.until_date - datetime.now()
-                                self.log.warning(f"发送失败: 您已被禁言 {delta.total_seconds()} 秒.")
+                                if member.until_date:
+                                    delta = member.until_date - datetime.now()
+                                    secs = delta.total_seconds()
+                                    if secs < 2592000:
+                                        self.log.warning(f"发送失败: 您已被禁言 {secs} 秒.")
+                                    else:
+                                        self.log.warning(f"发送失败: 您已被永久禁言.")
+                                else:
+                                    self.log.warning(f"发送失败: 您已被禁言.")
                     except RPCError:
                         self.log.warning(f"发送失败: {e}.")
                 except RPCError as e:
