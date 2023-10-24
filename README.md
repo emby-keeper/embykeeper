@@ -70,7 +70,9 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ## 安装与使用
 
-**请参考**: Wiki 中的 [安装指南](https://github.com/embykeeper/embykeeper/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97).
+Embykeeper 支持 Docker 或 PyPI 安装, 也支持云部署, 请点击下方按钮开始安装:
+
+[![Setup Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/setup-button.svg)](https://github.com/embykeeper/embykeeper/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)
 
 若您没有服务器, 您可以通过免费的 Render 托管平台进行部署, 点击下方按钮开始部署:
 
@@ -85,6 +87,8 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 您也可以使用 [Docker Compose 部署](https://github.com/embykeeper/embykeeper/wiki/Linux-Docker-Compose-%E9%83%A8%E7%BD%B2).
 
 除此之外, 您还可以通过 [PyPI 安装](https://github.com/embykeeper/embykeeper/wiki/Linux-%E4%BB%8E-PyPI-%E5%AE%89%E8%A3%85) 或 [源码构建](https://github.com/embykeeper/embykeeper/wiki/Linux-%E4%BB%8E%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA).
+
+更多安装和配置方面的帮助请参考 [Wiki](https://github.com/embykeeper/embykeeper/wiki).
 
 ## 运行截图
 

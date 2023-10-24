@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<svg width="520" height="160" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+ <defs>
+  <linearGradient id="svg_6" x1="0" x2="0" y1="1" y2="0">
+   <stop id="jq_stop_3331" offset="0" stop-color="#fbc2eb" stop-opacity="0.99"/>
+   <stop id="jq_stop_5835" offset="1" stop-color="#a6c1ee" stop-opacity="1"/>
+  </linearGradient>
+  <symbol height="160" id="svg_15" width="160" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+   <defs>
+    <linearGradient id="svg_10" x1="0" x2="0" y1="0.62" y2="0">
+     <stop id="svg_14" offset="0" stop-color="#d299c2"/>
+     <stop id="svg_13" offset="1" stop-color="#fef9d7"/>
+    </linearGradient>
+   </defs>
+   <g class="layer">
+    <title>Layer 1</title>
+    <g id="svg_7">
+     <image height="0" id="svg_12" width="0" x="10.09" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAIAAACNMk6CAAAABmJLR0QA/wD/AP+gvaeTAAAAh0lEQVQ4jaWNUQ7DIAxDH+b+99ndWmA/IKUstGQViuQY+4UPTWTUhMhovJYRqWsZnRzdpz1pnA5TjoDG4fAiY/2dzPCjnF3Gv/+rW0bvcsJdJ+dyA38XXjAb2u+4zr7D9vq33lPHYdi77j5xVpkf9txZeHWRq05meLV7di/GK31O0JnQATrgC1fJndkGZW9fAAAAAElFTkSuQmCC" y="-132.71"/>
+     <image height="0" id="svg_11" width="0" x="88.08" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAIAAACNMk6CAAAABmJLR0QA/wD/AP+gvaeTAAAAh0lEQVQ4jaWNUQ7DIAxDH+b+99ndWmA/IKUstGQViuQY+4UPTWTUhMhovJYRqWsZnRzdpz1pnA5TjoDG4fAiY/2dzPCjnF3Gv/+rW0bvcsJdJ+dyA38XXjAb2u+4zr7D9vq33lPHYdi77j5xVpkf9txZeHWRq05meLV7di/GK31O0JnQATrgC1fJndkGZW9fAAAAAElFTkSuQmCC" y="179.29"/>
+     <path d="m70.99,3.92c0,0 -41.83,41.52 -41.99,41.3c-0.15,-0.22 6.76,6.5 6.76,6.5c0,0 -35.85,35.85 -36.01,35.64c-0.15,-0.22 41.67,42.05 41.67,42.05c0,0 6.3,-6.3 6.13,-6.5c-0.15,-0.22 36.33,35.75 36.33,35.75c0,0 41.83,-41.83 41.67,-42.05c-0.15,-0.22 -5.82,-5.45 -5.98,-5.65c-0.15,-0.22 36.33,-35.32 36.17,-35.55c-0.15,-0.22 -42.62,-41.92 -42.77,-42.15c-0.15,-0.22 -5.5,6.2 -5.5,6.2c0,0 -36.48,-35.55 -36.48,-35.55l0,0.01z" fill="url(#svg_10)" id="svg_9" stroke="#000000" stroke-width="0"/>
+     <path d="m60.3,52.99c0,0 0,56.93 0,56.93c0,0 50.32,-28.3 50.32,-28.3c0,0 -50.32,-28.62 -50.32,-28.62l0,-0.01z" fill="#ffffff" id="svg_8" stroke="#000000" stroke-width="0"/>
+    </g>
+   </g>
+  </symbol>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <rect fill="url(#svg_6)" height="152" id="svg_1" rx="44" ry="44" stroke="#000000" stroke-opacity="0.14" width="515" x="2.5" y="4">Wiki</rect>
+  <use id="svg_16" transform="matrix(0.666647 0 0 0.666647 28.5849 16.971)" x="9.5" xlink:href="#svg_15" y="21.5"/>
+  <text fill="#000000" font-family="Courier" font-size="24" font-weight="bold" id="svg_17" stroke="#000000" stroke-opacity="0.14" stroke-width="0" text-anchor="middle" transform="matrix(1.42093 0 0 1.42093 -93.2477 -32.0182)" x="202.7" xml:space="preserve" y="62.9">Wiki</text>
+  <text fill="#000000" font-family="Sans-serif" font-size="24" font-weight="bold" id="svg_18" stroke="#000000" stroke-opacity="0.14" stroke-width="0" text-anchor="middle" transform="matrix(2.35671 0 0 2.35671 -321.429 -119.185)" x="278.15" xml:space="preserve" y="102.63">安装指南</text>
+ </g>
+</svg>
