@@ -9,6 +9,7 @@ from typing import Iterable, List, Union
 import yaml
 from dateutil import parser
 from loguru import logger
+from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import ChatWriteForbidden, RPCError
 from schema import Optional, Schema, SchemaError
 
@@ -264,8 +265,9 @@ class Messager:
                             self.log.warning(f"发送失败: 已全员禁言.")
                         else:
                             member = await chat.get_member(tg.me.id)
-                            delta = member.until_date - datetime.now()
-                            self.log.warning(f"发送失败: 您已被禁言 {delta.total_seconds()} 秒.")
+                            if member.status == ChatMemberStatus.RESTRICTED:
+                                delta = member.until_date - datetime.now()
+                                self.log.warning(f"发送失败: 您已被禁言 {delta.total_seconds()} 秒.")
                     except RPCError:
                         self.log.warning(f"发送失败: {e}.")
                 except RPCError as e:
