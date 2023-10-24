@@ -37,7 +37,8 @@ async def get_most_played_media(emby: Emby):
         i: Union[Movie, Episode]
         for i in items:
             yield i
-            
+
+
 async def get_random_media(emby: Emby):
     """获取随机视频."""
     while True:
@@ -153,7 +154,9 @@ async def login(config, continuous=False):
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
             loggeruser.info(f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).')
-            yield emby, a.get("time", None if continuous else 10), a.get("progress", -1 if continuous else 1000), loggeruser
+            yield emby, a.get("time", None if continuous else 10), a.get(
+                "progress", -1 if continuous else 1000
+            ), loggeruser
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
             continue
@@ -227,10 +230,11 @@ async def watch(emby, time, progress, logger, retries=5):
             show_exception(e, regular=False)
             return False
 
+
 async def watch_continuous(emby: Emby, logger):
     """
     主执行函数 - 持续观看.
-    
+
     参数:
         emby: Emby 客户端
         logger: 日志器
@@ -264,6 +268,7 @@ async def watch_continuous(emby: Emby, logger):
             show_exception(e, regular=False)
             return False
 
+
 async def watcher(config: dict):
     """入口函数 - 观看一个视频."""
 
@@ -273,7 +278,7 @@ async def watcher(config: dict):
         except asyncio.TimeoutError:
             logger.warning(f"一定时间内未完成播放, 保活失败.")
             return False
-        
+
     tasks = []
     async for emby, time, progress, logger in login(config):
         tasks.append(wrapper(emby, time, progress, logger))
@@ -281,6 +286,7 @@ async def watcher(config: dict):
     fails = len(tasks) - sum(results)
     if fails:
         logger.error(f"保活失败 ({fails}/{len(tasks)}).")
+
 
 async def watcher_schedule(config: dict, days: int = 7):
     """计划任务 - 观看一个视频."""
@@ -290,21 +296,22 @@ async def watcher_schedule(config: dict, days: int = 7):
         await asyncio.sleep((dt - datetime.now()).seconds)
         await watcher(config)
 
+
 async def watcher_continuous(config: dict):
     """入口函数 - 持续观看."""
-    
+
     async def wrapper(emby, time, progress, logger):
         if time:
-            logger.info(f'即将连续播放视频, 持续 {time} 秒.')
+            logger.info(f"即将连续播放视频, 持续 {time} 秒.")
         else:
-            logger.info(f'即将无限连续播放视频.')
+            logger.info(f"即将无限连续播放视频.")
         try:
             await asyncio.wait_for(watch_continuous(emby, logger), time)
         except asyncio.TimeoutError:
             return True
         else:
             return False
-    
+
     tasks = []
     async for emby, time, progress, logger in login(config, continuous=True):
         tasks.append(wrapper(emby, time, progress, logger))

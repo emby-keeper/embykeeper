@@ -90,10 +90,12 @@ class Messager:
         self.basedir = basedir
         self.config = config
 
-        self.min_interval = timedelta(seconds=config.get("min_interval", config.get("interval", 1800)))  # 两条消息间的最小间隔时间
+        self.min_interval = timedelta(
+            seconds=config.get("min_interval", config.get("interval", 1800))
+        )  # 两条消息间的最小间隔时间
         self.max_interval = timedelta(seconds=config.get("max_interval", None))  # 两条消息间的最大间隔时间
         if self.min_interval > self.max_interval:
-            raise ValueError('最小间隔不应大于最大间隔')
+            raise ValueError("最小间隔不应大于最大间隔")
 
         self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
