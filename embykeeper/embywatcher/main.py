@@ -98,11 +98,12 @@ async def play(obj: EmbyObject, time=10, progress=1000):
         time = progress
     # 获取播放源
     resp = await c.postJson(f"/Items/{obj.id}/PlaybackInfo", isPlayBack=True, AutoOpenLiveStream=True)
-    if not resp.get("MediaSources", None):
-        raise PlayError("无视频源")
-    else:
-        play_session_id = resp["PlaySessionId"]
+    play_session_id = resp.get("PlaySessionId", "")
+    if "MediaSources" in resp:
         media_source_id = resp["MediaSources"][0]["Id"]
+    else:
+        media_source_id = obj.id
+        
     # 模拟播放
     playing_info = {
         "ItemId": obj.id,
