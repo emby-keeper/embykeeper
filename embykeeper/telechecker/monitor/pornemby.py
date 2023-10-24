@@ -24,7 +24,7 @@ class PornembyMonitor:
         async def on_trigger(self, message: Message, key, reply):
             if self.client.me.name == key:
                 pornemby_status["nohp"] = datetime.today().date()
-    
+
     class PornembyDragonRainMonitor(Monitor):
         name = "Pornemby 红包雨"
         chat_user = "PronembyTGBot2_bot"

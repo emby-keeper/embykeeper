@@ -3,4 +3,4 @@
 misty_monitors = {}
 misty_locks = {}
 
-pornemby_status = {'nohp': None}
+pornemby_status = {"nohp": None}

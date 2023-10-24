@@ -35,7 +35,7 @@ async def main(
         None,
         dir_okay=False,
         allow_dash=True,
-        envvar=f"{__name__.upper()}_CONFIG",
+        envvar=f"EK_CONFIG_FILE",
         rich_help_panel="参数",
         help="配置文件 (置空以生成)",
     ),
@@ -67,7 +67,13 @@ async def main(
         help=f"打印 {__name__.capitalize()} 版本",
     ),
     instant: bool = typer.Option(
-        True, "--instant/--no-instant", "-i/-I", rich_help_panel="调试参数", help="立刻执行一次任务"
+        True,
+        "--instant/--no-instant",
+        "-i/-I",
+        envvar="EK_INSTANT",
+        show_envvar=False,
+        rich_help_panel="调试参数",
+        help="立刻执行一次任务",
     ),
     once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
     verbosity: int = typer.Option(
@@ -83,10 +89,10 @@ async def main(
     debug_cron: bool = typer.Option(
         False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
     ),
-    simple_log: bool = typer.Option(False, "--simple-log", "-L", help="简化日志输出格式"),
-    follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试参数", help="仅启动消息调试"),
-    analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试参数", help="仅启动历史信息分析"),
-    dump: List[str] = typer.Option([], "--dump", "-D", rich_help_panel="调试参数", help="仅启动更新日志"),
+    simple_log: bool = typer.Option(False, "--simple-log", "-L", rich_help_panel="调试参数", help="简化日志输出格式"),
+    follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试工具", help="仅启动消息调试"),
+    analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"),
+    dump: List[str] = typer.Option([], "--dump", "-D", rich_help_panel="调试工具", help="仅启动更新日志"),
     save: bool = typer.Option(False, "--save", "-S", rich_help_panel="调试参数", help="记录原始更新日志"),
     public: bool = typer.Option(False, "--public", "-P", rich_help_panel="调试参数", help="启用公共仓库部署模式"),
     basedir: Path = typer.Option(None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"),
@@ -149,10 +155,12 @@ async def main(
 
     if follow:
         from .telechecker.debug import follower
+
         return await follower(config)
 
     if analyze:
         from .telechecker.debug import analyzer
+
         indent = " " * 23
         chats = typer.prompt(indent + "请输入群组用户名 (以空格分隔)").split()
         keywords = typer.prompt(indent + "请输入关键词 (以空格分隔)", default="", show_default=False)
@@ -162,11 +170,12 @@ async def main(
         limit = typer.prompt(indent + "请输入各群组最大获取数量", default=10000, type=int)
         outputs = typer.prompt(indent + "请输入最大输出数量", default=1000, type=int)
         return await analyzer(config, chats, keywords, timerange, limit, outputs)
-    
+
     if dump:
         from .telechecker.debug import dumper
+
         return await dumper(config, dump)
-    
+
     from .embywatcher.main import watcher, watcher_schedule
     from .telechecker.main import (
         checkiner,
@@ -180,6 +189,7 @@ async def main(
 
     if save:
         from .telechecker.debug import saver
+
         asyncio.create_task(saver(config))
 
     if instant and not debug_cron:

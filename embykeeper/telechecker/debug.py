@@ -6,10 +6,8 @@ import yaml
 from dateutil import parser
 from loguru import logger
 from pyrogram.enums import ChatType
-from pyrogram.handlers import (CallbackQueryHandler, EditedMessageHandler,
-                               MessageHandler, RawUpdateHandler)
-from pyrogram.types import (CallbackQuery, InlineKeyboardMarkup, InlineQuery,
-                            Message, ReplyKeyboardMarkup)
+from pyrogram.handlers import CallbackQueryHandler, EditedMessageHandler, MessageHandler, RawUpdateHandler
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineQuery, Message, ReplyKeyboardMarkup
 from rich import box
 from rich.live import Live
 from rich.panel import Panel
@@ -21,7 +19,8 @@ from ..var import console
 from . import __name__
 from .tele import Client, ClientsSession
 
-log = logger.bind(scheme='debugtool')
+log = logger.bind(scheme="debugtool")
+
 
 async def _dump_message(client: Client, message: Message, table: Table):
     """消息调试工具, 将消息更新列到 table 中."""
@@ -84,7 +83,8 @@ async def _dump_message(client: Client, message: Message, table: Table):
         "|",
         "; ".join(others),
     )
-    
+
+
 async def follower(config: dict):
     """消息调试工具入口函数."""
     columns = [
@@ -111,19 +111,22 @@ async def follower(config: dict):
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
+
 async def _dumper_raw(client, update, users, chats):
     await client.queue.put(update)
-    
+
+
 async def _dumper_update(client, update):
     await client.queue.put(update)
 
-async def dumper(config: dict, types=['message']):
-    type_handler ={
-        'message': MessageHandler(_dumper_update),
-        'edited_message': EditedMessageHandler(_dumper_update),
-        'callback': CallbackQueryHandler(_dumper_update),
-        'inline': InlineKeyboardMarkup(_dumper_update),
-        'raw': RawUpdateHandler(_dumper_raw),
+
+async def dumper(config: dict, types=["message"]):
+    type_handler = {
+        "message": MessageHandler(_dumper_update),
+        "edited_message": EditedMessageHandler(_dumper_update),
+        "callback": CallbackQueryHandler(_dumper_update),
+        "inline": InlineKeyboardMarkup(_dumper_update),
+        "raw": RawUpdateHandler(_dumper_raw),
     }
     queue = asyncio.Queue()
     async with ClientsSession.from_config(config) as clients:
@@ -139,24 +142,27 @@ async def dumper(config: dict, types=['message']):
         while True:
             update = await queue.get()
             if isinstance(update, Message):
-                title = 'Message'
+                title = "Message"
             elif isinstance(update, CallbackQuery):
-                title = 'CallbackQuery'
+                title = "CallbackQuery"
             elif isinstance(update, InlineQuery):
-                title = 'InlineQuery'
+                title = "InlineQuery"
             else:
                 title = None
             console.rule(title)
             print(update)
 
+
 async def _saver_raw(client, update, users, chats):
     await client.saver_queue.put(update)
-    
+
+
 async def _saver_dumper(queue, output):
-    async with aiofiles.open(output, 'w+', buffering=1) as f:
+    async with aiofiles.open(output, "w+", buffering=1) as f:
         while True:
             update = await queue.get()
-            await f.write(str(update) + '\n')
+            await f.write(str(update) + "\n")
+
 
 async def saver(config: dict):
     async with ClientsSession.from_config(config) as clients:
@@ -168,8 +174,10 @@ async def saver(config: dict):
             tasks.append(_saver_dumper(queue, output))
         await asyncio.gather(*tasks)
 
+
 class IndentDumper(yaml.Dumper):
     """输出带缩进的 YAML."""
+
     def increase_indent(self, flow=False, indentless=False):
         return super().increase_indent(flow, False)
 

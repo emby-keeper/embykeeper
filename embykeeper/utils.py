@@ -172,12 +172,13 @@ class AsyncTaskPool:
                     if t.done():
                         yield t
                         self.tasks.remove(t)
-    
+
     async def wait(self):
         results = []
         async for t in self.as_completed():
             results.append(t.result())
         return results
+
 
 class AsyncCountPool(dict):
     """

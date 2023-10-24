@@ -145,6 +145,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
             if not version_matching:
                 break
 
+
 async def get_data(basedir: Path, name: str, proxy: dict = None, caller: str = None):
     async for data in get_datas(basedir, name, proxy, caller):
         return data

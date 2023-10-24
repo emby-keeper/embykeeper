@@ -8,7 +8,7 @@ from typing import Iterable, List, Union
 
 import yaml
 from loguru import logger
-from pyrogram.errors import RPCError
+from pyrogram.errors import RPCError, ChatWriteForbidden
 from schema import Optional, Schema, SchemaError
 from dateutil import parser
 
@@ -215,7 +215,7 @@ class Messager:
 
     def prepare_send(self, message):
         return message
-        
+
     async def send(self, message):
         message = await self.prepare_send(message)
         if not message:
@@ -230,6 +230,17 @@ class Messager:
                 self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: [gray50]{message}[/]')
                 try:
                     await tg.send_message(self.chat_name, message)
+                except ChatWriteForbidden as e:
+                    try:
+                        chat = await tg.get_chat(self.chat_name)
+                        if chat.permissions.can_send_messages:
+                            self.log.warning(f"发送失败: 已全员禁言.")
+                        else:
+                            member = await chat.get_member(tg.me.id)
+                            delta = member.until_date - datetime.now()
+                            self.log.warning(f"发送失败: 您已被禁言 {delta.total_seconds()} 秒.")
+                    except RPCError:
+                        self.log.warning(f"发送失败: {e}.")
                 except RPCError as e:
                     self.log.warning(f"发送失败: {e}.")
                 except KeyError as e:

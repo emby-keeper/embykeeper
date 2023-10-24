@@ -20,6 +20,7 @@ from .bots.base import BaseBotCheckin
 
 logger = logger.bind(scheme="telegram")
 
+
 def get_spec(type: str):
     """服务模块路径解析."""
     if type == "checkiner":
@@ -48,7 +49,7 @@ def get_names(type: str, allow_ignore=False) -> List[str]:
             if not getattr(module, "__ignore__", False):
                 results.append(mn)
         else:
-            if (not mn == 'base') and (not mn == 'test'):
+            if (not mn == "base") and (not mn == "test"):
                 results.append(mn)
     return results
 
@@ -83,6 +84,7 @@ def extract(clss: List[Type]) -> List[Type]:
             extracted.append(cls)
     return extracted
 
+
 async def _checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     """签到器壳, 用于随机等待开始."""
     if wait > 0:
@@ -90,6 +92,7 @@ async def _checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     await asyncio.sleep(wait * 60)
     async with sem:
         return await checkiner._start()
+
 
 async def _gather_task(tasks, username):
     return username, await asyncio.gather(*tasks)

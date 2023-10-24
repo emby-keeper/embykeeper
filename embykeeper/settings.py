@@ -191,7 +191,7 @@ def write_faked_config(path):
         telegram.append(t)
     doc["telegram"] = telegram
     for t in doc["telegram"]:
-        t.value.item("send").comment("启用该账号的自动水群功能 (谨慎使用)")
+        t.value.item("send").comment("启用该账号的自动水群功能 (需要高级账号, 谨慎使用)")
         t.value.item("monitor").comment("启用该账号的自动监控功能 (需要高级账号)")
     doc.add(nl())
     doc.add(comment("Emby 账号设置, 您可以重复该片段多次以增加多个账号."))

@@ -2,6 +2,7 @@ from pyrogram.types import Message
 
 from .base import BotCheckin
 
+
 class MagicCheckin(BotCheckin):
     name = "魔法Emby"
     bot_username = "Magic_EmbyBot"
