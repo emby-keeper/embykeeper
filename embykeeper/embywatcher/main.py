@@ -103,7 +103,7 @@ async def play(obj: EmbyObject, time: float = 10):
         raise PlayError("无法开始播放")
 
     t = time
-    last_report_t = None
+    last_report_t = t
     while t > 0:
         if last_report_t and last_report_t - t > (5 if debug else 30):
             logger.info(f'正在播放: "{truncate_str(obj.name, 10)}" (还剩 {t:.0f} 秒).')
@@ -212,7 +212,7 @@ async def watch(emby, time, logger, retries=5):
                         break
                     finally:
                         try:
-                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 2)):
+                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 5)):
                                 logger.debug(f"未能成功从最近播放中隐藏视频.")
                         except asyncio.TimeoutError:
                             logger.debug(f"从最近播放中隐藏视频超时.")
