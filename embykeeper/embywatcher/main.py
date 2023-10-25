@@ -128,8 +128,7 @@ async def play(obj: EmbyObject, time=10, progress=1000):
         pass
     finally:
         task.cancel()
-    if not is_ok(await c.post("/Sessions/Playing/Stopped", **playing_info)):
-        raise PlayError("无法正常结束播放")
+    await c.post("/Sessions/Playing/Stopped", **playing_info)
     return True
 
 
