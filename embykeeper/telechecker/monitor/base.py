@@ -5,7 +5,7 @@ import random
 import re
 from contextlib import asynccontextmanager
 import string
-from typing import Awaitable, Callable, Iterable, List, Sized, Union
+from typing import Awaitable, Callable, Iterable, List, Optional, Sized, Union
 
 from loguru import logger
 from appdirs import user_data_dir
@@ -107,7 +107,7 @@ class Monitor:
     chat_delay: int = 0  # 发信延迟 (s)
     chat_follow_user: int = 0  # 需要等待 N 个用户发送 {chat_reply} 方可回复
     chat_reply: Union[
-        str, Callable[[Message, Union[str, List[str]]], Union[str, Awaitable[str]]]
+        str, Callable[[Message, Optional[Union[str, List[str]]]], Union[str, Awaitable[str]]]
     ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
     allow_edit: bool = True  # 编辑消息内容后也触发
@@ -238,10 +238,18 @@ class Monitor:
         text = message.text or message.caption
         if cls.chat_keyword:
             for k in to_iterable(cls.chat_keyword):
+                if k is None:
+                    if text is None:
+                        yield None
+                    else:
+                        continue
+                else:
+                    continue
                 for m in re.findall(k, text, re.IGNORECASE):
                     yield m
         else:
-            return text
+            yield text
+                
 
     async def get_reply(self, message: Message, key: Union[str, List[str]]):
         """根据 keys 生成回复内容."""
@@ -257,6 +265,8 @@ class Monitor:
     @staticmethod
     def get_spec(keys):
         """返回 keys 的简要表示."""
+        if keys is None:
+            return "<仅媒体消息>"
         if isinstance(keys, Iterable) and not isinstance(keys, str):
             keys = " ".join([str(k).strip() for k in keys])
         return truncate_str(keys.replace("\n", " ").strip(), 30)
@@ -305,7 +315,7 @@ class Monitor:
                         f'从众计数 ({self.chat_follow_user - now}/{self.chat_follow_user}): "{message.from_user.name}"'
                     )
 
-    async def on_trigger(self, message: Message, key: Union[List[str], str], reply: str):
+    async def on_trigger(self, message: Message, key: Optional[Union[List[str], str]], reply: str):
         """
         可修改的回调函数.
         参数:

@@ -29,6 +29,7 @@ class PornembyMonitor:
         name = "Pornemby 红包雨"
         chat_user = "PronembyTGBot2_bot"
         chat_name = "Pornemby"
+        chat_keyword = [None]
 
         async def on_trigger(self, message: Message, key, reply):
             if message.reply_markup:
@@ -200,7 +201,6 @@ class PornembyMonitor:
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
             result = self.cache.get(key[0], None)
             if result:
-                await asyncio.sleep(random.randint(10, 15) / 10)
                 self.log.info(f"从缓存回答问题为{result}: {spec}.")
             elif self.config.get("only_history", False):
                 self.log.info(f"未从历史缓存找到问题, 请自行回答: {spec}.")
@@ -217,6 +217,7 @@ class PornembyMonitor:
                     self.log.info(f"错误次数超限, 回答失败: {spec}.")
                     return
             try:
+                await asyncio.sleep(random.randint(10, 15) / 10)
                 answer = await message.click(self.key_map[result])
                 self.log.debug(f"回答返回值: {answer.message} {spec}.")
             except KeyError:

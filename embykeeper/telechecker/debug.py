@@ -150,7 +150,7 @@ async def dumper(config: dict, types=["message"]):
             else:
                 title = None
             console.rule(title)
-            print(update)
+            print(update, flush=True)
 
 
 async def _saver_raw(client, update, users, chats):
