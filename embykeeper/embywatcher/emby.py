@@ -19,6 +19,7 @@ logger = logger.bind(scheme="embywatcher")
 
 faker = Faker()
 
+
 class Connector(_Connector):
     """重写的 Emby 连接器, 以支持代理."""
 
@@ -26,27 +27,29 @@ class Connector(_Connector):
         super().__init__(url, **kargs)
         self.proxy = proxy
         self.fake_headers = self.get_fake_headers()
-        
+
     def get_fake_headers(self):
         headers = {}
         ios_uas = [
-            'CFNetwork/1335.0.3 Darwin/21.6.0',
-            'CFNetwork/1406.0.4 Darwin/22.4.0',
-            'CFNetwork/1333.0.4 Darwin/21.5.0',
+            "CFNetwork/1335.0.3 Darwin/21.6.0",
+            "CFNetwork/1406.0.4 Darwin/22.4.0",
+            "CFNetwork/1333.0.4 Darwin/21.5.0",
         ]
-        client = 'Filebox',
+        client = ("Filebox",)
         device = f"{faker.first_name()}'s iPhone"
-        version = f'1.2.{random.randint(0, 32)}'
-        ua = f'Fileball/200 {random.choice(ios_uas)}'
-        auth_header = f'MediaBrowser Client="{client}",' + \
-                        f'Device="{device}",' + \
-                        f'DeviceId="{self.device_id}",' + \
-                        f'Version="{version}"'
+        version = f"1.2.{random.randint(0, 32)}"
+        ua = f"Fileball/200 {random.choice(ios_uas)}"
+        auth_header = (
+            f'MediaBrowser Client="{client}",'
+            + f'Device="{device}",'
+            + f'DeviceId="{self.device_id}",'
+            + f'Version="{version}"'
+        )
         if self.token:
-            headers['X-Emby-Token'] = self.token
+            headers["X-Emby-Token"] = self.token
         headers["User-Agent"] = ua
         headers["X-Emby-Authorization"] = auth_header
-        headers["Content-Type"] = 'application/json'
+        headers["Content-Type"] = "application/json"
         return headers
 
     async def _get_session(self):
@@ -97,11 +100,11 @@ class Connector(_Connector):
                     await asyncio.sleep(random.uniform(5, 10))
         finally:
             await self._end_session()
-            
-    def get_url(self, path='/', websocket=False, remote=True, userId=None, pass_uid=False, **query):
+
+    def get_url(self, path="/", websocket=False, remote=True, userId=None, pass_uid=False, **query):
         userId = userId or self.userid
         if pass_uid:
-            query['userId'] = userId
+            query["userId"] = userId
 
         if remote:
             url = self.urlremote or self.url
@@ -109,20 +112,15 @@ class Connector(_Connector):
             url = self.url
 
         if websocket:
-            scheme = url.scheme.replace('http', 'ws')
+            scheme = url.scheme.replace("http", "ws")
         else:
             scheme = url.scheme
 
-        url = urlunparse(
-            (scheme, url.netloc, path, '', '{params}', '')
-        ).format(
-            UserId	= userId,
-            ApiKey	= self.api_key,
-            DeviceId	= self.device_id,
-            params	= urlencode(query)
+        url = urlunparse((scheme, url.netloc, path, "", "{params}", "")).format(
+            UserId=userId, ApiKey=self.api_key, DeviceId=self.device_id, params=urlencode(query)
         )
 
-        return url[:-1] if url[-1] == '?' else url
+        return url[:-1] if url[-1] == "?" else url
 
 
 class Emby(_Emby):

@@ -249,7 +249,6 @@ class Monitor:
                     yield m
         else:
             yield text
-                
 
     async def get_reply(self, message: Message, key: Union[str, List[str]]):
         """根据 keys 生成回复内容."""

@@ -18,12 +18,14 @@ logger = logger.bind(scheme="embywatcher")
 class PlayError(Exception):
     pass
 
+
 def is_ok(co):
     """判定返回来自 emby 的响应为成功."""
     if isinstance(co, tuple):
         co, *_ = co
     if 200 <= co < 300:
         return True
+
 
 async def get_random_media(emby: Emby):
     """获取随机视频."""
@@ -51,11 +53,11 @@ def get_last_played(obj: EmbyObject):
     last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
     return datetime.fromisoformat(last_played[:-2]) if last_played else None
 
-    
+
 async def play(obj: EmbyObject, time: float = 10):
     """模拟播放视频."""
     c: Connector = obj.connector
-    
+
     # 检查
     totalticks = obj.object_dict.get("RunTimeTicks")
     if not totalticks:
@@ -65,7 +67,7 @@ async def play(obj: EmbyObject, time: float = 10):
             raise PlayError("视频长度低于观看进度所需")
     else:
         time = totalticks
-    
+
     # 获取播放源
     resp = await c.postJson(
         f"/Items/{obj.id}/PlaybackInfo",
@@ -81,7 +83,7 @@ async def play(obj: EmbyObject, time: float = 10):
         media_source_id = obj.id
 
     # 模拟播放
-    playing_info = lambda tick:{
+    playing_info = lambda tick: {
         "VolumeLevel": 100,
         "CanSeek": True,
         "BufferedRanges": [{"start": 0, "end": tick}] if tick else [],
@@ -99,7 +101,7 @@ async def play(obj: EmbyObject, time: float = 10):
 
     if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0))):
         raise PlayError("无法开始播放")
-    
+
     t = time
     last_report_t = None
     while t > 0:
@@ -109,20 +111,21 @@ async def play(obj: EmbyObject, time: float = 10):
         st = random.uniform(3, 5)
         await asyncio.sleep(st)
         t -= st
-        tick = int((time-t) * 10000000)
+        tick = int((time - t) * 10000000)
         payload = playing_info(tick)
         try:
-            resp = await asyncio.wait_for(c.post("/Sessions/Playing/Progress", data=payload, EventName="timeupdate"), 10)
+            resp = await asyncio.wait_for(
+                c.post("/Sessions/Playing/Progress", data=payload, EventName="timeupdate"), 10
+            )
         except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError) as e:
             logger.debug(f"播放状态设定错误: {e}")
         else:
             if not is_ok(resp):
                 logger.debug(f"播放状态设定错误: {resp}")
-    
+
     if not is_ok(await c.post("/Sessions/Playing/Stopped", data=playing_info(time * 10000000))):
         raise PlayError("无法停止播放")
     return True
-    
 
 
 async def login(config, continuous=False):
@@ -175,15 +178,17 @@ async def watch(emby, time, logger, retries=5):
                 while True:
                     try:
                         await play(obj, t)
-                        obj = await obj.update('UserData')
+                        obj = await obj.update("UserData")
                         if obj.play_count < 1:
                             raise PlayError("尝试播放后播放数低于1")
                         last_played = get_last_played(obj)
                         if not last_played:
                             raise PlayError("尝试播放后无记录")
                         last_played = last_played.strftime("%Y-%m-%d %H:%M")
-                        
-                        prompt = f"[yellow]成功播放视频[/], 当前该视频播放 {obj.play_count} 次, 上次播放于 {last_played} (服务端时间)."
+
+                        prompt = (
+                            f"[yellow]成功播放视频[/], 当前该视频播放 {obj.play_count} 次, 上次播放于 {last_played} (服务端时间)."
+                        )
                         logger.bind(notify="成功保活.").info(prompt)
                         return True
                     except (ClientError, OSError) as e:
@@ -282,7 +287,7 @@ async def watcher(config: dict):
         except asyncio.TimeoutError:
             logger.warning(f"一定时间内未完成播放, 保活失败.")
             return False
-    
+
     tasks = []
     async for emby, time, logger in login(config):
         tasks.append(wrapper(emby, time, logger))
