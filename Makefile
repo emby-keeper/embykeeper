@@ -5,10 +5,10 @@
 USE_MIRROR ?= True
 
 ifeq ($(USE_MIRROR), True)
-    CONDA_URL := "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+    CONDA_URL := "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-$$(uname -i).sh"
     PYPI_URL := "https://pypi.tuna.tsinghua.edu.cn/simple"
 else
-    CONDA_URL := "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+    CONDA_URL := "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-$$(uname -i).sh"
     PYPI_URL := "https://pypi.org/simple"
 endif
 
