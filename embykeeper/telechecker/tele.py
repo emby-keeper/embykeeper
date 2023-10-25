@@ -451,7 +451,8 @@ class ClientsSession:
                     account.update(random.choice(list(API_KEY.values())))
                 try:
                     client = Client(
-                        app_version=f"{__name__.capitalize()} {__version__}",
+                        app_version=__version__,
+                        device_model=__name__.capitalize(),
                         name=account["phone"],
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
