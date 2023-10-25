@@ -1,4 +1,5 @@
 import asyncio
+import random
 from pyrogram.types import Message
 
 from .base import Monitor
@@ -23,10 +24,10 @@ class JudogMonitor(Monitor):
         wr = async_partial(self.client.wait_reply, self.bot_username)
         msg: Message = await wr("/start")
         if "选择您要使用的功能" in (msg.caption or msg.text):
-            await asyncio.sleep(1)
+            await asyncio.sleep(random.uniform(2, 4))
             msg = await wr("🔱账号")
         if "账号管理中心" in (msg.caption or msg.text):
-            await asyncio.sleep(1)
+            await asyncio.sleep(random.uniform(2, 4))
             msg = await wr("💡注册")
         if "目前已无可注册资格" in (msg.caption or msg.text):
             return

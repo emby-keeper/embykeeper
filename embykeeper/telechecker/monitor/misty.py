@@ -1,4 +1,5 @@
 import asyncio
+import random
 import string
 
 from pyrogram.types import Message
@@ -52,16 +53,16 @@ class MistyMonitor(Monitor):
                 try:
                     msg: Message = await wr("/cancel")
                     if "选择您要使用的功能" in (msg.caption or msg.text):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🌏切换服务器")
                     if "选择您要使用的服务器" in (msg.text or msg.caption):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("✨Misty")
                     if "选择您要使用的功能" in (msg.caption or msg.text):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("⚡️账号功能")
                     if "请选择功能" in (msg.text or msg.caption):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("⚡️注册账号")
                         if "请输入验证码" in (msg.caption or msg.text):
                             data = await self.client.download_media(msg, in_memory=True)

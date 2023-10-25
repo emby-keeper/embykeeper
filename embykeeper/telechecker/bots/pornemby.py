@@ -1,4 +1,5 @@
 import asyncio
+import random
 from .base import AnswerBotCheckin
 
 from pyrogram.types import Message
@@ -16,7 +17,7 @@ class PornEmbyCheckin(AnswerBotCheckin):
         return await super().start()
 
     async def on_photo(self, message: Message):
-        await asyncio.sleep(1)
+        await asyncio.sleep(random.uniform(2, 4))
         async with self.client.catch_reply(self.bot_username) as f:
             try:
                 await message.click(0)

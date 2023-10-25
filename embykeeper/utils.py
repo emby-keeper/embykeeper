@@ -271,8 +271,8 @@ def random_time(start_time: time = None, end_time: time = None):
     end_datetime = datetime.combine(date.today(), end_time or time(23, 59, 59))
     if end_datetime < start_datetime:
         end_datetime += timedelta(days=1)
-    time_diff_seconds = (end_datetime - start_datetime).seconds
-    random_seconds = random.randint(0, time_diff_seconds)
+    time_diff_seconds = (end_datetime - start_datetime).total_seconds()
+    random_seconds = random.randint(0, int(time_diff_seconds))
     random_time = (start_datetime + timedelta(seconds=random_seconds)).time()
     return random_time
 

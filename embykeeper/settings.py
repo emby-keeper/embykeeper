@@ -74,8 +74,7 @@ def check_config(config):
                         ),
                         "username": str,
                         "password": str,
-                        Optional("time"): PositiveInt(),
-                        Optional("progress"): PositiveInt(),
+                        Optional("time"): Or(PositiveInt(), [PositiveInt()]),
                         Optional("continuous"): bool,
                     }
                 )
@@ -203,12 +202,10 @@ def write_faked_config(path):
                 "url": fake.url(["https"]),
                 "username": fake.profile()["username"],
                 "password": fake.password(),
-                "time": 10,
-                "progress": 1000,
+                "time": [120, 240],
             }
         )
-        t["time"].comment("模拟观看的时长 (秒)")
-        t["progress"].comment("模拟观看后设置的时间进度 (秒)")
+        t["time"].comment("模拟观看的时长范围 (秒)")
         emby.append(t)
     doc["emby"] = emby
     with open(path, "w+") as f:

@@ -5,14 +5,13 @@ from aiohttp import ClientSession
 from aiohttp_socks import ProxyConnector
 from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram.raw.functions.users import GetFullUser
-from fake_useragent import UserAgent
+from faker import Faker
 
 from ...utils import remove_prefix
 from ..link import Link
 from .base import BaseBotCheckin
 
 __ignore__ = True
-
 
 class NebulaCheckin(BaseBotCheckin):
     name = "Nebula"
@@ -62,7 +61,7 @@ class NebulaCheckin(BaseBotCheckin):
             self.log.warning("签到失败: 无法获得验证码.")
             return await self.fail()
         if not useragent:
-            useragent = UserAgent(browsers=["edge"]).random
+            useragent = Faker().safari()
         query["token"] = token
         url_checkin = scheme._replace(query=urlencode(query, True)).geturl()
         connector = ProxyConnector.from_url(proxy)

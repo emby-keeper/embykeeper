@@ -217,7 +217,7 @@ class PornembyMonitor:
                     self.log.info(f"错误次数超限, 回答失败: {spec}.")
                     return
             try:
-                await asyncio.sleep(random.randint(10, 15) / 10)
+                await asyncio.sleep(random.uniform(2, 4))
                 answer = await message.click(self.key_map[result])
                 self.log.debug(f"回答返回值: {answer.message} {spec}.")
             except KeyError:

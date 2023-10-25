@@ -1,4 +1,5 @@
 import asyncio
+import random
 from .base import BotCheckin
 
 from pyrogram.types import Message
@@ -29,23 +30,23 @@ class MistyCheckin(BotCheckin):
         for _ in range(3):
             try:
                 if retry:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(random.uniform(2, 4))
                     msg = await wr("🛎每日签到")
                     if any(w in (msg.text or msg.caption) for w in ("上次签到", "验证码")):
                         break
                 else:
                     msg: Message = await wr("/cancel")
                     if "选择您要使用的功能" in (msg.caption or msg.text):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🌏切换服务器")
                     if "选择您要使用的服务器" in (msg.text or msg.caption):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("✨Misty")
                     if "选择您要使用的功能" in (msg.caption or msg.text):
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🎲更多功能")
                     if "请选择功能" in msg.text or msg.caption:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🛎每日签到")
                         if any(w in (msg.text or msg.caption) for w in ("上次签到", "验证码")):
                             break

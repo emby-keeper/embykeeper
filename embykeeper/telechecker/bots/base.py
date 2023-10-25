@@ -1,4 +1,5 @@
 import asyncio
+import random
 import re
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
@@ -364,7 +365,7 @@ class BotCheckin(BaseBotCheckin):
                 self.log.info(f"签到失败: 验证码低于设定长度, 正在重试.")
                 await self.retry()
             else:
-                await asyncio.sleep(1)
+                await asyncio.sleep(random.uniform(2, 4))
                 await self.on_captcha(message, captcha)
         else:
             self.log.info(f"签到失败: 接收到空验证码, 正在重试.")

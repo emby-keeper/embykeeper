@@ -52,7 +52,6 @@ dependencies = [
     "thefuzz[speedup]",
     "schema",
     "aiocache",
-    "fake_useragent",
     "pycryptodome",
     "flask<3",
     "flask_socketio",

@@ -41,11 +41,11 @@ class JMSCheckin(AnswerBotCheckin):
         async with self.operable:
             if not self.message:
                 await self.operable.wait()
-            await asyncio.sleep(random.randint(300, 500) / 100)
+            await asyncio.sleep(random.uniform(3, 5))
             for l in captcha:
                 try:
                     await self.message.click(l)
-                    await asyncio.sleep(random.randint(50, 300) / 100)
+                    await asyncio.sleep(random.uniform(3, 5))
                 except ValueError:
                     self.log.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
                     await self.retry()

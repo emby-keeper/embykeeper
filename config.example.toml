@@ -30,7 +30,7 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 2.4.16 生成的.
+# 该部分内容是根据 Embykeeper 2.5.8 生成的.
 
 # 默认启用站点:
 # [service]
@@ -47,27 +47,25 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8616401875896"
+phone = "+8611237341532"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8613257908097"
+phone = "+8618703364922"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://richards.info/"
-username = "lisaharrington"
-password = "VN3Uznu4*B"
-time = 10 # 模拟观看的时长 (秒)
-progress = 1000 # 模拟观看后设置的时间进度 (秒)
+url = "https://www.carey.com/"
+username = "vaughnjohn"
+password = "*V40U^Roho"
+time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.morrison-cox.com/"
-username = "tabithawright"
-password = "77oK!oMd^K"
-time = 10 # 模拟观看的时长 (秒)
-progress = 1000 # 模拟观看后设置的时间进度 (秒)
+url = "https://www.dixon.com/"
+username = "allison41"
+password = "_4L^$KKeny"
+time = [120, 240] # 模拟观看的时长范围 (秒)
