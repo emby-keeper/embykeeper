@@ -206,13 +206,13 @@ class PornembyMonitor:
                 self.log.info(f"未从历史缓存找到问题, 请自行回答: {spec}.")
             else:
                 for retries in range(3):
-                    self.log.debug(f"未从历史缓存找到问题, 开始请求ChatGPT问题回答: {spec}.")
+                    self.log.debug(f"未从历史缓存找到问题, 开始请求云端问题回答: {spec}.")
                     result = await Link(self.client).answer(key[0] + "\n" + key[1])
                     if result:
-                        self.log.info(f"请求ChatGPT问题回答为{result}: {spec}.")
+                        self.log.info(f"请求云端问题回答为{result}: {spec}.")
                         break
                     else:
-                        self.log.info(f"ChatGPT问题错误或超时, 正在重试: {spec}.")
+                        self.log.info(f"云端问题回答错误或超时, 正在重试: {spec}.")
                 else:
                     self.log.info(f"错误次数超限, 回答失败: {spec}.")
                     return
