@@ -10,15 +10,15 @@ on:
     paths-ignore:
       - "*.md"
 
+env:
+  REGISTRY_IMAGE: embykeeper/embykeeper
+
 permissions:
   contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-  REGISTRY_IMAGE: ${{ env.REGISTRY_IMAGE }}
 
 jobs:
   build:
