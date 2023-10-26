@@ -357,9 +357,12 @@ async def watcher_continuous(config: dict):
         tasks.append(wrapper(emby, time, logger))
     return await asyncio.gather(*tasks)
 
-async def watcher_continuous_schedule(config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 1):
+
+async def watcher_continuous_schedule(
+    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 1
+):
     """计划任务 - 持续观看."""
-    
+
     dt = datetime.now() + 10
     t = asyncio.create_task(watcher_continuous(config))
     while True:
