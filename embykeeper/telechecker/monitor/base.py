@@ -238,15 +238,12 @@ class Monitor:
         text = message.text or message.caption
         if cls.chat_keyword:
             for k in to_iterable(cls.chat_keyword):
-                if k is None:
-                    if text is None:
+                if k is None or text is None:
+                    if k is None and text is None:
                         yield None
-                    else:
-                        continue
                 else:
-                    continue
-                for m in re.findall(k, text, re.IGNORECASE):
-                    yield m
+                    for m in re.findall(k, text, re.IGNORECASE):
+                        yield m
         else:
             yield text
 
