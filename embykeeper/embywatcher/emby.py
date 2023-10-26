@@ -28,7 +28,7 @@ class Connector(_Connector):
         self.proxy = proxy
         self.fake_headers = self.get_fake_headers()
         self.watch = asyncio.create_task(self.watchdog())
-        
+
     async def watchdog(self, timeout=60):
         logger.debug("Emby 链接池看门狗启动.")
         try:
@@ -41,7 +41,7 @@ class Connector(_Connector):
                             if s in counter:
                                 counter[s] += 1
                                 if counter[s] >= timeout / 10:
-                                    logger.debug('销毁了 Emby Session')
+                                    logger.debug("销毁了 Emby Session")
                                     async with await self._get_session_lock():
                                         counter[s] = 0
                                         await self._sessions[s].close()
@@ -107,13 +107,13 @@ class Connector(_Connector):
             else:
                 self._session_uses[loop_id] += 1
             return session
-    
+
     async def _end_session(self):
         loop = asyncio.get_running_loop()
         loop_id = hash(loop)
         async with await self._get_session_lock():
             self._session_uses[loop_id] -= 1
-    
+
     async def _get_session_lock(self):
         loop = asyncio.get_running_loop()
         return self._session_locks.setdefault(loop, asyncio.Lock())
