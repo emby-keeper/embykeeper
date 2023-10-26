@@ -288,7 +288,7 @@ async def interactive_config(config: dict = {}):
             )
             if " " in time:
                 try:
-                    time = [int(t) for t in time.split(time)]
+                    time = [int(t) for t in time.split(None, 1)]
                     break
                 except ValueError:
                     logger.warning(f"时长设置不正确, 请重新输入.")
