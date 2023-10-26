@@ -288,16 +288,16 @@ async def interactive_config(config: dict = {}):
             )
             if " " in time:
                 try:
-                    time = [int(t) for t in time.split(t)]
+                    time = [int(t) for t in time.split(time)]
                     break
                 except ValueError:
-                    logger.warning(f"{t} 不是正确的时长数字, 请重新输入.")
+                    logger.warning(f"时长设置不正确, 请重新输入.")
             else:
                 try:
                     time = int(time)
                     break
                 except ValueError:
-                    logger.warning(f"{time} 不是正确的时长数字, 请重新输入.")
+                    logger.warning(f"时长设置不正确, 请重新输入.")
         embies.append({"url": url, "username": username, "password": password, "time": time})
     config = {"telegram": telegrams, "emby": embies}
     advanced = Confirm.ask(pad + "是否配置高级设置", default=False, console=console)
