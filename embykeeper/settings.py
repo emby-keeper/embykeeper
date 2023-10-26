@@ -1,12 +1,9 @@
-import asyncio
 import os
 from pathlib import Path
 import re
 import sys
 import base64
 import hashlib
-import readline
-
 from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
