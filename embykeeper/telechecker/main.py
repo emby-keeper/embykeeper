@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import lru_cache
 import inspect
 import logging
@@ -163,12 +163,12 @@ async def checkiner(config: dict, instant=False):
                     log.bind(notify=True).info(f"签到成功 ({spec}).")
 
 
-async def checkiner_schedule(config: dict, start_time=None, end_time=None, instant=False):
+async def checkiner_schedule(config: dict, start_time=None, end_time=None, days: int = 1, instant=False):
     """签到器计划任务."""
-    dt = next_random_datetime(start_time, end_time, 0)
     while True:
+        dt = next_random_datetime(start_time, end_time, interval_days=days)
         logger.bind(scheme="telechecker").info(f"下一次签到将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
-        await asyncio.sleep((dt - datetime.now()).seconds)
+        await asyncio.sleep((dt - datetime.now()).total_seconds())
         await checkiner(config, instant=instant)
 
 

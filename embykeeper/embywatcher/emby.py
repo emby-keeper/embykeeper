@@ -27,6 +27,39 @@ class Connector(_Connector):
         super().__init__(url, **kargs)
         self.proxy = proxy
         self.fake_headers = self.get_fake_headers()
+        self.watch = asyncio.create_task(self.watchdog())
+        
+    async def watchdog(self, timeout=60):
+        logger.debug("Emby 链接池看门狗启动.")
+        try:
+            counter = {}
+            while True:
+                await asyncio.sleep(10)
+                for s, u in self._session_uses.items():
+                    try:
+                        if u and u <= 0:
+                            if s in counter:
+                                counter[s] += 1
+                                if counter[s] >= timeout / 10:
+                                    logger.debug('销毁了 Emby Session')
+                                    async with await self._get_session_lock():
+                                        counter[s] = 0
+                                        await self._sessions[s].close()
+                                        self._sessions[s] = None
+                                        self._session_uses[s] = None
+                            else:
+                                counter[s] = 1
+                        else:
+                            counter.pop(s, None)
+                    except (TypeError, KeyError):
+                        pass
+        except asyncio.CancelledError:
+            for s in self._sessions.values():
+                if s:
+                    try:
+                        await asyncio.wait_for(s.close(), 1)
+                    except asyncio.TimeoutError:
+                        pass
 
     def get_fake_headers(self):
         headers = {}
@@ -35,7 +68,7 @@ class Connector(_Connector):
             "CFNetwork/1406.0.4 Darwin/22.4.0",
             "CFNetwork/1333.0.4 Darwin/21.5.0",
         ]
-        client = ("Filebox",)
+        client = "Filebox"
         device = f"{faker.first_name()}'s iPhone"
         version = f"1.2.{random.randint(0, 32)}"
         ua = f"Fileball/200 {random.choice(ios_uas)}"
@@ -70,9 +103,27 @@ class Connector(_Connector):
                 session = aiohttp.ClientSession(headers=self.fake_headers, connector=connector)
                 self._sessions[loop_id] = session
                 self._session_uses[loop_id] = 1
+                logger.debug("创建了新的 Emby Session.")
             else:
                 self._session_uses[loop_id] += 1
             return session
+    
+    async def _end_session(self):
+        loop = asyncio.get_running_loop()
+        loop_id = hash(loop)
+        async with await self._get_session_lock():
+            self._session_uses[loop_id] -= 1
+    
+    async def _get_session_lock(self):
+        loop = asyncio.get_running_loop()
+        return self._session_locks.setdefault(loop, asyncio.Lock())
+
+    async def _reset_session(self):
+        async with await self._get_session_lock():
+            loop = asyncio.get_running_loop()
+            loop_id = hash(loop)
+            self._sessions[loop_id] = None
+            self._session_uses[loop_id] = 0
 
     @async_func
     async def _req(self, method, path, params={}, **query):

@@ -8,7 +8,7 @@ from pyrogram.types import Message
 class PornEmbyCheckin(AnswerBotCheckin):
     name = "Pornemby"
     bot_username = "PronembyTGBot2_bot"
-    bot_success_pat = r"(\d+).*?(\d+)[^\d]*$"
+    bot_success_pat = r".*?(\d+)$"
 
     async def start(self):
         if not self.client.me.username:

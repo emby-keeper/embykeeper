@@ -122,7 +122,7 @@ async def main(
     if not config.get("nofail", True):
         logger.warning(f"您当前处于调试模式: 错误将会导致程序停止运行.")
     if debug_cron:
-        logger.warning("您当前处于计划任务调试模式, 将在 3 秒后运行计划任务.")
+        logger.warning("您当前处于计划任务调试模式, 将在 10 秒后运行计划任务.")
 
     default_time = config.get("time", "<6:00PM,10:00PM>")
     default_interval = config.get("interval", 3)
@@ -206,20 +206,31 @@ async def main(
 
     if not once:
         await start_notifier(config)
-        debug_time = datetime.now() + timedelta(seconds=3) if debug_cron else None
         if emby:
-            pool.add(watcher_schedule(config, 1 if debug_cron else emby))
+            if debug_cron:
+                start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
+                pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0))
+            else:
+                pool.add(watcher_schedule(config, days=emby))
             pool.add(watcher_continuous(config))
         if checkin:
-            if debug_time:
-                start_time = end_time = debug_time.time()
+            if debug_cron:
+                start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
             else:
                 checkin_range_match = re.match(r"<\s*(.*),\s*(.*)\s*>", checkin)
                 if checkin_range_match:
                     start_time, end_time = [parser.parse(checkin_range_match.group(i)).time() for i in (1, 2)]
                 else:
                     start_time = end_time = parser.parse(checkin).time()
-            pool.add(checkiner_schedule(config, instant=debug_cron, start_time=start_time, end_time=end_time))
+            pool.add(
+                checkiner_schedule(
+                    config,
+                    instant=debug_cron,
+                    start_time=start_time,
+                    end_time=end_time,
+                    days=0 if debug_cron else 1,
+                )
+            )
         if monitor:
             pool.add(monitorer(config))
         if send:

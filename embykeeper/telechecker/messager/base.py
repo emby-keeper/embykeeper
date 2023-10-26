@@ -223,7 +223,7 @@ class Messager:
                 self.log.debug(
                     f"下一次计划任务将在 [blue]{next_p.at.strftime('%m-%d %H:%M:%S')}[/] 进行 ({'跳过' if next_p.skip else '有效'})."
                 )
-                await asyncio.sleep((next_p.at - datetime.now()).seconds)
+                await asyncio.sleep((next_p.at - datetime.now()).total_seconds())
                 if not next_p.skip:
                     await self._send(next_p.message)
                 self.timeline.remove(next_p)

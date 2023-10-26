@@ -1,7 +1,7 @@
 import asyncio
 import random
 from typing import Iterable, Union
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone, tzinfo
 import uuid
 
 from aiohttp import ClientError, ClientConnectionError
@@ -99,7 +99,7 @@ async def play(obj: EmbyObject, time: float = 10):
         "RepeatMode": "RepeatNone",
     }
 
-    if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0))):
+    if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0.1))):
         raise PlayError("无法开始播放")
 
     t = time
@@ -117,7 +117,15 @@ async def play(obj: EmbyObject, time: float = 10):
             resp = await asyncio.wait_for(
                 c.post("/Sessions/Playing/Progress", data=payload, EventName="timeupdate"), 10
             )
-        except (ClientError, ConnectionError, TimeoutError, asyncio.TimeoutError) as e:
+        except (
+            ClientError,
+            ConnectionError,
+            TimeoutError,
+            asyncio.TimeoutError,
+            asyncio.IncompleteReadError,
+        ) as e:
+            if isinstance(e, asyncio.IncompleteReadError):
+                await c._reset_session()
             logger.debug(f"播放状态设定错误: {e}")
         else:
             if not is_ok(resp):
@@ -125,6 +133,7 @@ async def play(obj: EmbyObject, time: float = 10):
 
     if not is_ok(await c.post("/Sessions/Playing/Stopped", data=playing_info(time * 10000000))):
         raise PlayError("无法停止播放")
+
     return True
 
 
@@ -178,27 +187,36 @@ async def watch(emby, time, logger, retries=5):
                 while True:
                     try:
                         await play(obj, t)
+
                         obj = await obj.update("UserData")
+
                         if obj.play_count < 1:
                             raise PlayError("尝试播放后播放数低于1")
                         last_played = get_last_played(obj)
+
                         if not last_played:
                             raise PlayError("尝试播放后无记录")
-                        last_played = last_played.strftime("%Y-%m-%d %H:%M")
+                        last_played = (
+                            last_played.replace(tzinfo=timezone.utc)
+                            .astimezone(tz=None)
+                            .strftime("%m-%d %H:%M")
+                        )
 
                         prompt = (
-                            f"[yellow]成功播放视频[/], 当前该视频播放 {obj.play_count} 次, 上次播放于 {last_played} (服务端时间)."
+                            f"[yellow]成功播放视频[/], " + f"当前该视频播放 {obj.play_count} 次, " + f"上次播放于 {last_played}."
                         )
                         logger.bind(notify="成功保活.").info(prompt)
                         return True
-                    except (ClientError, OSError) as e:
+                    except (ClientError, OSError, asyncio.IncompleteReadError) as e:
                         retry += 1
                         if retry > retries:
                             logger.warning(f"超过最大重试次数, 保活失败: {e}.")
                             return False
                         else:
+                            if isinstance(e, asyncio.IncompleteReadError):
+                                await emby.connector._reset_session()
                             rt = random.uniform(30, 60)
-                            logger.info(f"连接失败, 等待 {rt:.0f} 秒后重试其他视频: {e}.")
+                            logger.info(f"连接失败, 等待 {rt:.0f} 秒后重试: {e}.")
                             await asyncio.sleep(rt)
                     except PlayError as e:
                         retry += 1
@@ -216,15 +234,19 @@ async def watch(emby, time, logger, retries=5):
                                 logger.debug(f"未能成功从最近播放中隐藏视频.")
                         except asyncio.TimeoutError:
                             logger.debug(f"从最近播放中隐藏视频超时.")
+                        else:
+                            logger.info(f"已从最近播放中隐藏该视频.")
             else:
                 logger.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False
-        except (ClientError, OSError) as e:
+        except (ClientError, OSError, asyncio.IncompleteReadError) as e:
             retry += 1
             if retry > retries:
                 logger.warning(f"超过最大重试次数, 保活失败: {e}.")
                 return False
             else:
+                if isinstance(e, asyncio.IncompleteReadError):
+                    await emby.connector._reset_session()
                 rt = random.uniform(30, 60)
                 logger.info(f"连接失败, 等待 {rt:.0f} 秒后重试其他视频: {e}.")
                 await asyncio.sleep(rt)
@@ -254,8 +276,9 @@ async def watch_continuous(emby: Emby, logger):
                 try:
                     await play(obj, -1, -1)
                 except PlayError as e:
-                    logger.info(f"发生错误: {e}, 正在重试其他视频.")
-                    await asyncio.sleep(1)
+                    rt = random.uniform(30, 60)
+                    logger.info(f"发生错误, 等待 {rt:.0f} 秒后重试: {e}.")
+                    await asyncio.sleep(rt)
                     continue
                 finally:
                     try:
@@ -264,8 +287,11 @@ async def watch_continuous(emby: Emby, logger):
                     except asyncio.TimeoutError:
                         logger.debug(f"从最近播放中隐藏视频超时.")
         except (ClientError, OSError) as e:
-            logger.info(f"连接失败, 正在重试: {e}.")
-            await asyncio.sleep(1)
+            if isinstance(e, asyncio.IncompleteReadError):
+                await emby.connector._reset_session()
+            rt = random.uniform(30, 60)
+            logger.info(f"连接失败, 等待 {rt:.0f} 秒后重试: {e}.")
+            await asyncio.sleep(rt)
         except asyncio.CancelledError:
             raise
         except Exception as e:
@@ -289,20 +315,20 @@ async def watcher(config: dict):
             return False
 
     tasks = []
-    async for emby, time, logger in login(config):
-        tasks.append(wrapper(emby, time, logger))
+    async for emby, time, loggeruser in login(config):
+        tasks.append(wrapper(emby, time, loggeruser))
     results = await asyncio.gather(*tasks)
     fails = len(tasks) - sum(results)
     if fails:
         logger.error(f"保活失败 ({fails}/{len(tasks)}).")
 
 
-async def watcher_schedule(config: dict, days: int = 7):
+async def watcher_schedule(config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 7):
     """计划任务 - 观看一个视频."""
-    dt = next_random_datetime(time(11, 0), time(23, 0), interval_days=days)
     while True:
+        dt = next_random_datetime(start_time, end_time, interval_days=days)
         logger.bind(scheme="embywatcher").info(f"下一次保活将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
-        await asyncio.sleep((dt - datetime.now()).seconds)
+        await asyncio.sleep((dt - datetime.now()).total_seconds())
         await watcher(config)
 
 

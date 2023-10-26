@@ -364,7 +364,7 @@ class ClientsSession:
 
     @classmethod
     async def watchdog(cls, timeout=120):
-        logger.debug("Telegram 账号池 watchdog 启动.")
+        logger.debug("Telegram 账号池看门狗启动.")
         try:
             counter = {}
             while True:
@@ -375,6 +375,7 @@ class ClientsSession:
                             if p in counter:
                                 counter[p] += 1
                                 if counter[p] >= timeout / 10:
+                                    counter[p] = 0
                                     await cls.clean(p)
                             else:
                                 counter[p] = 1

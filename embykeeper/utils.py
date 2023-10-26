@@ -283,10 +283,11 @@ def next_random_datetime(start_time: time = None, end_time: time = None, interva
     target_time = random_time(start_time, end_time)
     offset_date = 0
     while True:
-        offset_date += 1
         t = datetime.combine(datetime.now() + timedelta(days=offset_date), target_time)
         if t >= min_datetime:
             break
+        else:
+            offset_date += 1
     return t
 
 
