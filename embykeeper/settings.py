@@ -291,7 +291,7 @@ async def interactive_config(config: dict = {}):
             )
             if " " in time:
                 try:
-                    time = [int(t) for t in time.split(1)]
+                    time = [int(t) for t in time.split(t)]
                     break
                 except ValueError:
                     logger.warning(f"{t} 不是正确的时长数字, 请重新输入.")
