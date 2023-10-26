@@ -286,22 +286,22 @@ async def interactive_config(config: dict = {}):
         username = Prompt.ask(pad + "请输入您在该 Emby 站点的用户名", console=console)
         password = Prompt.ask(pad + "请输入您在该 Emby 站点的密码 (不显示, 按回车确认)", password=True, console=console)
         while True:
-            time = Prompt.ask(pad + "设置模拟观看时长范围 (秒), 用空格分隔", default="120 240", show_default=True, console=console)
-            if ' ' in time:
+            time = Prompt.ask(
+                pad + "设置模拟观看时长范围 (秒), 用空格分隔", default="120 240", show_default=True, console=console
+            )
+            if " " in time:
                 try:
                     time = [int(t) for t in time.split(1)]
                     break
                 except ValueError:
-                    logger.warning(f'{t} 不是正确的时长数字, 请重新输入.')
+                    logger.warning(f"{t} 不是正确的时长数字, 请重新输入.")
             else:
                 try:
                     time = int(t)
                     break
                 except ValueError:
-                    logger.warning(f'{t} 不是正确的时长数字, 请重新输入.')
-        embies.append(
-            {"url": url, "username": username, "password": password, "time": time}
-        )
+                    logger.warning(f"{t} 不是正确的时长数字, 请重新输入.")
+        embies.append({"url": url, "username": username, "password": password, "time": time})
     config = {"telegram": telegrams, "emby": embies}
     advanced = Confirm.ask(pad + "是否配置高级设置", default=False, console=console)
     config.setdefault("notifier", True)
