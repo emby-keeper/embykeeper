@@ -450,9 +450,7 @@ class ClientsSession:
                     if session_string_file.is_file():
                         with open(session_string_file) as f:
                             session_string = f.read().strip()
-                            in_memory = True
-                else:
-                    in_memory = True
+                in_memory = True
                 if not session_string:
                     if session_file.is_file():
                         in_memory = False
