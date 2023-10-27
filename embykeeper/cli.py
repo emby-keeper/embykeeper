@@ -146,13 +146,7 @@ async def main(
     basedir = Path(basedir or user_data_dir(__name__))
     basedir.mkdir(parents=True, exist_ok=True)
     config["basedir"] = basedir
-    try:
-        session_dir_spec = Path("~") / basedir.relative_to(Path.home())
-    except ValueError:
-        session_dir_spec = basedir
-    if not basedir == Path("/app"):
-        logger.info(f'您的 Telegram 会话将存储至 "{session_dir_spec}", 请注意保管.')
-
+    
     if follow:
         from .telechecker.debug import follower
 

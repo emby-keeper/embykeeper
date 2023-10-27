@@ -10,7 +10,6 @@ import site
 import traceback
 from typing import Any, Coroutine, Iterable, Union
 
-import psutil
 import click
 from loguru import logger
 from typer import Typer
@@ -310,21 +309,6 @@ def humanbytes(B: float):
         return "{0:.2f} GB".format(B / GB)
     elif TB <= B:
         return "{0:.2f} TB".format(B / TB)
-
-
-def get_file_users(path):
-    for proc in psutil.process_iter():
-        try:
-            files = proc.open_files()
-            if files:
-                for _file in files:
-                    if _file.path == path:
-                        return proc
-        except psutil.NoSuchProcess:
-            pass
-    else:
-        return None
-
 
 @asynccontextmanager
 async def no_waiting(lock: asyncio.Lock):

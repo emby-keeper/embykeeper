@@ -33,7 +33,7 @@ from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
 from .. import var, __name__, __version__
-from ..utils import async_partial, show_exception, to_iterable, get_file_users
+from ..utils import async_partial, show_exception, to_iterable
 
 logger = logger.bind(scheme="telegram")
 
@@ -347,7 +347,7 @@ class ClientsSession:
     watch = None
 
     @classmethod
-    def from_config(cls, config, in_memory=False, **kw):
+    def from_config(cls, config, **kw):
         accounts = config.get("telegram", [])
         for k, v in kw.items():
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
@@ -355,7 +355,6 @@ class ClientsSession:
             accounts=accounts,
             proxy=config.get("proxy", None),
             basedir=config.get("basedir", None),
-            in_memory=in_memory,
         )
 
     @classmethod
@@ -426,25 +425,37 @@ class ClientsSession:
                 await client.storage.close()
                 logger.debug(f'登出账号 "{client.phone_number}".')
 
-    def __init__(self, accounts, proxy=None, basedir=None, quiet=False, in_memory=False):
+    def __init__(self, accounts, proxy=None, basedir=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
         self.basedir = basedir or user_data_dir(__name__)
         self.phones = []
         self.done = asyncio.Queue()
         self.quiet = quiet
-        self.in_memory = in_memory
         if not self.watch:
             self.__class__.watch = asyncio.create_task(self.watchdog())
 
-    async def login(self, account, proxy, in_memory=False):
+    async def login(self, account, proxy):
         try:
             account["phone"] = "".join(account["phone"].split())
+            session_file = Path(self.basedir) / f'{account["phone"]}.session'
+            session_string_file = Path(self.basedir) / f'{account["phone"]}.login'
             if not self.quiet:
                 logger.info(f'登录至账号 "{account["phone"]}".')
             for _ in range(3):
                 if account.get("api_id", None) is None or account.get("api_hash", None) is None:
                     account.update(random.choice(list(API_KEY.values())))
+                session_string = account.get("session", None)
+                if not session_string:
+                    if session_string_file.is_file():
+                        with open(session_string_file) as f:
+                            session_string = f.read().strip()
+                            in_memory = True
+                else:
+                    in_memory = True
+                if not session_string:
+                    if session_file.is_file():
+                        in_memory = False
                 try:
                     client = Client(
                         app_version=__version__,
@@ -453,10 +464,9 @@ class ClientsSession:
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
                         phone_number=account["phone"],
-                        session_string=account.get("session", None),
-                        in_memory=in_memory or bool("session" in account),
+                        session_string=session_string,
+                        in_memory=in_memory,
                         proxy=proxy,
-                        # lang_code="zh",
                         workdir=self.basedir,
                     )
                     await client.start()
@@ -473,20 +483,6 @@ class ClientsSession:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
                     show_exception(e)
                     await asyncio.sleep(3)
-                except OperationalError as e:
-                    if "database is locked" in str(e):
-                        session_file = Path(self.basedir) / f'{account["phone"]}.session'
-                        proc = get_file_users(str(session_file.absolute()))
-                        if proc:
-                            spec = f"进程 {proc.name()}({proc.pid}) "
-                        else:
-                            spec = f"未知进程可能"
-                        logger.warning(f'{spec}正在使用账号 "{account["phone"]}", 本次登录将不会存储.')
-                        in_memory = True
-                    else:
-                        logger.warning(f'登录账号 "{account["phone"]}" 时发生数据库异常, 将被跳过: {e}.')
-                        show_exception(e, regular=False)
-                        break
                 else:
                     break
             else:
@@ -499,11 +495,14 @@ class ClientsSession:
             logger.error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过.')
             show_exception(e, regular=False)
         else:
+            if not session_string_file.exists():
+                with open(session_string_file, 'w+') as f:
+                    f.write(await client.export_session_string())
             logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client
 
     async def loginer(self, account):
-        client = await self.login(account, proxy=self.proxy, in_memory=self.in_memory)
+        client = await self.login(account, proxy=self.proxy)
         if isinstance(client, Client):
             async with self.lock:
                 phone = account["phone"]
