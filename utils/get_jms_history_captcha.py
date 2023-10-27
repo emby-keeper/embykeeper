@@ -29,7 +29,7 @@ async def generate(config: Path, output: Path = "captchas.txt"):
                     if msg.photo:
                         photos.append(msg.photo.file_id)
             finally:
-                with open(output, "a+", encoding='utf-8') as f:
+                with open(output, "a+", encoding="utf-8") as f:
                     f.writelines(str(photo) + "\n" for photo in photos)
 
 
