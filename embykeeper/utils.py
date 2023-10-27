@@ -315,7 +315,7 @@ def humanbytes(B: float):
 def get_file_users(path):
     for proc in psutil.process_iter():
         try:
-            files = proc.get_open_files()
+            files = proc.open_files()
             if files:
                 for _file in files:
                     if _file.path == path:
