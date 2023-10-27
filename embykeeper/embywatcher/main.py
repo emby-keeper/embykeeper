@@ -275,7 +275,7 @@ async def watch_continuous(emby: Emby, logger):
                 totalticks = obj.object_dict.get("RunTimeTicks")
                 if not totalticks:
                     raise PlayError("无法获取视频长度")
-                logger.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({totalticks / 10000000:.0f} 秒).')
+                logger.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totalticks / 10000000:.0f} 秒).')
                 try:
                     await play(obj, 0)
                 except PlayError as e:
