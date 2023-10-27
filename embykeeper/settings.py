@@ -205,7 +205,7 @@ def write_faked_config(path):
         t["time"].comment("模拟观看的时长范围 (秒)")
         emby.append(t)
     doc["emby"] = emby
-    with open(path, "w+") as f:
+    with open(path, "w+", encoding='utf-8') as f:
         dump(doc, f)
 
 

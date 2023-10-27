@@ -494,7 +494,7 @@ class ClientsSession:
             show_exception(e, regular=False)
         else:
             if not session_string_file.exists():
-                with open(session_string_file, "w+") as f:
+                with open(session_string_file, "w+", encoding='utf-8') as f:
                     f.write(await client.export_session_string())
             logger.debug(f'登录账号 "{client.phone_number}" 成功.')
             return client

@@ -66,13 +66,13 @@ def test_nonexist_config(in_temp_dir: Path):
 
 
 def test_check_config(in_temp_dir: Path):
-    with open("config.toml", "w+") as f:
+    with open("config.toml", "w+", encoding='utf-8') as f:
         f.write("notifier: true")
     result = runner.invoke(app)
     assert result.exit_code == 252
 
     config = {"telegram": {"phone": "Test"}}
-    with open("config.toml", "w+") as f:
+    with open("config.toml", "w+", encoding='utf-8') as f:
         tomlkit.dump(config, f)
     result = runner.invoke(app)
     assert result.exit_code == 253

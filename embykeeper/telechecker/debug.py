@@ -158,7 +158,7 @@ async def _saver_raw(client, update, users, chats):
 
 
 async def _saver_dumper(queue, output):
-    async with aiofiles.open(output, "w+", buffering=1) as f:
+    async with aiofiles.open(output, "w+", buffering=1, encoding='utf-8') as f:
         while True:
             update = await queue.get()
             await f.write(str(update) + "\n")
@@ -239,7 +239,7 @@ async def analyzer(config: dict, chats, keywords, timerange, limit=10000, output
                         p.advance(pmsgs)
                     p.update(pmsgs, visible=False)
                     p.advance(pchats)
-            with open(target, "w+") as f:
+            with open(target, "w+", encoding='utf-8') as f:
                 yaml.dump(
                     {
                         "messages": [

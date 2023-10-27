@@ -153,7 +153,7 @@ class PornembyMonitor:
                         self.log.info(f"读取问题答案历史: 已读取 {qs} 问题 / {count} 信息.")
                         await asyncio.sleep(2)
             self.log.debug(f"已向问题答案历史缓存写入 {qs} 条问题.")
-            with open(cache_timestamp, "w+") as f:
+            with open(cache_timestamp, "w+", encoding='utf-8') as f:
                 f.write(str(datetime.now().timestamp()))
 
         async def read_cache(self):
