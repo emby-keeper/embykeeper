@@ -11,6 +11,7 @@ import random
 from sqlite3 import OperationalError
 import sys
 from typing import AsyncGenerator, Optional, Union
+import uuid
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
@@ -452,7 +453,7 @@ class ClientsSession:
                 try:
                     client = Client(
                         app_version=__version__,
-                        device_model=__name__.capitalize(),
+                        device_model='Server ' + uuid.uuid1().hex[16:20].upper(),
                         name=account["phone"],
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
