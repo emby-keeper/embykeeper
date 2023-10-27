@@ -45,11 +45,6 @@ _decode = lambda x: "".join(map(chr, to_iterable(pickle.loads(x))))
 API_KEY = {
     "_": {"api_id": _decode(_id), "api_hash": _decode(_hash)}
     # "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    # "android": {"api_id": "6", "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e"},
-    # "ios": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
-    # "desktop": {"api_id": "2040", "api_hash": "b18441a1ff607e10a989891a5462e627"},
-    # "ios-beta": {"api_id": "8", "api_hash": "7245de8e747a0d6fbe11f7cc14fcc0bb"},
-    # "webogram": {"api_id": "2496", "api_hash": "8da85b0d5bfe62527e5b244c209159c3"},
     # "tgx-android": {"api_id": "21724", "api_hash": "3e0cb5efcd52300aec5994fdfc5bdc16"},
     # "tg-react": {"api_id": "414121", "api_hash": "db09ccfc2a65e1b14a937be15bdb5d4b"},
 }
@@ -175,11 +170,11 @@ class Client(pyrogram.Client):
             try:
                 sent_code = await self.send_code(self.phone_number)
                 code_target = {
-                    SentCodeType.APP: "Telegram客户端",
+                    SentCodeType.APP: " Telegram 客户端",
                     SentCodeType.SMS: "短信",
                     SentCodeType.CALL: "来电",
                     SentCodeType.FLASH_CALL: "闪存呼叫",
-                    SentCodeType.FRAGMENT_SMS: "Fragment短信",
+                    SentCodeType.FRAGMENT_SMS: " Fragment 短信",
                     SentCodeType.EMAIL_CODE: "邮件",
                 }
                 if not self.phone_code:
@@ -461,7 +456,7 @@ class ClientsSession:
                         session_string=account.get("session", None),
                         in_memory=in_memory or bool("session" in account),
                         proxy=proxy,
-                        lang_code="zh",
+                        #lang_code="zh",
                         workdir=self.basedir,
                     )
                     await client.start()
