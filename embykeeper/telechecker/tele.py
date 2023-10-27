@@ -448,7 +448,7 @@ class ClientsSession:
                 try:
                     client = Client(
                         app_version=__version__,
-                        device_model='Server ' + uuid.uuid1().hex[16:20].upper(),
+                        device_model="Server " + uuid.uuid1().hex[16:20].upper(),
                         name=account["phone"],
                         api_id=account["api_id"],
                         api_hash=account["api_hash"],
@@ -456,7 +456,7 @@ class ClientsSession:
                         session_string=account.get("session", None),
                         in_memory=in_memory or bool("session" in account),
                         proxy=proxy,
-                        #lang_code="zh",
+                        # lang_code="zh",
                         workdir=self.basedir,
                     )
                     await client.start()
