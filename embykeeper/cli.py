@@ -222,7 +222,7 @@ async def main(
                     instant=debug_cron,
                     start_time=start_time,
                     end_time=end_time,
-                    days=0 if debug_cron else 1,
+                    days=0,
                 )
             )
         if monitor:
