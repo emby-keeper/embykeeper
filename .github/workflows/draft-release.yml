@@ -1,0 +1,33 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  WIN_SCRIPT_ZIP_NAME: 'windows-installer-script-v2.6.15.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Archive Release
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+        directory: 'windows/installer-script'
+        exclusions: 'python-* desktop.ini'
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        draft: true
+        artifacts: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        bodyFile: '.github/RELEASE_BODY.md'

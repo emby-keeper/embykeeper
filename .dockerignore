@@ -4,6 +4,7 @@
 *.session
 *.session-journal
 *.msgs
+*.updates.json
 
 # Test files
 /test.py
@@ -23,13 +24,29 @@
 # Docs
 /images
 
+# Builds
+/windows
+
 # Git
 .git
 .gitignore
-.github
+.gitattributes
 
-# Editor Config
-.editorconfig
+# Cloud Config
+/.github
+/.circleci
+/.codesandbox
+/app.json
+/heroku.yml
+/render.yaml
+
+# Dev Config
+/.pre-commit-config.yaml
+/.bumpversion
+/.editorconfig
+/Makefile
+/tox.ini
+/requirements_dev.txt
 
 # Vscode
 .vscode

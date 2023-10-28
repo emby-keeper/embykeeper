@@ -70,7 +70,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ## 安装与使用
 
-Embykeeper 支持 Docker 或 PyPI 安装, 也支持云部署, 请点击下方按钮开始安装:
+Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 请点击下方按钮开始安装:
 
 [![Setup Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/setup-button.svg)](https://github.com/embykeeper/embykeeper/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)
 
