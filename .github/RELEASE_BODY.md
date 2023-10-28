@@ -1,5 +1,5 @@
 ## What's Changed
 
-1. 
+1.
 
 **Full Changelog**: https://github.com/embykeeper/embykeeper/compare/v0.0.0...v2.6.10
