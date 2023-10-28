@@ -9,7 +9,7 @@ on:
       - 'v*'
 
 env:
-  WIN_SCRIPT_ZIP_NAME: 'windows-installer-script-v2.6.11.zip'
+  WIN_SCRIPT_ZIP_NAME: 'windows-installer-script-v2.6.12.zip'
 
 permissions:
   contents: write
