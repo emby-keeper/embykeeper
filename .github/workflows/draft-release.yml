@@ -1,8 +1,12 @@
 name: Create Windows Installer Script Archive
 
 on:
-  release:
-    types: [released]
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
 
 env:
   ZIP_NAME: 'windows-installer-script-v2.6.10.zip'
@@ -25,5 +29,7 @@ jobs:
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:
+        prerelease: true
         artifacts: ${{ env.ZIP_NAME }}
         token: ${{ secrets.GITHUB_TOKEN }}
+        bodyFile: '.github/RELEASE_BODY.md'
