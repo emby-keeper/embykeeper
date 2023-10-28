@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 import random
 import re
 from abc import ABC, abstractmethod
@@ -16,11 +17,12 @@ from pyrogram import filters
 from pyrogram.errors import UsernameNotOccupied, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
+from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
 from thefuzz import fuzz
-from aiocache import cached
 
 from ...data import get_datas
 from ...utils import show_exception, to_iterable, AsyncCountPool
+from ..lock import ocrs, ocrs_lock
 from ..tele import Client
 
 __ignore__ = True
@@ -149,21 +151,32 @@ class BotCheckin(BaseBotCheckin):
             except ValueError:
                 pass
 
-    @cached(ttl=60, noself=True)
     async def get_ocr(self, ocr: str = None):
         """加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型."""
-        if not ocr:
-            return DdddOcr(beta=True, show_ad=False)
-        else:
-            data = []
-            files = (f"{ocr}.onnx", f"{ocr}.json")
-            async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
-                if p is None:
-                    self.log.warning(f"初始化错误: 无法下载所需文件.")
-                    return None
+        while True:
+            async with ocrs_lock:
+                if ocr in ocrs:
+                    return ocrs[ocr]
+                if not ocr:
+                    model = DdddOcr(beta=True, show_ad=False)
                 else:
-                    data.append(p)
-            return DdddOcr(show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1]))
+                    data = []
+                    files = (f"{ocr}.onnx", f"{ocr}.json")
+                    async for p in get_datas(self.basedir, files, proxy=self.proxy, caller=self.name):
+                        if p is None:
+                            self.log.warning(f"初始化错误: 无法下载所需文件.")
+                            return None
+                        else:
+                            data.append(p)
+                    try:
+                        model = DdddOcr(show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1]))
+                    except InvalidProtobuf:
+                        self.log.warning(f"文件下载不完全, 正在重试下载.")
+                        Path(str(data[0])).unlink()
+                        Path(str(data[1])).unlink()
+                        continue
+                ocrs[ocr] = model
+                return model
 
     async def start(self):
         """签到器的入口函数."""
@@ -353,8 +366,9 @@ class BotCheckin(BaseBotCheckin):
         """分析分析传入的验证码图片并返回验证码."""
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
+        ocr = await self.get_ocr(self.ocr)
         captcha = (
-            (await self.get_ocr(self.ocr))
+            ocr
             .classification(image)
             .translate(str.maketrans("", "", string.punctuation))
             .replace(" ", "")
