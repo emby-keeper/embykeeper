@@ -97,9 +97,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                                     if resp.status == 200:
                                         file_size = int(resp.headers.get("Content-Length", 0))
                                         logger.info(f"开始下载: {name} ({humanbytes(file_size)})")
-                                        async with aiofiles.open(
-                                            basedir / name, mode="wb+", encoding="utf-8"
-                                        ) as f:
+                                        async with aiofiles.open(basedir / name, mode="wb+") as f:
                                             timer = time.time()
                                             length = 0
                                             async for chunk in resp.content.iter_chunked(512):
