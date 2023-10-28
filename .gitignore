@@ -7,7 +7,7 @@
 *.msgs.yaml
 *.updates.json
 
-
+# Data files
 /utils/data
 
 # Test files
@@ -17,6 +17,10 @@
 # Venvs
 /venv
 /conda
+
+# Builds
+/windows/installer-script/python*
+/windows/installer-script/Update.bat
 
 # Vscode
 .vscode/*
