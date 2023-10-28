@@ -2,4 +2,4 @@
 
 1.
 
-**Full Changelog**: https://github.com/embykeeper/embykeeper/compare/v0.0.0...v2.6.19
+**Full Changelog**: https://github.com/embykeeper/embykeeper/compare/v0.0.0...v2.6.20
