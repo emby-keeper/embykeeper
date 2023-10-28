@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 env:
-  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.17.zip'
+  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.18.zip'
 
 permissions:
   contents: write
