@@ -169,7 +169,9 @@ class BotCheckin(BaseBotCheckin):
                         else:
                             data.append(p)
                     try:
-                        model = DdddOcr(show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1]))
+                        model = DdddOcr(
+                            show_ad=False, import_onnx_path=str(data[0]), charsets_path=str(data[1])
+                        )
                     except InvalidProtobuf:
                         self.log.warning(f"文件下载不完全, 正在重试下载.")
                         Path(str(data[0])).unlink()
@@ -368,10 +370,7 @@ class BotCheckin(BaseBotCheckin):
         image = Image.open(data)
         ocr = await self.get_ocr(self.ocr)
         captcha = (
-            ocr
-            .classification(image)
-            .translate(str.maketrans("", "", string.punctuation))
-            .replace(" ", "")
+            ocr.classification(image).translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
         )
         if captcha:
             self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
