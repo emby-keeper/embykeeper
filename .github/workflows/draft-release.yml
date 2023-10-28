@@ -28,6 +28,6 @@ jobs:
       uses: ncipollo/release-action@v1.12.0
       with:
         draft: true
-        artifacts: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+        artifacts: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
         token: ${{ secrets.GITHUB_TOKEN }}
         bodyFile: '.github/RELEASE_BODY.md'
