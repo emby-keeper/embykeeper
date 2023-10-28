@@ -5,6 +5,7 @@ from pathlib import Path
 import random
 
 from pyrogram.types import Message, InlineKeyboardMarkup
+from pyrogram.enums import MessageEntityType
 from pyrogram.errors import RPCError
 
 from ...utils import truncate_str, flatten
@@ -52,19 +53,17 @@ class PornembyMonitor:
         chat_keyword = "击杀者\s+(.*)\s+是否要奖励翻倍"
 
         async def on_trigger(self, message: Message, key, reply):
-            if self.client.me.name == key:
-                if message.reply_markup:
-                    if isinstance(message.reply_markup, InlineKeyboardMarkup):
-                        buttons = flatten(message.reply_markup.inline_keyboard)
-                        for b in buttons:
-                            if "翻倍游戏" in b.text:
-                                try:
-                                    await message.click(0)
-                                except RPCError:
-                                    pass
-                                else:
-                                    self.log.info("检测到 Pornemby 怪兽击败, 已点击翻倍.")
-                                    return
+            for me in message.entities:
+                if me.type == MessageEntityType.TEXT_MENTION:
+                    if me.user.id == self.client.me.id:
+                        if isinstance(message.reply_markup, InlineKeyboardMarkup):
+                            try:
+                                await message.click(0)
+                            except RPCError:
+                                pass
+                            else:
+                                self.log.info("检测到 Pornemby 怪兽击败, 已点击翻倍.")
+                                return
 
     class PornembyRegisterMonitor(Monitor):
         name = "Pornemby 抢注"
