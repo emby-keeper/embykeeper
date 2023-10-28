@@ -207,9 +207,9 @@ class Messager:
             while True:
                 valid_p = [p for p in self.timeline if not p.skip]
                 self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划, {len(valid_p)} 个有效.")
-                self.log.debug(
-                    "时间序列: " + " ".join([p.at.strftime("%H%M") for p in sorted(valid_p, key=lambda x: x.at)])
-                )
+                # self.log.debug(
+                #     "时间序列: " + " ".join([p.at.strftime("%H%M") for p in sorted(valid_p, key=lambda x: x.at)])
+                # )
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
                     if not next_valid_p == last_valid_p:
