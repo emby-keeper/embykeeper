@@ -92,9 +92,10 @@ async def main(
     simple_log: bool = typer.Option(False, "--simple-log", "-L", rich_help_panel="调试参数", help="简化日志输出格式"),
     follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试工具", help="仅启动消息调试"),
     analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"),
-    dump: List[str] = typer.Option([], "--dump", "-D", rich_help_panel="调试工具", help="仅启动更新日志"),
-    save: bool = typer.Option(False, "--save", "-S", rich_help_panel="调试参数", help="记录原始更新日志"),
-    public: bool = typer.Option(False, "--public", "-P", rich_help_panel="调试参数", help="启用公共仓库部署模式"),
+    dump: List[str] = typer.Option([], "--dump", "-D", hidden=True, rich_help_panel="调试工具", help="仅启动更新日志"),
+    save: bool = typer.Option(False, "--save", "-S", hidden=True, rich_help_panel="调试参数", help="记录原始更新日志"),
+    public: bool = typer.Option(False, "--public", "-P", hidden=True, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
+    windows: bool = typer.Option(False, "--windows", "-W", hidden=True, rich_help_panel="调试参数", help="启用 Windows 安装部署模式"),
     basedir: Path = typer.Option(None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
     from .log import logger, initialize
@@ -115,7 +116,7 @@ async def main(
         logger.warning(f"您当前处于调试模式: 日志等级 {verbosity}.")
         app.pretty_exceptions_enable = True
 
-    config: dict = await prepare_config(config, public=public)
+    config: dict = await prepare_config(config, public=public, windows=windows)
 
     if verbosity >= 2:
         config["nofail"] = False
@@ -249,7 +250,6 @@ async def main(
                 show_exception(e, regular=False)
                 if not config.get("nofail", True):
                     raise
-
 
 if __name__ == "__main__":
     app()

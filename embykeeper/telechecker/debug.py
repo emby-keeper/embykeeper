@@ -16,7 +16,6 @@ from rich.text import Text
 
 from ..utils import async_partial, batch, flatten, idle, time_in_range
 from ..var import console
-from . import __name__
 from .tele import Client, ClientsSession
 
 log = logger.bind(scheme="debugtool")
