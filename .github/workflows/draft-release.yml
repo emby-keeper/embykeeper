@@ -22,7 +22,7 @@ jobs:
       with:
         type: 'zip'
         filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
-        path: 'windows/installer-script'
+        directory: 'windows/installer-script'
         exclusions: 'python-* desktop.ini'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
