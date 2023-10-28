@@ -20,7 +20,7 @@ Write-Host "Downloading get-pip.py"
 $Proxy = [System.Net.WebRequest]::GetSystemWebproxy()
 $ProxyBypassed = $Proxy.IsBypassed($PipUrl)
 if ($ProxyBypassed){
-    Invoke-WebRequest -Uri $PipUrl -OutFile $PipFile 
+    Invoke-WebRequest -Uri $PipUrl -OutFile $PipFile
 } else {
     $ProxyUrl = $Proxy.GetProxy($PipUrl)
     Invoke-WebRequest -Uri $PipUrl -OutFile $PipFile -Proxy $ProxyUrl -ProxyUseDefaultCredentials

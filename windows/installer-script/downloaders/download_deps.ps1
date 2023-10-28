@@ -19,4 +19,3 @@ if ($Update) {
     & $PipPath install -U embykeeper --no-warn-script-location
 }
 Write-Host "Done installing dependencies"
-
