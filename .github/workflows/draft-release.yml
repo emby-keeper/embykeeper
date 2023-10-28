@@ -48,11 +48,11 @@ jobs:
     steps:
       - name: Download Artifact [Windows Installer Script Version]
         uses: actions/download-artifact@v3
-        with: 
+        with:
           name: ${{ env.WIN_SCRIPT_ZIP_NAME }}
       - name: Download Artifact [Windows Installer GUI Version]
         uses: actions/download-artifact@v3
-        with: 
+        with:
           name: ${{ env.WIN_GUI_EXE_NAME }}
       - name: Upload Release
         uses: ncipollo/release-action@v1.12.0

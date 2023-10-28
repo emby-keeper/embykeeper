@@ -8,7 +8,14 @@ from loguru import logger
 import tomli as tomllib
 from pyrogram import filters
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.types import Message, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, MessageEntity, CallbackQuery
+from pyrogram.types import (
+    Message,
+    BotCommand,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    MessageEntity,
+    CallbackQuery,
+)
 from pyrogram.enums import ParseMode, MessageEntityType
 
 from embykeeper.utils import AsyncTyper
@@ -70,7 +77,7 @@ async def parse(client: Client, message: Message, updates: List[Dict]):
         if u.get("media", None) == "MessageMediaType.PHOTO":
             await client.send_photo(
                 message.chat.id,
-                Path(__file__).parent.parent / 'images' / 'kitty.gif',
+                Path(__file__).parent.parent / "images" / "kitty.gif",
                 caption_entities=_entities,
                 caption=text,
                 parse_mode=ParseMode.DISABLED,
