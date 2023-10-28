@@ -122,7 +122,7 @@ class Messager:
             }
         )
         schema.validate(data)
-        at = data.get("at", ("10:00", "23:00"))
+        at = data.get("at", ("9:00", "23:00"))
         assert len(at) == 2
         at = [parser.parse(t).time() for t in at]
         return MessageSchedule(
