@@ -133,7 +133,7 @@ class Monitor:
 
     def get_filter(self):
         """设定要监控的目标."""
-        filter = filters.caption | filters.text
+        filter = filters.all
         if self.chat_name:
             filter = filter & filters.chat(to_iterable(self.chat_name))
         if not self.chat_allow_outgoing:

@@ -146,6 +146,7 @@ async def main(
     basedir = Path(basedir or user_data_dir(__name__))
     basedir.mkdir(parents=True, exist_ok=True)
     config["basedir"] = basedir
+    logger.debug(f'工作目录: "{basedir}".')
 
     if follow:
         from .telechecker.debug import follower
