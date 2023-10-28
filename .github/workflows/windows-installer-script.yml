@@ -5,7 +5,7 @@ on:
     types: [released]
 
 env:
-  ZIP_NAME: 'windows-installer-script-v2.6.9.zip'
+  ZIP_NAME: 'windows-installer-script-v2.6.10.zip'
 
 permissions:
   contents: read
