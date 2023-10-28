@@ -8,7 +8,7 @@ env:
   ZIP_NAME: 'windows-installer-script-v2.6.10.zip'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
