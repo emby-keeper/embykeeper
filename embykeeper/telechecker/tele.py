@@ -8,7 +8,6 @@ import inspect
 from pathlib import Path
 import pickle
 import random
-from sqlite3 import OperationalError
 import sys
 from typing import AsyncGenerator, Optional, Union
 import uuid

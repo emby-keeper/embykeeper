@@ -7,27 +7,57 @@ on:
       - 'v*'
 
 env:
-  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.17.zip'
+  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.19.zip'
+  WIN_GUI_EXE_NAME: 'embykeeper-win-v2.6.19.exe'
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  win-script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Archive Release
-      uses: thedoctor0/zip-release@0.7.1
-      with:
-        type: 'zip'
-        filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
-        directory: 'windows/installer-script'
-        exclusions: 'python-* desktop.ini'
-    - name: Upload Release
-      uses: ncipollo/release-action@v1.12.0
-      with:
-        draft: true
-        artifacts: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        bodyFile: '.github/RELEASE_BODY.md'
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Archive Windows Installer Script Version
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+          directory: 'windows/installer-script'
+          exclusions: 'python-* desktop.ini'
+      - name: Save Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+          path: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
+  win-gui:
+    runs-on: windows-latest
+    steps:
+      - name: Build Windows Installer GUI Version
+      - run: |
+          python -m pip install -U pynsist
+          pynsist installer.cfg
+      - name: Save Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.WIN_GUI_EXE_NAME }}
+          path: windows/installer-script/Embykeeper.exe
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact [Windows Installer Script Version]
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+      - name: Download Artifact [Windows Installer GUI Version]
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.WIN_GUI_EXE_NAME }}
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          draft: true
+          artifacts: '${{ env.WIN_SCRIPT_ZIP_NAME }},${{ env.WIN_GUI_EXE_NAME }}'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: '.github/RELEASE_BODY.md'
