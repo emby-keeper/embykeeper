@@ -23,13 +23,13 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        filename: ${{ env.ZIP_NAME }}
+        filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
         path: 'windows/installer-script'
         exclusions: 'python-* desktop.ini'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:
         prerelease: true
-        artifacts: ${{ env.ZIP_NAME }}
+        artifacts: ${{ env.WIN_SCRIPT_ZIP_NAME }}
         token: ${{ secrets.GITHUB_TOKEN }}
         bodyFile: '.github/RELEASE_BODY.md'
