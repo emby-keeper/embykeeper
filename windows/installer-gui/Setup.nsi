@@ -256,9 +256,9 @@ Section "开始菜单文件夹" SectionProgramGroup
 			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\配置文件.lnk" "${CONFIG_FILE_DIR}\config.toml"
 		!endif
 
-		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\项目主页.lnk" "InternetShortcut" "URL" "${URL_INFO_ABOUT}"
-		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\部署帮助.lnk" "InternetShortcut" "URL" "${URL_HELP_LINK}"
-		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\检查更新.lnk" "InternetShortcut" "URL" "${URL_UPDATE_INFO}"
+		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\项目主页.url" "InternetShortcut" "URL" "${URL_INFO_ABOUT}"
+		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\部署帮助.url" "InternetShortcut" "URL" "${URL_HELP_LINK}"
+		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\检查更新.url" "InternetShortcut" "URL" "${URL_UPDATE_INFO}"
 		
 		${if} $MultiUser.InstallMode == "AllUsers"
 			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\卸载.lnk" "$INSTDIR\${UNINSTALL_FILENAME}" "/allusers"
