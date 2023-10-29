@@ -43,11 +43,12 @@ jobs:
         run: |
           python -m pip install -U pynsistfix
           pynsist installer.cfg
+          mv build/nsis/Embykeeper.exe ${{ env.WIN_GUI_EXE_NAME }}
       - name: Save Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.WIN_GUI_EXE_NAME }}
-          path: build/nsis/Embykeeper.exe
+          path: .
   upload:
     needs:
       - win-script
