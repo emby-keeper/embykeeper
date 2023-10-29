@@ -1,4 +1,4 @@
-!include WinCore.nsh
+﻿!include WinCore.nsh
 !include LogicLib.nsh
 !include x64.nsh
 

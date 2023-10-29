@@ -1,4 +1,4 @@
-/*
+﻿/*
 
 NsisMultiUser.nsh - NSIS plugin that allows "per-user" (no admin required) and "per-machine" (asks elevation *only when necessary*) installations
 

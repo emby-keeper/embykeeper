@@ -36,9 +36,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Build PyAES
+        run: |
+          pip wheel pyaes==1.6.1 -w windows/installer-gui/Resources
       - name: Build Windows Installer GUI Version
         run: |
-          python -m pip install -U pynsist
+          python -m pip install -U pynsistfix
           pynsist installer.cfg
       - name: Save Artifacts
         uses: actions/upload-artifact@v3

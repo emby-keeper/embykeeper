@@ -1,4 +1,4 @@
-/*** UAC Plug-in ***
+﻿/*** UAC Plug-in ***
 
 Interactive User (MediumIL)        Admin user (HighIL)
 ***[Setup.exe]*************      ***[Setup.exe]**************
