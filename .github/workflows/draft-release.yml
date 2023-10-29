@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.WIN_GUI_EXE_NAME }}
-          path: .
+          path: ${{ env.WIN_GUI_EXE_NAME }}
   upload:
     needs:
       - win-script
