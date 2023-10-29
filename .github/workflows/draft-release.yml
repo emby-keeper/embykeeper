@@ -7,8 +7,8 @@ on:
       - 'v*'
 
 env:
-  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.28.zip'
-  WIN_GUI_EXE_NAME: 'embykeeper-win-v2.6.28.exe'
+  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-v2.6.29.zip'
+  WIN_GUI_EXE_NAME: 'embykeeper-win-v2.6.29.exe'
 
 permissions:
   contents: write
