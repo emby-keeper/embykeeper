@@ -94,8 +94,12 @@ async def main(
     analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"),
     dump: List[str] = typer.Option([], "--dump", "-D", hidden=True, rich_help_panel="调试工具", help="仅启动更新日志"),
     save: bool = typer.Option(False, "--save", "-S", hidden=True, rich_help_panel="调试参数", help="记录原始更新日志"),
-    public: bool = typer.Option(False, "--public", "-P", hidden=True, rich_help_panel="调试参数", help="启用公共仓库部署模式"),
-    windows: bool = typer.Option(False, "--windows", "-W", hidden=True, rich_help_panel="调试参数", help="启用 Windows 安装部署模式"),
+    public: bool = typer.Option(
+        False, "--public", "-P", hidden=True, rich_help_panel="调试参数", help="启用公共仓库部署模式"
+    ),
+    windows: bool = typer.Option(
+        False, "--windows", "-W", hidden=True, rich_help_panel="调试参数", help="启用 Windows 安装部署模式"
+    ),
     basedir: Path = typer.Option(None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"),
 ):
     from .log import logger, initialize
@@ -250,6 +254,7 @@ async def main(
                 show_exception(e, regular=False)
                 if not config.get("nofail", True):
                     raise
+
 
 if __name__ == "__main__":
     app()

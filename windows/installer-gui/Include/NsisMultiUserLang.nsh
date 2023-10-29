@@ -26,7 +26,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ENGLISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ENGLISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ENGLISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ENGLISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ENGLISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_AFRIKAANS
@@ -57,7 +57,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_AFRIKAANS} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_AFRIKAANS} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_AFRIKAANS} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_AFRIKAANS} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_AFRIKAANS} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ALBANIAN
@@ -88,7 +88,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ALBANIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ALBANIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ALBANIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ALBANIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ALBANIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ARABIC
@@ -119,7 +119,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ARABIC} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ARABIC} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ARABIC} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ARABIC} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ARABIC} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ARMENIAN
@@ -150,7 +150,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ARMENIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ARMENIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ARMENIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ARMENIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ARMENIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ASTURIAN
@@ -181,7 +181,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ASTURIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ASTURIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ASTURIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ASTURIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ASTURIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_BASQUE
@@ -212,7 +212,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_BASQUE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_BASQUE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_BASQUE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BASQUE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BASQUE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_BELARUSIAN
@@ -243,7 +243,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_BELARUSIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_BELARUSIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_BELARUSIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BELARUSIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BELARUSIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_BOSNIAN
@@ -274,7 +274,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_BOSNIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_BOSNIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_BOSNIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BOSNIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BOSNIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_BRETON
@@ -305,7 +305,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_BRETON} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_BRETON} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_BRETON} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BRETON} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BRETON} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_BULGARIAN
@@ -336,7 +336,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_BULGARIAN} "Трябва да влезете с профил, който е член на администраторската група, за да продължите."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_BULGARIAN} "Операционната система не поддържа повишаване на привилегиите."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_BULGARIAN} "Не е възможно повишаване на привилегиите, услугата Secondary Logon не е пусната."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BULGARIAN} "Не е възможно повишаване на привилегиите, грешка {ERROR}."		
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_BULGARIAN} "Не е възможно повишаване на привилегиите, грешка {ERROR}."
 !endif
 
 !ifdef LANG_CATALAN
@@ -367,7 +367,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_CATALAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_CATALAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_CATALAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CATALAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CATALAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_CORSICAN
@@ -398,7 +398,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_CORSICAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_CORSICAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_CORSICAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CORSICAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CORSICAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_CROATIAN
@@ -429,7 +429,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_CROATIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_CROATIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_CROATIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CROATIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CROATIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_CZECH
@@ -460,7 +460,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_CZECH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_CZECH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_CZECH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CZECH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_CZECH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_DANISH
@@ -491,7 +491,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_DANISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_DANISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_DANISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_DANISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_DANISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_DUTCH
@@ -522,7 +522,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_DUTCH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_DUTCH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_DUTCH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_DUTCH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_DUTCH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ESPERANTO
@@ -553,7 +553,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ESPERANTO} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ESPERANTO} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ESPERANTO} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ESPERANTO} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ESPERANTO} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ESTONIAN
@@ -584,7 +584,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ESTONIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ESTONIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ESTONIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ESTONIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ESTONIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_FARSI
@@ -615,7 +615,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_FARSI} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_FARSI} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_FARSI} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FARSI} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FARSI} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_FINNISH
@@ -646,7 +646,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_FINNISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_FINNISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_FINNISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FINNISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FINNISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_FRENCH
@@ -677,7 +677,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_FRENCH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_FRENCH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_FRENCH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FRENCH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_FRENCH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_GALICIAN
@@ -708,7 +708,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_GALICIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_GALICIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_GALICIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GALICIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GALICIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_GEORGIAN
@@ -739,7 +739,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_GEORGIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_GEORGIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_GEORGIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GEORGIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GEORGIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_GERMAN
@@ -771,7 +771,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_GERMAN} "Du musst Dich mit einem Konto, dass ein Mitglied der Administratoren Gruppe ist, anmelden um fortzufahren."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_GERMAN} "Das Betriebssystem unterstützt nicht Hochstuffung."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_GERMAN} "Hochstuffung nicht möglich, zweiter Anmelde-Service läuft nicht."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GERMAN} "Hochstuffung nicht möglich, Fehler {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GERMAN} "Hochstuffung nicht möglich, Fehler {ERROR}."
 !endif
 
 !ifdef LANG_GREEK
@@ -802,7 +802,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_GREEK} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_GREEK} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_GREEK} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GREEK} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_GREEK} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_HEBREW
@@ -833,7 +833,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_HEBREW} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_HEBREW} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_HEBREW} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_HEBREW} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_HEBREW} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_HUNGARIAN
@@ -862,7 +862,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_HUNGARIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_HUNGARIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_HUNGARIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_HUNGARIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_HUNGARIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ICELANDIC
@@ -893,7 +893,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ICELANDIC} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ICELANDIC} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ICELANDIC} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ICELANDIC} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ICELANDIC} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_INDONESIAN
@@ -924,7 +924,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_INDONESIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_INDONESIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_INDONESIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_INDONESIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_INDONESIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_IRISH
@@ -955,7 +955,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_IRISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_IRISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_IRISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_IRISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_IRISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ITALIAN
@@ -984,7 +984,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ITALIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ITALIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ITALIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ITALIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ITALIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_JAPANESE
@@ -1015,7 +1015,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_JAPANESE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_JAPANESE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_JAPANESE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_JAPANESE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_JAPANESE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_KOREAN
@@ -1046,7 +1046,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_KOREAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_KOREAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_KOREAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_KOREAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_KOREAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_KURDISH
@@ -1077,7 +1077,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_KURDISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_KURDISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_KURDISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_KURDISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_KURDISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_LATVIAN
@@ -1108,7 +1108,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_LATVIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_LATVIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_LATVIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LATVIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LATVIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_LITHUANIAN
@@ -1139,7 +1139,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_LITHUANIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_LITHUANIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_LITHUANIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LITHUANIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LITHUANIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_LUXEMBOURGISH
@@ -1170,7 +1170,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_LUXEMBOURGISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_LUXEMBOURGISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_LUXEMBOURGISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LUXEMBOURGISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_LUXEMBOURGISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_MACEDONIAN
@@ -1201,7 +1201,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_MACEDONIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_MACEDONIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_MACEDONIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MACEDONIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MACEDONIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_MALAY
@@ -1232,7 +1232,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_MALAY} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_MALAY} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_MALAY} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MALAY} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MALAY} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_MONGOLIAN
@@ -1263,7 +1263,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_MONGOLIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_MONGOLIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_MONGOLIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MONGOLIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_MONGOLIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_NORWEGIAN
@@ -1294,7 +1294,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_NORWEGIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_NORWEGIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_NORWEGIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_NORWEGIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_NORWEGIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_NORWEGIANNYNORSK
@@ -1325,7 +1325,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_NORWEGIANNYNORSK} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_NORWEGIANNYNORSK} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_NORWEGIANNYNORSK} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_NORWEGIANNYNORSK} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_NORWEGIANNYNORSK} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_PASHTO
@@ -1356,7 +1356,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_PASHTO} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_PASHTO} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_PASHTO} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PASHTO} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PASHTO} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_POLISH
@@ -1387,7 +1387,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_POLISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_POLISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_POLISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_POLISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_POLISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_PORTUGUESE
@@ -1418,7 +1418,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_PORTUGUESE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_PORTUGUESE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_PORTUGUESE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PORTUGUESE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PORTUGUESE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_PORTUGUESEBR
@@ -1449,7 +1449,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_PORTUGUESEBR} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_PORTUGUESEBR} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_PORTUGUESEBR} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PORTUGUESEBR} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_PORTUGUESEBR} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_ROMANIAN
@@ -1480,7 +1480,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_ROMANIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_ROMANIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_ROMANIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ROMANIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_ROMANIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_RUSSIAN
@@ -1511,7 +1511,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_RUSSIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_RUSSIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_RUSSIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_RUSSIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_RUSSIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SCOTSGAELIC
@@ -1540,7 +1540,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SCOTSGAELIC} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SCOTSGAELIC} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SCOTSGAELIC} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SCOTSGAELIC} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SCOTSGAELIC} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SERBIAN
@@ -1571,7 +1571,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SERBIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SERBIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SERBIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SERBIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SERBIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SERBIANLATIN
@@ -1600,7 +1600,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SERBIANLATIN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SERBIANLATIN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SERBIANLATIN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SERBIANLATIN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SERBIANLATIN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SIMPCHINESE
@@ -1631,7 +1631,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SIMPCHINESE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SIMPCHINESE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SIMPCHINESE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SIMPCHINESE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SIMPCHINESE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SLOVAK
@@ -1662,7 +1662,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SLOVAK} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SLOVAK} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SLOVAK} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SLOVAK} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SLOVAK} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SLOVENIAN
@@ -1693,7 +1693,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SLOVENIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SLOVENIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SLOVENIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SLOVENIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SLOVENIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SPANISH
@@ -1724,7 +1724,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SPANISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SPANISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SPANISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SPANISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SPANISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SPANISHINTERNATIONAL
@@ -1755,7 +1755,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SPANISHINTERNATIONAL} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SPANISHINTERNATIONAL} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SPANISHINTERNATIONAL} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SPANISHINTERNATIONAL} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SPANISHINTERNATIONAL} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_SWEDISH
@@ -1786,7 +1786,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_SWEDISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_SWEDISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_SWEDISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SWEDISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_SWEDISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_TATAR
@@ -1817,7 +1817,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_TATAR} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_TATAR} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_TATAR} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TATAR} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TATAR} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_THAI
@@ -1848,7 +1848,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_THAI} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_THAI} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_THAI} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_THAI} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_THAI} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_TRADCHINESE
@@ -1879,7 +1879,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_TRADCHINESE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_TRADCHINESE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_TRADCHINESE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TRADCHINESE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TRADCHINESE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_TURKISH
@@ -1910,7 +1910,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_TURKISH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_TURKISH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_TURKISH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TURKISH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_TURKISH} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_UKRAINIAN
@@ -1941,7 +1941,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_UKRAINIAN} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_UKRAINIAN} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_UKRAINIAN} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_UKRAINIAN} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_UKRAINIAN} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_UZBEK
@@ -1972,7 +1972,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_UZBEK} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_UZBEK} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_UZBEK} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_UZBEK} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_UZBEK} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_VIETNAMESE
@@ -2003,7 +2003,7 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_VIETNAMESE} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_VIETNAMESE} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_VIETNAMESE} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_VIETNAMESE} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_VIETNAMESE} "Unable to elevate, error {ERROR}."
 !endif
 
 !ifdef LANG_WELSH
@@ -2034,5 +2034,5 @@
 	LangString MULTIUSER_ADMIN_ACCOUNT_LOGIN_REQUIRED ${LANG_WELSH} "You need to login with an account that is a member of the administrators group to continue."
 	LangString MULTIUSER_ELEVATION_NOT_SUPPORTED ${LANG_WELSH} "The operating system doesn't support elevation."
 	LangString MULTIUSER_LOGON_SERVICE_NOT_RUNNING ${LANG_WELSH} "Unable to elevate, Secondary Logon service not running."
-	LangString MULTIUSER_ELEVATION_ERROR ${LANG_WELSH} "Unable to elevate, error {ERROR}."	
+	LangString MULTIUSER_ELEVATION_ERROR ${LANG_WELSH} "Unable to elevate, error {ERROR}."
 !endif

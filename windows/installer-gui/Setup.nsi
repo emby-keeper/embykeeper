@@ -98,7 +98,7 @@ SetCompressor /SOLID lzma
 !insertmacro MUI_PAGE_FINISH
 
 ; Installer Attributes
-ShowUninstDetails show 
+ShowUninstDetails show
 
 ; Pages
 !insertmacro MULTIUSER_UNPAGE_INSTALLMODE
@@ -116,7 +116,7 @@ UninstPage instfiles
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
 ; Functions
-Function CheckInstallation 
+Function CheckInstallation
 	; if there's an installed version, uninstall it first (I chose not to start the uninstaller silently, so that user sees what failed)
 	; if both per-user and per-machine versions are installed, unistall the one that matches $MultiUser.InstallMode
 	StrCpy $0 ""
@@ -259,7 +259,7 @@ Section "开始菜单文件夹" SectionProgramGroup
 		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\项目主页.url" "InternetShortcut" "URL" "${URL_INFO_ABOUT}"
 		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\部署帮助.url" "InternetShortcut" "URL" "${URL_HELP_LINK}"
 		WriteINIStr "$SMPROGRAMS\$StartMenuFolder\检查更新.url" "InternetShortcut" "URL" "${URL_UPDATE_INFO}"
-		
+
 		${if} $MultiUser.InstallMode == "AllUsers"
 			CreateShortCut "$SMPROGRAMS\$StartMenuFolder\卸载.lnk" "$INSTDIR\${UNINSTALL_FILENAME}" "/allusers"
 		${else}
@@ -408,7 +408,7 @@ Section "un.程序文件" SectionUninstallProgram
 	SectionIn RO
 
 	!insertmacro MULTIUSER_GetCurrentUserString $0
-	
+
 	[% block uninstall_files %]
     ; Uninstall files
     [% for file, destination in ib.install_files %]
@@ -443,10 +443,10 @@ Section "-Uninstall" ; hidden section, must always be the last one!
 	Delete "$INSTDIR\${UNINSTALL_FILENAME}" ; we cannot use un.DeleteRetryAbort here - when using the _? parameter the uninstaller cannot delete itself and Delete fails, which is OK
 	; remove the directory only if it is empty - the user might have saved some files in it
 	RMDir "$INSTDIR"
-	
+
 	; Remove the uninstaller from registry as the very last step - if sth. goes wrong, let the user run it again
-	!insertmacro MULTIUSER_RegistryRemoveInstallInfo ; Remove registry keys	
-	
+	!insertmacro MULTIUSER_RegistryRemoveInstallInfo ; Remove registry keys
+
 	; If the uninstaller still exists, use cmd.exe on exit to remove it (along with $INSTDIR if it's empty)
 	${if} ${FileExists} "$INSTDIR\${UNINSTALL_FILENAME}"
 		Exec 'cmd.exe /c (del /f /q "$INSTDIR\${UNINSTALL_FILENAME}") && (rmdir "$INSTDIR")'
