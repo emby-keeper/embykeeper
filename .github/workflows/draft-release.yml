@@ -49,6 +49,9 @@ jobs:
           name: ${{ env.WIN_GUI_EXE_NAME }}
           path: windows/installer-script/Embykeeper.exe
   upload:
+    needs:
+      - win-script
+      - win-gui
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact [Windows Installer Script Version]
