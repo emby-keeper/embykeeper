@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.WIN_GUI_EXE_NAME }}
-          path: windows/installer-script/Embykeeper.exe
+          path: build/nsis/Embykeeper.exe
   upload:
     needs:
       - win-script
