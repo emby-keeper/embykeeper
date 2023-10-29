@@ -54,6 +54,8 @@ jobs:
       - win-gui
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Download Artifact [Windows Installer Script Version]
         uses: actions/download-artifact@v3
         with:
