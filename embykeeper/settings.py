@@ -4,10 +4,13 @@ import re
 import sys
 import base64
 import hashlib
+
 from loguru import logger
 import tomli as tomllib
 from schema import And, Optional, Or, Regex, Schema, SchemaError
+from appdirs import user_data_dir
 
+from . import __name__ as __product__
 from .var import console
 from .telechecker.tele import ClientsSession
 
@@ -90,17 +93,18 @@ def check_config(config):
         return None
 
 
-def write_faked_config(path):
+def write_faked_config(path, quiet=False):
     """生成配置文件骨架, 并填入生成的信息."""
     from tomlkit import document, nl, comment, item, dump
     from faker import Faker
     from faker.providers import internet, profile
 
     from .telechecker.main import get_names
-    from . import __name__, __version__, __url__
+    from . import __name__ as __product__, __version__, __url__
 
-    logger.warning("需要输入一个toml格式的config文件.")
-    logger.warning(f'您可以根据生成的参考配置文件 "{path}" 进行配置')
+    if not quiet:
+        logger.warning("需要输入一个toml格式的config文件.")
+        logger.warning(f'您可以根据生成的参考配置文件 "{path}" 进行配置')
 
     fake = Faker()
     fake.add_provider(internet)
@@ -147,7 +151,7 @@ def write_faked_config(path):
         doc.add(comment(line))
     doc.add(nl())
     doc.add(comment(f"服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改."))
-    doc.add(comment(f"该部分内容是根据 {__name__.capitalize()} {__version__} 生成的."))
+    doc.add(comment(f"该部分内容是根据 {__product__.capitalize()} {__version__} 生成的."))
     doc.add(nl())
     service = item(
         {
@@ -247,7 +251,7 @@ async def interactive_config(config: dict = {}):
     from rich import get_console
     from rich.prompt import Prompt, IntPrompt, Confirm
 
-    from . import __name__, __url__
+    from . import __url__
 
     pad = " " * 23
     logger.info("我们将为您生成配置, 需要您根据提示填入信息, 并按回车确认.")
@@ -374,7 +378,7 @@ def load_env_config(data: str):
     return config
 
 
-async def prepare_config(config_file=None, public=False):
+async def prepare_config(config_file=None, public=False, windows=False):
     """
     准备配置
     参数:
@@ -401,7 +405,10 @@ async def prepare_config(config_file=None, public=False):
             if not config:
                 sys.exit(250)
         else:
-            default_config_file = Path("config.toml")
+            if windows:
+                default_config_file = Path(user_data_dir(__product__)) / 'config.toml'
+            else:
+                default_config_file = Path("config.toml")
             if not config_file:
                 if not default_config_file.exists():
                     write_faked_config(default_config_file)

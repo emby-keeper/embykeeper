@@ -12,7 +12,7 @@ from loguru import logger
 
 from ..utils import next_random_datetime
 from ..log import formatter
-from . import __name__
+from . import __name__ as __product__
 from .link import Link
 from .log import TelegramStream
 from .tele import ClientsSession
@@ -42,9 +42,9 @@ def get_names(type: str, allow_ignore=False) -> List[str]:
     """列出服务中所有可用站点."""
     sub, _ = get_spec(type)
     results = []
-    typemodule = import_module(f"{__name__}.{sub}")
+    typemodule = import_module(f"{__product__}.{sub}")
     for _, mn, _ in pkgutil.iter_modules(typemodule.__path__):
-        module = import_module(f"{__name__}.{sub}.{mn}")
+        module = import_module(f"{__product__}.{sub}.{mn}")
         if not allow_ignore:
             if not getattr(module, "__ignore__", False):
                 results.append(mn)
@@ -62,7 +62,7 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
     results = []
     for name in names:
         try:
-            module = import_module(f"{__name__}.{sub}.{name.lower()}")
+            module = import_module(f"{__product__}.{sub}.{name.lower()}")
             for cn, cls in inspect.getmembers(module, inspect.isclass):
                 if (name.lower().replace("_", "") + suffix).lower() == cn.lower():
                     results.append(cls)
