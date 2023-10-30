@@ -426,7 +426,7 @@ class ClientsSession:
                 await client.storage.close()
                 logger.debug(f'登出账号 "{client.phone_number}".')
 
-    def __init__(self, accounts, proxy=None, basedir=None, in_memory=False, quiet=False):
+    def __init__(self, accounts, proxy=None, basedir=None, in_memory=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
         self.basedir = basedir or user_data_dir(__name__)
