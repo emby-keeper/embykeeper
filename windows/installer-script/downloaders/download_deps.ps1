@@ -12,10 +12,9 @@ param(
 )
 
 Write-Host "Installing dependencies"
-& $PipPath config set global.index-url "https://pypi.tuna.tsinghua.edu.cn/simple"
 if ($Update) {
-    & $PipPath install -r $RequirementsFile --no-warn-script-location
+    & $PipPath install -i "https://pypi.tuna.tsinghua.edu.cn/simple" -r $RequirementsFile --no-warn-script-location
 } else {
-    & $PipPath install -U embykeeper --no-warn-script-location
+    & $PipPath install -i "https://pypi.tuna.tsinghua.edu.cn/simple" -U embykeeper --no-warn-script-location
 }
 Write-Host "Done installing dependencies"
