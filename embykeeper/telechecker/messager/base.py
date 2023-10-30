@@ -9,6 +9,7 @@ from typing import Iterable, List, Union
 import yaml
 from dateutil import parser
 from loguru import logger
+from pyrogram.types import User
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import ChatWriteForbidden, RPCError, SlowmodeWait
 from schema import Optional, Schema, SchemaError
@@ -78,12 +79,12 @@ class Messager:
     site_last_message_time = None
     site_lock = asyncio.Lock()
 
-    def __init__(self, account, username=None, nofail=True, proxy=None, basedir=None, config: dict = None):
+    def __init__(self, account, me: User = None, nofail=True, proxy=None, basedir=None, config: dict = None):
         """
         自动水群类.
         参数:
             account: 账号登录信息
-            username: 用户名, 仅用于在登录前的日志输出
+            me: 当前用户
             nofail: 启用错误处理外壳, 当错误时报错但不退出
             basedir: 文件存储默认位置
             proxy: 代理配置
@@ -94,6 +95,7 @@ class Messager:
         self.proxy = proxy
         self.basedir = basedir
         self.config = config
+        self.me = me
 
         self.min_interval = timedelta(
             seconds=config.get("min_interval", config.get("interval", 1800))
@@ -106,7 +108,7 @@ class Messager:
         else:
             self.max_interval = None
 
-        self.log = logger.bind(scheme="telemessager", name=self.name, username=username)
+        self.log = logger.bind(scheme="telemessager", name=self.name, username=me.name)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
 
     def parse_message_yaml(self, file):

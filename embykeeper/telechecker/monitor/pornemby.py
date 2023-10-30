@@ -10,7 +10,7 @@ from pyrogram.errors import RPCError
 
 from ...utils import truncate_str, flatten
 from ..link import Link
-from ..lock import pornemby_status
+from ..lock import pornemby_nohp
 
 from .base import Monitor
 
@@ -26,7 +26,7 @@ class PornembyMonitor:
             for me in message.entities:
                 if me.type == MessageEntityType.TEXT_MENTION:
                     if me.user.id == self.client.me.id:
-                        pornemby_status["nohp"] = datetime.today().date()
+                        pornemby_nohp[self.client.me.id] = datetime.today().date()
 
     class PornembyDragonRainMonitor(Monitor):
         name = "Pornemby 红包雨"

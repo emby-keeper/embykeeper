@@ -219,7 +219,7 @@ async def messager(config: dict):
                 messagers.append(
                     cls(
                         {"api_id": tg.api_id, "api_hash": tg.api_hash, "phone": tg.phone_number},
-                        username=tg.me.name,
+                        me=tg.me,
                         nofail=config.get("nofail", True),
                         proxy=config.get("proxy", None),
                         basedir=config.get("basedir", None),
