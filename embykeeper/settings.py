@@ -406,7 +406,9 @@ async def prepare_config(config_file=None, public=False, windows=False):
                 sys.exit(250)
         else:
             if windows:
-                default_config_file = Path(user_data_dir(__product__)) / "config.toml"
+                basedir = Path(user_data_dir(__product__))
+                basedir.mkdir(parents=True, exist_ok=True)
+                default_config_file = basedir / "config.toml"
             else:
                 default_config_file = Path("config.toml")
             if not config_file:

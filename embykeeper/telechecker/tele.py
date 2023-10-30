@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from contextlib import asynccontextmanager
+import os
 import uuid
 from datetime import datetime
 import asyncio
@@ -441,6 +442,7 @@ class ClientsSession:
     async def login(self, account, proxy):
         try:
             account["phone"] = "".join(account["phone"].split())
+            Path(self.basedir).mkdir(parents=True, exist_ok=True)
             session_file = Path(self.basedir) / f'{account["phone"]}.session'
             session_string_file = Path(self.basedir) / f'{account["phone"]}.login'
             if not self.quiet:

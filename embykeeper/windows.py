@@ -21,7 +21,6 @@ from .settings import write_faked_config
 def generate_config(config: Path):
     if config.exists():
         return False
-    os.makedirs(config.parent)
     write_faked_config(config, quiet=True)
     message = Table.grid(padding=2)
     message.add_column()
@@ -61,6 +60,7 @@ def generate_config(config: Path):
 
 def main():
     config = Path(user_data_dir(__product__)) / "config.toml"
+    config.parent.mkdir(exist_ok=True, parents=True)
     generate_config(config)
     os.system("cls")
     var.console.rule("Embykeeper")
