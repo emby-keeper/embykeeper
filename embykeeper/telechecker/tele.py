@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from collections import OrderedDict
 from contextlib import asynccontextmanager
-
+import uuid
 from datetime import datetime
 import asyncio
 import inspect
@@ -10,7 +11,7 @@ import pickle
 import random
 import sys
 from typing import AsyncGenerator, Optional, Union
-import uuid
+from sqlite3 import OperationalError
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
@@ -475,6 +476,9 @@ class ClientsSession:
                         workdir=self.basedir,
                     )
                     await client.start()
+                except OperationalError:
+                    logger.warning(f'内部数据库错误, 正在重置, 您可能需要重新登录.')
+                    session_file.unlink(missing_ok=True)
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
                     logger.warning(f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.")
