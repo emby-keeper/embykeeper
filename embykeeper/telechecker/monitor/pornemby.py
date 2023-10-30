@@ -23,8 +23,10 @@ class PornembyMonitor:
         chat_keyword = "(.*)血量已耗尽。"
 
         async def on_trigger(self, message: Message, key, reply):
-            if self.client.me.name == key:
-                pornemby_status["nohp"] = datetime.today().date()
+            for me in message.entities:
+                if me.type == MessageEntityType.TEXT_MENTION:
+                    if me.user.id == self.client.me.id:
+                        pornemby_status["nohp"] = datetime.today().date()
 
     class PornembyDragonRainMonitor(Monitor):
         name = "Pornemby 红包雨"
@@ -40,11 +42,13 @@ class PornembyMonitor:
                         if "红包奖励" in b.text:
                             try:
                                 await message.click(0)
+                            except TimeoutError:
+                                self.log.info("检测到 Pornemby 抢红包雨, 但没有抢到红包.")
                             except RPCError:
-                                pass
+                                self.log.info("检测到 Pornemby 抢红包雨, 但没有抢到红包.")
                             else:
                                 self.log.info("检测到 Pornemby 抢红包雨, 已点击.")
-                                return
+                            return
 
     class PornembyDoubleMonitor(Monitor):
         name = "Pornemby 怪兽自动翻倍"
@@ -74,8 +78,10 @@ class PornembyMonitor:
         async def on_trigger(self, message: Message, key, reply):
             try:
                 await message.click(0)
+            except TimeoutError:
+                self.log.info("检测到 Pornemby 抢注, 但没有抢到.")
             except RPCError:
-                pass
+                self.log.info("检测到 Pornemby 抢注, 但没有抢到.")
             else:
                 self.log.info("检测到 Pornemby 抢注, 已点击.")
 

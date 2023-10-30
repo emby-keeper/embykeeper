@@ -10,7 +10,7 @@ import yaml
 from dateutil import parser
 from loguru import logger
 from pyrogram.enums import ChatMemberStatus
-from pyrogram.errors import ChatWriteForbidden, RPCError
+from pyrogram.errors import ChatWriteForbidden, RPCError, SlowmodeWait
 from schema import Optional, Schema, SchemaError
 
 from ...data import get_data
@@ -279,6 +279,8 @@ class Messager:
                             self.log.warning(f"发送失败: 已全员禁言.")
                     except RPCError:
                         self.log.warning(f"发送失败: {e}.")
+                except SlowmodeWait as e:
+                    self.log.info(f"发送等待: Telegram 限制, 等待 {e.value} 秒.")
                 except RPCError as e:
                     self.log.warning(f"发送失败: {e}.")
                 except KeyError as e:
