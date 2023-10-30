@@ -18,7 +18,7 @@ from .telechecker.tele import ClientsSession
 async def convert_session(accounts):
     results = []
     for a in accounts:
-        async with ClientsSession.from_config({"telegram": [a]}) as clients:
+        async with ClientsSession.from_config({"telegram": [a]}, in_memory=False) as clients:
             async for tg in clients:
                 session_string = await tg.export_session_string()
                 results.append({**a, "session": session_string})
