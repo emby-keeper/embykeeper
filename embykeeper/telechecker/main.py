@@ -163,7 +163,7 @@ async def checkiner(config: dict, instant=False):
                     log.bind(notify=True).info(f"签到成功 ({spec}).")
 
 
-async def checkiner_schedule(config: dict, start_time=None, end_time=None, days: int = 0, instant=False):
+async def checkiner_schedule(config: dict, start_time=None, end_time=None, days: int = 1, instant=False):
     """签到器计划任务."""
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)

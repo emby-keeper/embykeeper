@@ -278,7 +278,8 @@ def random_time(start_time: time = None, end_time: time = None):
 
 def next_random_datetime(start_time: time = None, end_time: time = None, interval_days=1):
     """在特定的开始和结束时间之间生成时间, 并设定最小间隔天数."""
-    min_datetime = datetime.now() + timedelta(days=interval_days)
+    min_date = (datetime.now() + timedelta(days=interval_days)).date()
+    min_datetime = datetime.combine(min_date, time(0, 0))
     target_time = random_time(start_time, end_time)
     offset_date = 0
     while True:
