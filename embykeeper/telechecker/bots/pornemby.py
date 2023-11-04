@@ -9,6 +9,7 @@ class PornEmbyCheckin(AnswerBotCheckin):
     name = "Pornemby"
     bot_username = "PronembyTGBot2_bot"
     bot_success_pat = r".*?(\d+)$"
+    additional_auth = ['pornemby_pack']
 
     async def start(self):
         if not self.client.me.username:

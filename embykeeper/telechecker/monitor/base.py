@@ -17,6 +17,7 @@ from pyrogram.types import Message, User
 
 from ...utils import show_exception, to_iterable, truncate_str, AsyncCountPool
 from ..tele import Client
+from ..link import Link
 
 __ignore__ = True
 
@@ -111,6 +112,7 @@ class Monitor:
     ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
     allow_edit: bool = True  # 编辑消息内容后也触发
+    additional_auth: List[str] = [] # 额外认证要求
 
     def __init__(self, client: Client, nofail=True, basedir=None, proxy=None, config: dict = {}):
         """
@@ -208,6 +210,11 @@ class Monitor:
         if me.status in (ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED):
             self.log.warning(f'初始化错误: 被群组 "{chat.title}" 禁言.')
             return False
+        if self.additional_auth:
+            for a in self.additional_auth:
+                if not await Link(self.client).auth(a):
+                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                    return False
         if self.notify_create_name:
             self.unique_name = self.get_unique_name()
         spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"

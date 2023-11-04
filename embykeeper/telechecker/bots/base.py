@@ -24,6 +24,7 @@ from ...data import get_datas
 from ...utils import show_exception, to_iterable, AsyncCountPool
 from ..lock import ocrs, ocrs_lock
 from ..tele import Client
+from ..link import Link
 
 __ignore__ = True
 
@@ -114,6 +115,7 @@ class BotCheckin(BaseBotCheckin):
     bot_too_many_tries_fail_keywords: Union[str, List[str]] = []  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     bot_fail_keywords: Union[str, List[str]] = []  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
+    additional_auth: List[str] = [] # 额外认证要求
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -214,6 +216,12 @@ class BotCheckin(BaseBotCheckin):
                 if not self.bot_allow_from_scratch:
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
                     return None
+        
+        if self.additional_auth:
+            for a in self.additional_auth:
+                if not await Link(self.client).auth(a):
+                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                    return False
 
         bot = await self.client.get_users(self.bot_username)
         msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"

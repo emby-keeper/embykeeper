@@ -7,6 +7,7 @@ class PornembyMessager(Messager):
     name = "Pornemby"
     chat_name = "Pornemby"
     default_messages = ["pornemby-common-wl@latest.yaml * 100"]
+    additional_auth = ['pornemby_pack']
 
     async def prepare_send(self, message):
         nohp_date = pornemby_nohp.get(self.me.id, None)

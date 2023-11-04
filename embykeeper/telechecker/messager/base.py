@@ -14,9 +14,11 @@ from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import ChatWriteForbidden, RPCError, SlowmodeWait
 from schema import Optional, Schema, SchemaError
 
+
 from ...data import get_data
 from ...utils import show_exception, truncate_str, distribute_numbers
 from ..tele import ClientsSession
+from ..link import Link
 
 __ignore__ = True
 
@@ -49,6 +51,7 @@ class Messager:
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
     default_messages: List[str] = []  # 默认的话术列表资源名
+    additional_auth: List[str] = [] # 额外认证要求
 
     site_last_message_time = None
     site_lock = asyncio.Lock()
@@ -189,6 +192,12 @@ class Messager:
 
     async def start(self):
         """自动水群器的入口函数."""
+        if self.additional_auth:
+            for a in self.additional_auth:
+                if not await Link(self.client).auth(a):
+                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                    return False
+        
         if self.max_interval and self.min_interval > self.max_interval:
             self.log.warning(f"发生错误: 最小间隔不应大于最大间隔, 自动水群将停止.")
             return False

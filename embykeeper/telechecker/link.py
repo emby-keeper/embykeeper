@@ -145,7 +145,7 @@ class Link:
 
     async def auth(self, service: str):
         """向机器人发送授权请求."""
-        results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.capitalize()} 认证")
+        results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.upper()} 认证")
         return bool(results)
 
     async def captcha(self):
@@ -160,7 +160,9 @@ class Link:
         """向机器人发送问题回答请求."""
         results = await self.post(f"/answer {self.instance} {question}", timeout=10, name="请求问题回答")
         if results:
-            return results.get("answer", None)
+            return results.get("answer", None), results.get("by", None)
+        else:
+            return None, None
 
     async def send_log(self, message):
         """向机器人发送日志记录请求."""
