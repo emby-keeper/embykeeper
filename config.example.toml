@@ -30,12 +30,12 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 2.5.8 生成的.
+# 该部分内容是根据 Embykeeper 3.0.2 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["charon", "embyhub", "jms", "judog", "ljyy", "magic", "peach", "pornemby", "sssq", "temby", "terminus"]
-# monitor = ["bgk", "embyhub", "judog", "pornemby", "viper"]
+# checkiner = ["charon", "embyhub", "jms", "ljyy", "magic", "peach", "pornemby", "sssq", "temby", "terminus"]
+# monitor = ["bgk", "embyhub", "pornemby", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
@@ -47,25 +47,25 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8611237341532"
+phone = "+8617764927584"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8618703364922"
+phone = "+8617711315064"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://www.carey.com/"
-username = "vaughnjohn"
-password = "*V40U^Roho"
+url = "https://www.rodriguez.org/"
+username = "theresadavis"
+password = "+PBYw^4f)1"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.dixon.com/"
-username = "allison41"
-password = "_4L^$KKeny"
+url = "https://www.rogers-hart.net/"
+username = "williamsstephanie"
+password = "^cx6FTZfW$"
 time = [120, 240] # 模拟观看的时长范围 (秒)
