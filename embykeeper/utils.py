@@ -326,16 +326,17 @@ async def no_waiting(lock: asyncio.Lock):
         if acquired:
             lock.release()
 
+
 def distribute_numbers(min_value, max_value, num_elements=1, min_distance=0, max_distance=None, base=[]):
     if max_value < min_value:
         raise ValueError("invalid value range.")
-    
+
     if max_distance and max_distance < min_distance:
         raise ValueError("invalid distance range.")
-    
+
     numbers = sorted(base)
     results = []
-    
+
     for _ in range(num_elements):
         allowed_range = []
         for i in range(-1, len(numbers)):
@@ -346,12 +347,14 @@ def distribute_numbers(min_value, max_value, num_elements=1, min_distance=0, max
             if i == len(numbers) - 1:
                 max_allowed_value = max_value
             else:
-                max_allowed_value = min(numbers[i+1] - min_distance, max_value)
+                max_allowed_value = min(numbers[i + 1] - min_distance, max_value)
             if min_allowed_value < max_allowed_value:
                 allowed_range.append((min_allowed_value, max_allowed_value))
         if not allowed_range:
             break
-        estimated_num_elements = [min(int((r[1] - r[0]) // min_distance), num_elements) for r in allowed_range]
+        estimated_num_elements = [
+            min(int((r[1] - r[0]) // min_distance), num_elements) for r in allowed_range
+        ]
         r = random.choices(allowed_range, k=1, weights=estimated_num_elements)[0]
         d = r[1] - r[0]
         min_v = r[0] + min_distance if r[0] == min_value else r[0]

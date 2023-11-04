@@ -71,8 +71,8 @@ class Messager:
         self.config = config
         self.me = me
 
-        self.min_interval = config.get("min_interval", config.get("interval", 60)) # 两条消息间的最小间隔时间
-        self.max_interval = config.get("max_interval", None) # 两条消息间的最大间隔时间
+        self.min_interval = config.get("min_interval", config.get("interval", 60))  # 两条消息间的最小间隔时间
+        self.max_interval = config.get("max_interval", None)  # 两条消息间的最大间隔时间
         self.log = logger.bind(scheme="telemessager", name=self.name, username=me.name)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
 
@@ -113,12 +113,7 @@ class Messager:
         num_plans = schedule.multiply if use_multiply else 1
         base = [mp.at.timestamp() for mp in self.timeline]
         timestamps = distribute_numbers(
-            start_timestamp,
-            end_timestamp,
-            num_plans,
-            self.min_interval,
-            self.max_interval,
-            base=base
+            start_timestamp, end_timestamp, num_plans, self.min_interval, self.max_interval, base=base
         )
         mps = []
         ignored = num_plans - len(timestamps)
@@ -197,7 +192,7 @@ class Messager:
         if self.max_interval and self.min_interval > self.max_interval:
             self.log.warning(f"发生错误: 最小间隔不应大于最大间隔, 自动水群将停止.")
             return False
-        
+
         messages = self.config.get("messages", [])
         if not messages:
             messages = self.default_messages
