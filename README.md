@@ -31,13 +31,13 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 卷毛鼠: [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
   - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
   - Peach: [机器人](https://t.me/peach_emby_bot)
-  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
   - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
   - 卡戎: [频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)
   - 剧狗: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)
   - Temby: [频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)
   - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - 魔法Emby: [频道](https://t.me/Magic_EmbyChannel) [群组](https://t.me/Magicemby) [机器人](https://t.me/Magic_EmbyBot)
+  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377))
   - 默认禁用:
     - ~~Misty: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~ (无响应)
     - ~~BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~ (关服)
@@ -51,12 +51,12 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - Telegram 自动水群 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
-  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
+  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml) ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377))
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
 - Telegram 自动监控信息 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
-  - Pornemby:
-    - 科举考试: [活动频道](https://t.me/PornembyFun) (需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 回答准确率 90% 以上)
+  - Pornemby ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377)):
+    - 科举考试: [活动频道](https://t.me/PornembyFun) (可选的[高准确云题库](https://afdian.net/item/eb2319f47b2711ee95305254001e7c00), 回答准确率 90% 以上)
     - 自动抢注: [群组](https://t.me/Pornemby)
     - 自动抢红包雨: [群组](https://t.me/Pornemby)
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)

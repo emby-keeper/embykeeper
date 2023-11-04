@@ -193,10 +193,12 @@ class Messager:
     async def start(self):
         """自动水群器的入口函数."""
         if self.additional_auth:
-            for a in self.additional_auth:
-                if not await Link(self.client).auth(a):
-                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
-                    return False
+            async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
+                async for tg in clients:
+                    for a in self.additional_auth:
+                        if not await Link(tg).auth(a):
+                            self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                            return False
 
         if self.max_interval and self.min_interval > self.max_interval:
             self.log.warning(f"发生错误: 最小间隔不应大于最大间隔, 自动水群将停止.")
