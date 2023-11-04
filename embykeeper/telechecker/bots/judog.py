@@ -6,6 +6,7 @@ from .base import BotCheckin
 
 __ignore__ = True
 
+
 class JudogCheckin(BotCheckin):
     name = "剧狗"
     bot_username = "mulgorebot"

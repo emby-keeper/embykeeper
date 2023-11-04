@@ -7,6 +7,7 @@ from ...utils import async_partial
 
 __ignore__ = True
 
+
 class JudogMonitor(Monitor):
     name = "剧狗"
     chat_name = "Mulgoreemby"
