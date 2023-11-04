@@ -112,7 +112,7 @@ class Monitor:
     ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
     allow_edit: bool = True  # 编辑消息内容后也触发
-    additional_auth: List[str] = [] # 额外认证要求
+    additional_auth: List[str] = []  # 额外认证要求
 
     def __init__(self, client: Client, nofail=True, basedir=None, proxy=None, config: dict = {}):
         """

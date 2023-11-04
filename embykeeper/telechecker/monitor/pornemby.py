@@ -21,7 +21,7 @@ class PornembyMonitor:
         chat_user = "PronembyTGBot2_bot"
         chat_name = "Pornemby"
         chat_keyword = "(.*)血量已耗尽。"
-        additional_auth = ['pornemby_pack']
+        additional_auth = ["pornemby_pack"]
 
         async def on_trigger(self, message: Message, key, reply):
             for me in message.entities:
@@ -34,7 +34,7 @@ class PornembyMonitor:
         chat_user = "PronembyTGBot2_bot"
         chat_name = "Pornemby"
         chat_keyword = [None]
-        additional_auth = ['pornemby_pack']
+        additional_auth = ["pornemby_pack"]
 
         async def on_trigger(self, message: Message, key, reply):
             if message.reply_markup:
@@ -57,7 +57,7 @@ class PornembyMonitor:
         chat_user = "PronembyTGBot2_bot"
         chat_name = "Pornemby"
         chat_keyword = "击杀者\s+(.*)\s+是否要奖励翻倍"
-        additional_auth = ['pornemby_pack']
+        additional_auth = ["pornemby_pack"]
 
         async def on_trigger(self, message: Message, key, reply):
             for me in message.entities:
@@ -77,7 +77,7 @@ class PornembyMonitor:
         chat_name = "Pornemby"
         chat_user = "PornembyTGBot_bot"
         chat_keyword = "开 放 注 册"
-        additional_auth = ['pornemby_pack']
+        additional_auth = ["pornemby_pack"]
 
         async def on_trigger(self, message: Message, key, reply):
             try:
@@ -93,7 +93,7 @@ class PornembyMonitor:
         name = "Pornemby 科举答案"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_keyword = r"问题\d*：(.*?)\n+A:(.*)\n+B:(.*)\n+C:(.*)\n+D:(.*)\n+答案为：([ABCD])"
-        additional_auth = ['pornemby_pack']
+        additional_auth = ["pornemby_pack"]
 
         key_map = {"A": 1, "B": 2, "C": 3, "D": 4}
 
@@ -106,8 +106,8 @@ class PornembyMonitor:
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
         chat_keyword = r"问题\d*：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
-        additional_auth = ['pornemby_pack']
-        
+        additional_auth = ["pornemby_pack"]
+
         cache = {}
         lock = asyncio.Lock()
 
