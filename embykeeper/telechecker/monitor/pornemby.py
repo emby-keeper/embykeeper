@@ -43,7 +43,7 @@ class PornembyMonitor:
                     for b in buttons:
                         if "红包奖励" in b.text:
                             try:
-                                await message.click(0)
+                                await message.click(b.text)
                             except TimeoutError:
                                 self.log.info("检测到 Pornemby 抢红包雨, 但没有抢到红包.")
                             except RPCError:
@@ -65,7 +65,7 @@ class PornembyMonitor:
                     if me.user.id == self.client.me.id:
                         if isinstance(message.reply_markup, InlineKeyboardMarkup):
                             try:
-                                await message.click(0)
+                                await message.click("🎲开始翻倍游戏")
                             except RPCError:
                                 pass
                             else:

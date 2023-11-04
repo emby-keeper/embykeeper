@@ -2,6 +2,8 @@ from .base import AnswerBotCheckin
 
 from pyrogram.types import Message
 
+__ignore__ = True
+
 
 class TembyCheckin(AnswerBotCheckin):
     name = "Temby"

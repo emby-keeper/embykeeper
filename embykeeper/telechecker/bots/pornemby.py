@@ -21,7 +21,7 @@ class PornEmbyCheckin(AnswerBotCheckin):
         await asyncio.sleep(random.uniform(2, 4))
         async with self.client.catch_reply(self.bot_username) as f:
             try:
-                await message.click(0)
+                await message.click("点击签到")
             except TimeoutError:
                 pass
             try:
