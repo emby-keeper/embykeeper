@@ -348,6 +348,7 @@ async def watcher_continuous(config: dict):
         try:
             await asyncio.wait_for(watch_continuous(emby, logger), time)
         except asyncio.TimeoutError:
+            logger.info(f"连续播放结束.")
             return True
         else:
             return False
