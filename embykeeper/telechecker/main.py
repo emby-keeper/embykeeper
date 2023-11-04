@@ -226,7 +226,7 @@ async def messager(config: dict):
                         config=cls_config,
                     )
                 )
-    await asyncio.gather(*[m.start() for m in messagers])
+    await asyncio.gather(*[m._start() for m in messagers])
 
 
 async def start_notifier(config: dict):

@@ -2,7 +2,7 @@ import asyncio
 import random
 import re
 from dataclasses import dataclass
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Iterable, List, Union
 
@@ -15,7 +15,7 @@ from pyrogram.errors import ChatWriteForbidden, RPCError, SlowmodeWait
 from schema import Optional, Schema, SchemaError
 
 from ...data import get_data
-from ...utils import random_time, show_exception, time_in_range, truncate_str
+from ...utils import show_exception, truncate_str, distribute_numbers
 from ..tele import ClientsSession
 
 __ignore__ = True
@@ -31,32 +31,6 @@ class MessageSchedule:
     possibility: float = 1.0
     multiply: int = 1
     only: str = None
-
-    def next_time(self, days=None, trange=None):
-        """生成下一个发送时间"""
-        days = days if days is not None else self.days
-        trange = trange if trange is not None else self.at
-        rtime = datetime.combine(datetime.today() + timedelta(days=days), random_time(*trange))
-        if rtime < datetime.now():
-            rtime += timedelta(days=1)
-        return rtime
-
-    def roll(self, days=None, trange=None):
-        skip = False
-        if random.random() >= self.possibility:
-            skip = True
-        if self.only:
-            today = datetime.today()
-            if self.only.startswith("weekday") and today.weekday() > 4:
-                skip = True
-            if self.only.startswith("weekend") and today.weekday() < 5:
-                skip = True
-        return MessagePlan(
-            message=random.choice(self.messages),
-            at=self.next_time(days=days, trange=trange),
-            schedule=self,
-            skip=skip,
-        )
 
 
 @dataclass(eq=False)
@@ -97,21 +71,13 @@ class Messager:
         self.config = config
         self.me = me
 
-        self.min_interval = timedelta(
-            seconds=config.get("min_interval", config.get("interval", 1800))
-        )  # 两条消息间的最小间隔时间
-        max_interval = config.get("max_interval", None)
-        if max_interval:
-            self.max_interval = timedelta(seconds=max_interval)  # 两条消息间的最大间隔时间
-            if self.min_interval > self.max_interval:
-                raise ValueError("最小间隔不应大于最大间隔")
-        else:
-            self.max_interval = None
-
+        self.min_interval = config.get("min_interval", config.get("interval", 60)) # 两条消息间的最小间隔时间
+        self.max_interval = config.get("max_interval", None) # 两条消息间的最大间隔时间
         self.log = logger.bind(scheme="telemessager", name=self.name, username=me.name)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
 
     def parse_message_yaml(self, file):
+        """解析话术文件."""
         with open(file, "r") as f:
             data = yaml.safe_load(f)
         schema = Schema(
@@ -135,39 +101,72 @@ class Messager:
             only=data.get("only", None),
         )
 
-    def add(self, schedule: MessageSchedule):
-        for _ in range(600):
-            plan = schedule.roll()
-            for p in self.timeline:
-                if time_in_range(p.at - self.min_interval, p.at + self.min_interval, plan.at):
-                    break
-            else:
-                if self.max_interval:
-                    if self.timeline:
-                        for p in self.timeline:
-                            if time_in_range(p.at - self.max_interval, p.at + self.max_interval, plan.at):
-                                self.timeline.append(plan)
-                                return
-                    else:
-                        now = datetime.now()
-                        if time_in_range(now - self.max_interval, now + self.max_interval, plan.at):
-                            self.timeline.append(plan)
-                            return
-                else:
-                    self.timeline.append(plan)
-                    return
-        else:
-            plan.skip = True
-            self.timeline.append(plan)
-            return
+    def add(self, schedule: MessageSchedule, use_multiply=False):
+        """根据规划, 生成计划, 并增加到时间线."""
+        start_time, end_time = schedule.at
+        start_datetime = datetime.combine(date.today(), start_time or time(0, 0))
+        end_datetime = datetime.combine(date.today(), end_time or time(23, 59, 59))
+        if end_datetime < start_datetime:
+            end_datetime += timedelta(days=1)
+        start_timestamp = start_datetime.timestamp()
+        end_timestamp = end_datetime.timestamp()
+        num_plans = schedule.multiply if use_multiply else 1
+        base = [mp.at.timestamp() for mp in self.timeline]
+        timestamps = distribute_numbers(
+            start_timestamp,
+            end_timestamp,
+            num_plans,
+            self.min_interval,
+            self.max_interval,
+            base=base
+        )
+        mps = []
+        ignored = num_plans - len(timestamps)
+        if ignored:
+            self.log.warning(f"发生错误: 部分发送计划 ({ignored}) 无法排入当日日程并被跳过, 请检查您的配置.")
+            for _ in range(ignored):
+                mps.append(
+                    MessagePlan(
+                        message=random.choice(schedule.messages),
+                        at=end_datetime,
+                        schedule=schedule,
+                        skip=True,
+                    )
+                )
+        for t in timestamps:
+            at = datetime.fromtimestamp(t)
+            if at < datetime.now():
+                at += timedelta(days=1)
+            skip = False
+            if random.random() >= schedule.possibility:
+                skip = True
+            elif schedule.only:
+                today = datetime.today()
+                if schedule.only.startswith("weekday") and today.weekday() > 4:
+                    skip = True
+                if schedule.only.startswith("weekend") and today.weekday() < 5:
+                    skip = True
+            mps.append(
+                MessagePlan(
+                    message=random.choice(schedule.messages),
+                    at=at,
+                    schedule=schedule,
+                    skip=skip,
+                )
+            )
+        self.timeline.extend(mps)
+        self.timeline = sorted(self.timeline, key=lambda x: x.at)
+        return True
 
     async def get_spec_path(self, spec):
+        """下载话术文件对应的本地或云端文件."""
         if not Path(spec).exists():
             return await get_data(self.basedir, spec, proxy=self.proxy, caller=f"{self.name}水群")
         else:
             return spec
 
     async def get_spec_schedule(self, spec):
+        """解析话术文件对应的本地或云端文件."""
         file = await self.get_spec_path(spec)
         if not file:
             self.log.warning(f'话术文件 "{spec}" 无法下载或不存在, 将被跳过.')
@@ -179,7 +178,26 @@ class Messager:
             show_exception(e)
             return None
 
+    async def _start(self):
+        """自动水群器的入口函数的错误处理外壳."""
+        try:
+            return await self.start()
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            if self.nofail:
+                self.log.warning(f"发生错误, 自动水群器将停止.")
+                show_exception(e, regular=False)
+                return False
+            else:
+                raise
+
     async def start(self):
+        """自动水群器的入口函数."""
+        if self.max_interval and self.min_interval > self.max_interval:
+            self.log.warning(f"发生错误: 最小间隔不应大于最大间隔, 自动水群将停止.")
+            return False
+        
         messages = self.config.get("messages", [])
         if not messages:
             messages = self.default_messages
@@ -201,8 +219,7 @@ class Messager:
         nmsgs = sum([s.multiply for s in schedules])
         self.log.info(f"共启用 {len(schedules)} 个消息规划, 发送 {nmsgs} 条消息.")
         for s in schedules:
-            for _ in range(s.multiply):
-                self.add(s)
+            self.add(s, use_multiply=True)
 
         if self.timeline:
             last_valid_p = None
@@ -210,7 +227,7 @@ class Messager:
                 valid_p = [p for p in self.timeline if not p.skip]
                 self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划, {len(valid_p)} 个有效.")
                 # self.log.debug(
-                #     "时间序列: " + " ".join([p.at.strftime("%H%M") for p in sorted(valid_p, key=lambda x: x.at)])
+                #     "时间序列: " + " ".join([p.at.strftime("%H%M%S") for p in sorted(valid_p, key=lambda x: x.at)])
                 # )
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
@@ -227,29 +244,16 @@ class Messager:
                 )
                 await asyncio.sleep((next_p.at - datetime.now()).total_seconds())
                 if not next_p.skip:
-                    await self._send(next_p.message)
+                    await self.send(next_p.message)
                 self.timeline.remove(next_p)
                 self.add(next_p.schedule)
 
-    async def _send(self, *args, **kw):
-        try:
-            return await self.send(*args, **kw)
-        except OSError as e:
-            self.log.info(f'出现错误: "{e}", 忽略.')
-            show_exception(e)
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            if self.nofail:
-                self.log.warning(f"发生错误, 自动水群将停止.")
-                show_exception(e, regular=False)
-            else:
-                raise
-
     async def prepare_send(self, message):
+        """可重写的信息改写函数, 发送前执行, 返回 None 以取消发送."""
         return message
 
     async def send(self, message):
+        """自动水群器的发信器的入口函数."""
         message = await self.prepare_send(message)
         if not message:
             return
@@ -288,6 +292,8 @@ class Messager:
                 except KeyError as e:
                     self.log.warning(f"发送失败, 您可能已被封禁.")
                     show_exception(e)
+                except Exception as e:
+                    self.log.warning(f"发送失败: {e}.")
                 else:
                     async with self.site_lock:
                         self.__class__.site_last_message_time = datetime.now()
