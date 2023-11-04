@@ -5,6 +5,7 @@ from pyrogram.types import Message
 from .base import Monitor
 from ...utils import async_partial
 
+__ignore__ = True
 
 class JudogMonitor(Monitor):
     name = "剧狗"

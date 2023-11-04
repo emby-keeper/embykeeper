@@ -2,9 +2,9 @@ import asyncio
 
 from pyrogram.types import Message
 
-from ...utils import async_partial
 from .base import BotCheckin
 
+__ignore__ = True
 
 class JudogCheckin(BotCheckin):
     name = "剧狗"
