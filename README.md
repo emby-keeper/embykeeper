@@ -51,7 +51,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - Telegram 自动水群 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
-  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml) ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377))
+  - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
 - Telegram 自动监控信息 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
