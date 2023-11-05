@@ -6,6 +6,7 @@ from ...utils import flatten
 
 from .base import Monitor
 
+
 class PornembyDragonRainMonitor:
     class PornembyDragonRainClickMonitor(Monitor):
         name = "Pornemby 红包雨"
@@ -29,7 +30,7 @@ class PornembyDragonRainMonitor:
                             else:
                                 self.log.info("检测到 Pornemby 抢红包雨, 已点击抢红包, 等待结果.")
                             return
-                        
+
     class PornembyDragonRainStatusMonitor(Monitor):
         name = "Pornemby 红包雨结果"
         chat_user = "PronembyTGBot2_bot"

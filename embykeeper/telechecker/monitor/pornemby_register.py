@@ -5,6 +5,7 @@ from .base import Monitor
 
 __ignore__ = True
 
+
 class PornembyRegisterMonitor(Monitor):
     name = "Pornemby 抢注"
     chat_name = "Pornemby"

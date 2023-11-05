@@ -7,6 +7,7 @@ from ..lock import pornemby_nohp
 
 from .base import Monitor
 
+
 class PornembyNoHPMonitor(Monitor):
     name = "Pornemby 血量耗尽停止发言"
     chat_user = "PronembyTGBot2_bot"

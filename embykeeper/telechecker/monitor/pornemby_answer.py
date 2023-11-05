@@ -12,6 +12,7 @@ from ..link import Link
 
 from .base import Monitor
 
+
 class PornembyAnswerMonitor:
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"

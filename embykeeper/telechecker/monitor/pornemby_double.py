@@ -4,6 +4,7 @@ from pyrogram.errors import RPCError
 
 from .base import Monitor
 
+
 class PornembyDoubleMonitor(Monitor):
     name = "Pornemby 怪兽自动翻倍"
     chat_user = "PronembyTGBot2_bot"
