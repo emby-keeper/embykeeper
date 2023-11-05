@@ -1,7 +1,9 @@
 from pyrogram.types import Message
 
 from .base import Monitor
-from .pornemby import PornembyMonitor
+from .pornemby_answer import PornembyAnswerMonitor
+from .pornemby_double import PornembyDoubleMonitor
+from .pornemby_dragon_rain import PornembyDragonRainMonitor
 from .misty import MistyMonitor
 from .bgk import BGKMonitor
 from .polo import PoloMonitor
@@ -40,19 +42,19 @@ class TestMonitor:
         chat_delay = 1
         chat_reply = "我来"
 
-    class TestPornembyExamMonitor(PornembyMonitor.PornembyAnswerMonitor):
+    class TestPornembyExamMonitor(PornembyAnswerMonitor.PornembyAnswerAnswerMonitor):
         name = "Pornemby 科举 测试"
         chat_name = "api_group"
         chat_user = "embykeeper_test_bot"
         chat_allow_outgoing = True
 
-    class TestPornembyDragonRainMonitor(PornembyMonitor.PornembyDragonRainMonitor):
+    class TestPornembyDragonRainMonitor(PornembyDragonRainMonitor.PornembyDragonRainClickMonitor):
         name = "Pornemby 红包雨 测试"
         chat_name = "api_group"
         chat_user = "embykeeper_test_bot"
         chat_allow_outgoing = True
 
-    class TestPornembyDoubleMonitor(PornembyMonitor.PornembyDoubleMonitor):
+    class TestPornembyDoubleMonitor(PornembyDoubleMonitor):
         name = "Pornemby 怪兽自动翻倍 测试"
         chat_name = "api_group"
         chat_user = "embykeeper_test_bot"

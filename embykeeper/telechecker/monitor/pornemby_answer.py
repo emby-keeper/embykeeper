@@ -4,89 +4,15 @@ from datetime import datetime
 from pathlib import Path
 import random
 
-from pyrogram.types import Message, InlineKeyboardMarkup
-from pyrogram.enums import MessageEntityType
+from pyrogram.types import Message
 from pyrogram.errors import RPCError
 
-from ...utils import truncate_str, flatten
+from ...utils import truncate_str
 from ..link import Link
-from ..lock import pornemby_nohp
 
 from .base import Monitor
 
-
-class PornembyMonitor:
-    class PornembyNoHPMonitor(Monitor):
-        name = "Pornemby 血量耗尽停止发言"
-        chat_user = "PronembyTGBot2_bot"
-        chat_name = "Pornemby"
-        chat_keyword = "(.*)血量已耗尽。"
-
-        async def on_trigger(self, message: Message, key, reply):
-            for me in message.entities:
-                if me.type == MessageEntityType.TEXT_MENTION:
-                    if me.user.id == self.client.me.id:
-                        pornemby_nohp[self.client.me.id] = datetime.today().date()
-
-    class PornembyDragonRainMonitor(Monitor):
-        name = "Pornemby 红包雨"
-        chat_user = "PronembyTGBot2_bot"
-        chat_name = "Pornemby"
-        chat_keyword = [None]
-        additional_auth = ["pornemby_pack"]
-
-        async def on_trigger(self, message: Message, key, reply):
-            if message.reply_markup:
-                if isinstance(message.reply_markup, InlineKeyboardMarkup):
-                    buttons = flatten(message.reply_markup.inline_keyboard)
-                    for b in buttons:
-                        if "红包奖励" in b.text:
-                            try:
-                                await message.click(b.text)
-                            except TimeoutError:
-                                self.log.info("检测到 Pornemby 抢红包雨, 但没有抢到红包.")
-                            except RPCError:
-                                self.log.info("检测到 Pornemby 抢红包雨, 但没有抢到红包.")
-                            else:
-                                self.log.info("检测到 Pornemby 抢红包雨, 已点击.")
-                            return
-
-    class PornembyDoubleMonitor(Monitor):
-        name = "Pornemby 怪兽自动翻倍"
-        chat_user = "PronembyTGBot2_bot"
-        chat_name = "Pornemby"
-        chat_keyword = "击杀者\s+(.*)\s+是否要奖励翻倍"
-
-        async def on_trigger(self, message: Message, key, reply):
-            for me in message.entities:
-                if me.type == MessageEntityType.TEXT_MENTION:
-                    if me.user.id == self.client.me.id:
-                        if isinstance(message.reply_markup, InlineKeyboardMarkup):
-                            try:
-                                await message.click("🎲开始翻倍游戏")
-                            except RPCError:
-                                pass
-                            else:
-                                self.log.info("检测到 Pornemby 怪兽击败, 已点击翻倍.")
-                                return
-
-    class PornembyRegisterMonitor(Monitor):
-        name = "Pornemby 抢注"
-        chat_name = "Pornemby"
-        chat_user = "PornembyTGBot_bot"
-        chat_keyword = "开 放 注 册"
-        additional_auth = ["pornemby_pack"]
-
-        async def on_trigger(self, message: Message, key, reply):
-            try:
-                await message.click(0)
-            except TimeoutError:
-                self.log.info("检测到 Pornemby 抢注, 但没有抢到.")
-            except RPCError:
-                self.log.info("检测到 Pornemby 抢注, 但没有抢到.")
-            else:
-                self.log.info("检测到 Pornemby 抢注, 已点击.")
-
+class PornembyAnswerMonitor:
     class PornembyAnswerResultMonitor(Monitor):
         name = "Pornemby 科举答案"
         chat_name = ["Pornemby", "PornembyFun"]
@@ -99,7 +25,7 @@ class PornembyMonitor:
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
             self.log.info(f"本题正确答案为 {key[5]} ({key[self.key_map[key[5]]]}): {spec}.")
 
-    class PornembyAnswerMonitor(Monitor):
+    class PornembyAnswerAnswerMonitor(Monitor):
         name = "Pornemby 科举"
         chat_name = ["Pornemby", "PornembyFun"]
         chat_user = "pornemby_question_bot"
@@ -156,7 +82,7 @@ class PornembyMonitor:
                         count += 1
                         finished = False
                         if m.text:
-                            for key in PornembyMonitor.PornembyAnswerResultMonitor.keys(m):
+                            for key in PornembyAnswerMonitor.PornembyAnswerResultMonitor.keys(m):
                                 qs += 1
                                 writer.writerow(key)
                     if count and (finished or count % 500 == 0):
