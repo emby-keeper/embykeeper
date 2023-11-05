@@ -13,6 +13,7 @@ class PornembyNoHPMonitor(Monitor):
     chat_user = "PronembyTGBot2_bot"
     chat_name = "Pornemby"
     chat_keyword = "(.*)血量已耗尽。"
+    additional_auth = ["pornemby_pack"]
 
     async def on_trigger(self, message: Message, key, reply):
         for me in message.entities:
