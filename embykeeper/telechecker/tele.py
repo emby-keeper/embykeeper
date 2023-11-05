@@ -453,7 +453,7 @@ class ClientsSession:
                 session_string = account.get("session", None)
                 if not session_string:
                     if session_string_file.is_file():
-                        with open(session_string_file) as f:
+                        with open(session_string_file, encoding="utf-8") as f:
                             session_string = f.read().strip()
                 if self.in_memory is None:
                     in_memory = True

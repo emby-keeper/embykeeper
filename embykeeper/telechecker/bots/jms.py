@@ -22,7 +22,7 @@ class JMSCheckin(AnswerBotCheckin):
                 file = await get_data(self.basedir, "idioms@v1.txt", proxy=self.proxy, caller=self.name)
                 if not file:
                     raise FileNotFoundError("无法下载所需数据文件")
-                with open(file) as f:
+                with open(file, encoding="utf-8") as f:
                     self.__class__.idioms = [i for i in f.read().splitlines() if len(i) == 4]
         return await super().start()
 

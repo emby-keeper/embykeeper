@@ -70,7 +70,7 @@ class PornembyAnswerMonitor:
             count = 0
             qs = 0
             finished = False
-            with open(self.cache_file, mode="a+", newline="") as csvfile:
+            with open(self.cache_file, mode="a+", newline="", encoding="utf-8") as csvfile:
                 writer = csv.writer(csvfile)
                 if created:
                     writer.writerow(["Question", "A", "B", "C", "D", "Answer"])
@@ -97,7 +97,7 @@ class PornembyAnswerMonitor:
             if not self.cache_file.exists():
                 return {}
             questions = {}
-            with open(self.cache_file, "r") as csvfile:
+            with open(self.cache_file, "r", encoding="utf-8") as csvfile:
                 rows = csv.DictReader(csvfile)
                 for row in rows:
                     entry = dict(row)
