@@ -81,7 +81,7 @@ class Messager:
 
     def parse_message_yaml(self, file):
         """解析话术文件."""
-        with open(file, "r", encoding='utf-8') as f:
+        with open(file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         schema = Schema(
             {
