@@ -152,6 +152,8 @@ class Dispatcher(dispatcher.Dispatcher):
                         break
             except pyrogram.StopPropagation:
                 pass
+            except TimeoutError:
+                logger.info("网络不稳定, 可能遗漏消息.")
             except Exception as e:
                 logger.error("更新控制器错误.")
                 show_exception(e, regular=False)

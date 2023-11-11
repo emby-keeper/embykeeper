@@ -9,6 +9,9 @@ from .tele import ClientsSession
 
 logger = logger.bind(scheme="telenotifier")
 
+from asyncio import constants
+
+constants.LOG_THRESHOLD_FOR_CONNLOST_WRITES = 1000000
 
 class TelegramStream(io.TextIOWrapper):
     """消息推送处理器类"""
