@@ -342,26 +342,24 @@ class Client(pyrogram.Client):
                 ),
             )
         )
-        
+
     async def handle_updates(self, updates):
         self.last_update_time = datetime.now()
 
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
-            is_min = any((
-                await self.fetch_peers(updates.users),
-                await self.fetch_peers(updates.chats),
-            ))
+            is_min = any(
+                (
+                    await self.fetch_peers(updates.users),
+                    await self.fetch_peers(updates.chats),
+                )
+            )
 
             users = {u.id: u for u in updates.users}
             chats = {c.id: c for c in updates.chats}
 
             for update in updates.updates:
                 channel_id = getattr(
-                    getattr(
-                        getattr(
-                            update, "message", None
-                        ), "peer_id", None
-                    ), "channel_id", None
+                    getattr(getattr(update, "message", None), "peer_id", None), "channel_id", None
                 ) or getattr(update, "channel_id", None)
 
                 pts = getattr(update, "pts", None)
@@ -376,13 +374,14 @@ class Client(pyrogram.Client):
                                 raw.functions.updates.GetChannelDifference(
                                     channel=await self.resolve_peer(utils.get_channel_id(channel_id)),
                                     filter=raw.types.ChannelMessagesFilter(
-                                        ranges=[raw.types.MessageRange(
-                                            min_id=update.message.id,
-                                            max_id=update.message.id
-                                        )]
+                                        ranges=[
+                                            raw.types.MessageRange(
+                                                min_id=update.message.id, max_id=update.message.id
+                                            )
+                                        ]
                                     ),
                                     pts=pts - pts_count,
-                                    limit=pts
+                                    limit=pts,
                                 )
                             )
                         except ChannelPrivate:
@@ -398,22 +397,20 @@ class Client(pyrogram.Client):
         elif isinstance(updates, (raw.types.UpdateShortMessage, raw.types.UpdateShortChatMessage)):
             diff = await self.invoke(
                 raw.functions.updates.GetDifference(
-                    pts=updates.pts - updates.pts_count,
-                    date=updates.date,
-                    qts=-1
+                    pts=updates.pts - updates.pts_count, date=updates.date, qts=-1
                 )
             )
 
             if diff.new_messages:
-                self.dispatcher.updates_queue.put_nowait((
-                    raw.types.UpdateNewMessage(
-                        message=diff.new_messages[0],
-                        pts=updates.pts,
-                        pts_count=updates.pts_count
-                    ),
-                    {u.id: u for u in diff.users},
-                    {c.id: c for c in diff.chats}
-                ))
+                self.dispatcher.updates_queue.put_nowait(
+                    (
+                        raw.types.UpdateNewMessage(
+                            message=diff.new_messages[0], pts=updates.pts, pts_count=updates.pts_count
+                        ),
+                        {u.id: u for u in diff.users},
+                        {c.id: c for c in diff.chats},
+                    )
+                )
             else:
                 if diff.other_updates:  # The other_updates list can be empty
                     self.dispatcher.updates_queue.put_nowait((diff.other_updates[0], {}, {}))
