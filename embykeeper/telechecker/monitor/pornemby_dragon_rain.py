@@ -10,7 +10,7 @@ from .base import Monitor
 class PornembyDragonRainMonitor:
     class PornembyDragonRainClickMonitor(Monitor):
         name = "Pornemby 红包雨"
-        chat_user = ["PronembyTGBot2_bot", "PornembyBot"]
+        chat_user = ["PronembyTGBot2_bot", "PronembyTGBot3_bot"]
         chat_name = "Pornemby"
         chat_keyword = [None]
         additional_auth = ["pornemby_pack"]
@@ -33,7 +33,7 @@ class PornembyDragonRainMonitor:
 
     class PornembyDragonRainStatusMonitor(Monitor):
         name = "Pornemby 红包雨结果"
-        chat_user = "PronembyTGBot2_bot"
+        chat_user = ["PronembyTGBot2_bot", "PronembyTGBot3_bot"]
         chat_name = "Pornemby"
         chat_keyword = "恭喜\s+(.*):本次获得(\d+)豆"
 
