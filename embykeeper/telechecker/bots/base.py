@@ -497,7 +497,7 @@ class BotCheckin(BaseBotCheckin):
                         await message.reply(answer)
                         self.log.warning(f'智能回答回复了 "{b}", 为了避免风险签到器将停止.')
                         await self.fail()
-                        return  
+                        return
             else:
                 self.log.warning(f"智能回答失败, 为了避免风险签到器将停止.")
                 await self.fail()
