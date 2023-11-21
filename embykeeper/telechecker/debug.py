@@ -136,7 +136,7 @@ async def dumper(config: dict, specs=["message"]):
                 try:
                     t, c = s.split("@")
                     c = [i.strip() for i in c.split(",")]
-                except IndexError:
+                except ValueError:
                     t = s
                     c = []
                 try:

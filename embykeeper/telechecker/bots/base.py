@@ -488,13 +488,16 @@ class BotCheckin(BaseBotCheckin):
                         else:
                             try:
                                 await message.click(b)
-                                self.log.warning(f'智能回答点击了按钮 "{b}", 为了避免风险签到器将停止.')
-                                await self.fail()
-                                return
                             except TimeoutError:
                                 pass
+                            self.log.warning(f'智能回答点击了按钮 "{b}", 为了避免风险签到器将停止.')
+                            await self.fail()
+                            return
                     else:
                         await message.reply(answer)
+                        self.log.warning(f'智能回答回复了 "{b}", 为了避免风险签到器将停止.')
+                        await self.fail()
+                        return  
             else:
                 self.log.warning(f"智能回答失败, 为了避免风险签到器将停止.")
                 await self.fail()
