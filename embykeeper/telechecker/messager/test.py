@@ -1,9 +1,8 @@
-from .base import Messager
+from .pornemby import PornembyMessager
 
 __ignore__ = True
 
 
-class TestMessager(Messager):
+class TestMessager(PornembyMessager):
     name = "测试群组"
     chat_name = "api_group"
-    default_messages = ["watery-wl@v1.yaml * 100"]

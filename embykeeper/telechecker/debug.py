@@ -5,6 +5,7 @@ import aiofiles
 import yaml
 from dateutil import parser
 from loguru import logger
+from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.handlers import CallbackQueryHandler, EditedMessageHandler, MessageHandler, RawUpdateHandler
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineQuery, Message, ReplyKeyboardMarkup
@@ -119,7 +120,7 @@ async def _dumper_update(client, update):
     await client.queue.put(update)
 
 
-async def dumper(config: dict, types=["message"]):
+async def dumper(config: dict, specs=["message"]):
     type_handler = {
         "message": MessageHandler(_dumper_update),
         "edited_message": EditedMessageHandler(_dumper_update),
@@ -131,9 +132,17 @@ async def dumper(config: dict, types=["message"]):
     async with ClientsSession.from_config(config) as clients:
         async for tg in clients:
             tg.queue = queue
-            for t in types:
+            for s in specs:
                 try:
-                    tg.add_handler(type_handler[t])
+                    t, c = s.split("@")
+                    c = [i.strip() for i in c.split(",")]
+                except IndexError:
+                    t = s
+                    c = []
+                try:
+                    handler = type_handler[t]
+                    handler.filters = filters.chat(c) if c else None
+                    tg.add_handler(handler)
                 except KeyError:
                     log.warning(f'更新类型 {t} 不可用, 请选择: {", ".join(list(type_handler.keys()))}')
                     continue

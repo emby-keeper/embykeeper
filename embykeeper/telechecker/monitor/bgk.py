@@ -9,7 +9,6 @@ class BGKMonitor(Monitor):
     chat_keyword = r"(?:^|\s)([a-zA-Z0-9]{32})(?!\S)"
     bot_username = "UnknownEmbyBot"
     notify_create_name = True
-    allow_edit = False
 
     async def on_trigger(self, message: Message, key, reply):
         await self.client.send_message(self.bot_username, "/invite")

@@ -1,6 +1,7 @@
 from pyrogram.types import Message
 from pyrogram.errors import RPCError
 
+from ..lock import pornemby_alert
 from .base import Monitor
 
 __ignore__ = True
@@ -14,6 +15,9 @@ class PornembyRegisterMonitor(Monitor):
     additional_auth = ["pornemby_pack"]
 
     async def on_trigger(self, message: Message, key, reply):
+        if pornemby_alert.get(self.client.me.id, False):
+            self.log.info(f"由于风险急停不抢注.")
+            return
         try:
             await message.click(0)
         except TimeoutError:

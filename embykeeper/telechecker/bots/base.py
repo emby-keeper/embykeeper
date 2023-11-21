@@ -18,10 +18,10 @@ from pyrogram.errors import UsernameNotOccupied, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
-from thefuzz import fuzz
+from thefuzz import fuzz, process
 
 from ...data import get_datas
-from ...utils import show_exception, to_iterable, AsyncCountPool
+from ...utils import show_exception, to_iterable, AsyncCountPool, truncate_str
 from ..lock import ocrs, ocrs_lock
 from ..tele import Client
 from ..link import Link
@@ -231,6 +231,10 @@ class BotCheckin(BaseBotCheckin):
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
                     return None
 
+        if not await self.init():
+            self.log.warning(f"初始化错误.")
+            return False
+
         if self.additional_auth:
             for a in self.additional_auth:
                 if not await Link(self.client).auth(a):
@@ -246,47 +250,43 @@ class BotCheckin(BaseBotCheckin):
         if not self.chat_name:
             self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
             await self.client.mute_chat(ident, time.time() + self.timeout + 10)
-        if await self.init():
-            try:
-                async with self.listener():
-                    cancelled = False
-                    try:
-                        if self.bot_use_history is None:
-                            await self.send_checkin()
-                        elif not await self.walk_history(self.bot_use_history):
-                            await self.send_checkin()
-                        await asyncio.wait_for(self.finished.wait(), self.timeout)
-                    except asyncio.CancelledError:
-                        cancelled = True
-                        raise
-                    finally:
-                        if not cancelled:
-                            if not await self.cleanup():
-                                self.log.debug(f"[gray50]执行清理失败: {ident}[/]")
-                            if self._is_archived:
-                                self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
-                                try:
-                                    if await chat.archive():
-                                        self.log.debug(f"[gray50]重新归档成功: {ident}[/]")
-                                except asyncio.TimeoutError:
-                                    self.log.debug(f"[gray50]归档失败: {ident}[/]")
-                            if not self.chat_name:
-                                self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
-                                try:
-                                    if await self.client.read_chat_history(ident):
-                                        self.log.debug(f"[gray50]设为已读成功: {ident}[/]")
-                                except asyncio.TimeoutError:
-                                    self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
-            except OSError as e:
-                self.log.warning(f'初始化错误: "{e}", 签到器将停止.')
-                show_exception(e)
-                return False
-            except asyncio.TimeoutError:
-                pass
-        else:
-            self.log.warning(f"初始化错误.")
-            return False
 
+        try:
+            async with self.listener():
+                cancelled = False
+                try:
+                    if self.bot_use_history is None:
+                        await self.send_checkin()
+                    elif not await self.walk_history(self.bot_use_history):
+                        await self.send_checkin()
+                    await asyncio.wait_for(self.finished.wait(), self.timeout)
+                except asyncio.CancelledError:
+                    cancelled = True
+                    raise
+                finally:
+                    if not cancelled:
+                        if not await self.cleanup():
+                            self.log.debug(f"[gray50]执行清理失败: {ident}[/]")
+                        if self._is_archived:
+                            self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
+                            try:
+                                if await chat.archive():
+                                    self.log.debug(f"[gray50]重新归档成功: {ident}[/]")
+                            except asyncio.TimeoutError:
+                                self.log.debug(f"[gray50]归档失败: {ident}[/]")
+                        if not self.chat_name:
+                            self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
+                            try:
+                                if await self.client.read_chat_history(ident):
+                                    self.log.debug(f"[gray50]设为已读成功: {ident}[/]")
+                            except asyncio.TimeoutError:
+                                self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
+        except OSError as e:
+            self.log.warning(f'初始化错误: "{e}", 签到器将停止.')
+            show_exception(e)
+            return False
+        except asyncio.TimeoutError:
+            pass
         if not self.finished.is_set():
             self.log.warning("无法在时限内完成签到.")
             return False
@@ -448,7 +448,57 @@ class BotCheckin(BaseBotCheckin):
                     self.log.info(f"[yellow]签到成功[/].")
             self.finished.set()
         else:
-            self.log.warning(f"接收到异常返回信息: {text}")
+            await self.on_unexpected_text(message)
+
+    async def on_unexpected_text(self, message: Message):
+        content = message.text or message.caption
+        if content:
+            spec = content.replace("\n", " ")
+            self.log.warning(f"接收到异常返回信息: {spec}, 正在尝试智能回答.")
+            if message.reply_markup and message.reply_markup.inline_keyboard:
+                buttons = [b.text for r in message.reply_markup.inline_keyboard for b in r]
+            else:
+                buttons = []
+            button_specs = [f"'{b}'" for b in buttons]
+            prompt = (
+                "我正在进行签到, 机器将显示指令或状态, 我需要通过回答问题以完成签到, 现在机器给出的值为:\n\n"
+                f"{content}\n\n"
+                f"你可选: {', '.join(button_specs)} 中的一个作为回答.\n"
+                "如果您认为不应该进行任何操作, 请输出 'NO_RESP'.\n"
+                "如果这是一个指令, 请输出您需要发送或点击的内容, 不要说明这是一个指令, 不要说明需要发送文本消息, 仅仅输出发送或点击的内容. "
+                "如果这是一个状态, 请输出 'IS_STATUS', 禁止输出其他内容."
+            )
+            for _ in range(3):
+                answer, by = await Link(self.client).gpt(prompt)
+                if answer:
+                    self.log.debug(f"智能回答 ({by}): {answer}")
+                    if "NO_RESP" in answer:
+                        self.log.info(f"智能回答认为无需进行操作.")
+                        return
+                    if "IS_STATUS" in answer:
+                        self.log.info(f"智能回答认为这是一条状态信息.")
+                        return
+                    if buttons:
+                        self.log.debug(f"当前按钮: {', '.join(button_specs)}")
+                        b, s = process.extractOne(answer, buttons, scorer=fuzz.partial_ratio)
+                        if s < 70:
+                            self.log.info(f"找不到对应回答的按钮, 正在重试.")
+                            await asyncio.sleep(3)
+                            continue
+                        else:
+                            try:
+                                await message.click(b)
+                                self.log.warning(f'智能回答点击了按钮 "{b}", 为了避免风险签到器将停止.')
+                                await self.fail()
+                                return
+                            except TimeoutError:
+                                pass
+                    else:
+                        await message.reply(answer)
+            else:
+                self.log.warning(f"智能回答失败, 为了避免风险签到器将停止.")
+                await self.fail()
+                return
 
     async def retry(self):
         """执行重试, 重新发送签到指令."""

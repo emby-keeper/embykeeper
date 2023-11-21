@@ -15,7 +15,7 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 ## 声明
 
-本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关.
+本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关. 为了您的账号安全, 推荐使用小号.
 
 本项目设计初衷是在中文 Emby 社群规则下, 保号要求逐渐苛刻 (部分要求每月登录或每日签到), 这使得休闲时间紧张的人士难以安心使用. 本项目仅旨在帮助该类人群保号, 不鼓励持有大量 Emby 账号而不使用, 导致真正需要的人、为中文影视资源分享和翻译有贡献的人难以获得账号的行为, 开发团队也呼吁仅保留 1-2 个较全面质量较高的 Emby 服务器. 本项目仅提供工具, 具体使用形式及造成的影响和后果与开发团队无关.
 
@@ -50,11 +50,11 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-- Telegram 自动水群 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime), 默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
+- Telegram 自动水群 (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime), 默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
   - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~ (停服)
-- Telegram 自动监控信息 (需要[高级用户](https://t.me/embykeeper_bot?start=__prime))
+- Telegram 自动监控信息 (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime))
   - Pornemby ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377)):
     - 科举考试: [活动频道](https://t.me/PornembyFun) (可选的[高准确云题库](https://afdian.net/item/eb2319f47b2711ee95305254001e7c00), 回答准确率 90% 以上)
     - 自动抢注: [群组](https://t.me/Pornemby)

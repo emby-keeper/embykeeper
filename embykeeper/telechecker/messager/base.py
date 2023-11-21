@@ -16,6 +16,7 @@ from schema import Optional, Schema, SchemaError
 
 
 from ...data import get_data
+from ...var import debug
 from ...utils import show_exception, truncate_str, distribute_numbers
 from ..tele import ClientsSession
 from ..link import Link
@@ -204,6 +205,10 @@ class Messager:
             self.log.warning(f"发生错误: 最小间隔不应大于最大间隔, 自动水群将停止.")
             return False
 
+        if not await self.init():
+            self.log.warning(f"状态初始化失败, 自动水群将停止.")
+            return False
+
         messages = self.config.get("messages", [])
         if not messages:
             messages = self.default_messages
@@ -232,9 +237,11 @@ class Messager:
             while True:
                 valid_p = [p for p in self.timeline if not p.skip]
                 self.log.debug(f"时间线上当前有 {len(self.timeline)} 个消息计划, {len(valid_p)} 个有效.")
-                # self.log.debug(
-                #     "时间序列: " + " ".join([p.at.strftime("%H%M%S") for p in sorted(valid_p, key=lambda x: x.at)])
-                # )
+                if debug > 1:
+                    self.log.debug(
+                        "时间序列: "
+                        + " ".join([p.at.strftime("%H%M%S") for p in sorted(valid_p, key=lambda x: x.at)])
+                    )
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
                     if not next_valid_p == last_valid_p:
@@ -254,6 +261,10 @@ class Messager:
                 self.timeline.remove(next_p)
                 self.add(next_p.schedule)
 
+    async def init(self):
+        """可重写的初始化函数, 返回 False 将视为初始化错误."""
+        return True
+
     async def prepare_send(self, message):
         """可重写的信息改写函数, 发送前执行, 返回 None 以取消发送."""
         return message
@@ -272,7 +283,7 @@ class Messager:
                 chat = await tg.get_chat(self.chat_name)
                 self.log.bind(username=tg.me.name).info(f'向聊天 "{chat.name}" 发送: [gray50]{message}[/]')
                 try:
-                    await tg.send_message(self.chat_name, message)
+                    msg = await tg.send_message(self.chat_name, message)
                 except ChatWriteForbidden as e:
                     try:
                         chat = await tg.get_chat(self.chat_name)
@@ -303,3 +314,4 @@ class Messager:
                 else:
                     async with self.site_lock:
                         self.__class__.site_last_message_time = datetime.now()
+                    return msg

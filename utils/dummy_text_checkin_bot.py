@@ -7,13 +7,11 @@ import string
 from loguru import logger
 import tomli as tomllib
 from pyrogram import filters
-from pyrogram.handlers import MessageHandler
-from pyrogram.types import Message, BotCommand
-from captcha.image import ImageCaptcha
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.types import Message, BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from embykeeper.utils import AsyncTyper
 from embykeeper.telechecker.tele import Client
-from embykeeper.settings import PUBLISHED_API
 
 user_states = {}
 
@@ -29,23 +27,33 @@ async def start(client: Client, message: Message):
     await client.send_message(message.from_user.id, "你好! 请使用命令进行签到测试!")
 
 
-async def check_captcha(client: Client, message: Message):
-    if message.from_user.id not in user_states:
-        await message.reply("未知输入")
+async def check_answer(client: Client, callback: CallbackQuery):
+    if callback.from_user.id not in user_states:
+        await callback.answer("未知用户")
     else:
-        if user_states[message.from_user.id].lower() == message.text.lower():
-            del user_states[message.from_user.id]
-            await message.reply("成功")
+        await callback.answer()
+        del user_states[callback.from_user.id]
+        if user_states[callback.from_user.id] == int(callback.data):
+            await callback.message.reply("成功")
         else:
-            await message.reply("失败")
+            await callback.message.reply("失败")
 
 
-async def send_captcha(client: Client, message: Message):
-    code = "".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
-    user_states[message.from_user.id] = code
-    stream = BytesIO()
-    ImageCaptcha().write(code, stream)
-    await client.send_photo(message.from_user.id, stream)
+async def send_question(client: Client, message: Message):
+    a = random.randint(10, 100)
+    b = random.randint(10, 100)
+    user_states[message.from_user.id] = a + b
+    answers = []
+    while len(answers) < 3:
+        w = random.randint(10, 100)
+        if w == a + b:
+            continue
+        else:
+            answers.append(w)
+    answers.append(a + b)
+    random.shuffle(answers)
+    markup = InlineKeyboardMarkup([[InlineKeyboardButton(str(w), callback_data=str(w)) for w in answers]])
+    await message.reply(f"{a} + {b} = ?", reply_markup=markup)
 
 
 @app.async_command()
@@ -57,13 +65,12 @@ async def main(config: Path):
         bot_token=config["bot"]["token"],
         proxy=config.get("proxy", None),
         workdir=Path(__file__).parent,
-        **PUBLISHED_API["nicegram"],
     )
     async with bot:
         bot.add_handler(MessageHandler(dump), group=1)
         bot.add_handler(MessageHandler(start, filters.command("start")))
-        bot.add_handler(MessageHandler(send_captcha, filters.command("checkin")))
-        bot.add_handler(MessageHandler(check_captcha, filters.text))
+        bot.add_handler(MessageHandler(send_question, filters.command("checkin")))
+        bot.add_handler(CallbackQueryHandler(check_answer))
         await bot.set_bot_commands(
             [
                 BotCommand("start", "Start the bot"),

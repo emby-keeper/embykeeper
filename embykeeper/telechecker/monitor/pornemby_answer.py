@@ -9,7 +9,7 @@ from pyrogram.errors import RPCError
 
 from ...utils import truncate_str
 from ..link import Link
-
+from ..lock import pornemby_alert
 from .base import Monitor
 
 
@@ -19,6 +19,7 @@ class PornembyAnswerMonitor:
         chat_name = ["Pornemby", "PornembyFun"]
         chat_keyword = r"问题\d*：(.*?)\n+A:(.*)\n+B:(.*)\n+C:(.*)\n+D:(.*)\n+答案为：([ABCD])"
         additional_auth = ["pornemby_pack"]
+        allow_edit = True
 
         key_map = {"A": 1, "B": 2, "C": 3, "D": 4}
 
@@ -32,6 +33,7 @@ class PornembyAnswerMonitor:
         chat_user = "pornemby_question_bot"
         chat_keyword = r"问题\d*：(.*?)\n+(A:.*\n+B:.*\n+C:.*\n+D:.*)\n(?!\n*答案)"
         additional_auth = ["pornemby_pack"]
+        allow_edit = True
 
         cache = {}
         lock = asyncio.Lock()
@@ -77,15 +79,16 @@ class PornembyAnswerMonitor:
                 while not finished:
                     finished = True
                     m: Message
-                    async for m in self.client.get_chat_history("PornembyFun", limit=100, offset=count):
-                        if m.date < to_date:
-                            break
-                        count += 1
-                        finished = False
-                        if m.text:
-                            for key in PornembyAnswerMonitor.PornembyAnswerResultMonitor.keys(m):
-                                qs += 1
-                                writer.writerow(key)
+                    for g in self.chat_name:
+                        async for m in self.client.search_messages(g, limit=100, offset=count, query="答案为"):
+                            if m.date < to_date:
+                                break
+                            count += 1
+                            finished = False
+                            if m.text:
+                                for key in PornembyAnswerMonitor.PornembyAnswerResultMonitor.keys(m):
+                                    qs += 1
+                                    writer.writerow(key)
                     if count and (finished or count % 500 == 0):
                         self.log.info(f"读取问题答案历史: 已读取 {qs} 问题 / {count} 信息.")
                         await asyncio.sleep(2)
@@ -136,6 +139,9 @@ class PornembyAnswerMonitor:
 
         async def on_trigger(self, message: Message, key, reply):
             spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
+            if pornemby_alert.get(self.client.me.id, False):
+                self.log.info(f"由于风险急停不作答: {spec}.")
+                return
             result = self.cache.get(key[0], None)
             if result:
                 self.log.info(f"从缓存回答问题为{result}: {spec}.")

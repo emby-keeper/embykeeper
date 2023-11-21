@@ -3,7 +3,7 @@ from pyrogram.errors import RPCError
 from pyrogram.enums import MessageEntityType
 
 from ...utils import flatten
-
+from ..lock import pornemby_alert
 from .base import Monitor
 
 
@@ -14,8 +14,13 @@ class PornembyDragonRainMonitor:
         chat_name = "Pornemby"
         chat_keyword = [None]
         additional_auth = ["pornemby_pack"]
+        allow_edit = True
+        debug_no_log = True
 
         async def on_trigger(self, message: Message, key, reply):
+            if pornemby_alert.get(self.client.me.id, False):
+                self.log.info(f"由于风险急停不抢红包.")
+                return
             if message.reply_markup:
                 if isinstance(message.reply_markup, InlineKeyboardMarkup):
                     buttons = flatten(message.reply_markup.inline_keyboard)
@@ -36,6 +41,7 @@ class PornembyDragonRainMonitor:
         chat_user = ["PronembyTGBot2_bot", "PronembyTGBot3_bot", "PornembyBot"]
         chat_name = "Pornemby"
         chat_keyword = "恭喜\s+(.*):本次获得(\d+)豆"
+        allow_edit = True
 
         async def on_trigger(self, message: Message, key, reply):
             for me in message.entities:

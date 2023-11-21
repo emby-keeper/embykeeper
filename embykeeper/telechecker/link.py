@@ -46,7 +46,7 @@ class Link:
         return await asyncio.gather(*[delete(m) for m in messages])
 
     async def post(
-        self, cmd, condition: Callable = None, timeout: int = 5, retries=3, name: str = None
+        self, cmd, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         向机器人发送请求.
@@ -158,7 +158,15 @@ class Link:
 
     async def answer(self, question: str):
         """向机器人发送问题回答请求."""
-        results = await self.post(f"/answer {self.instance} {question}", timeout=10, name="请求问题回答")
+        results = await self.post(f"/answer {self.instance} {question}", timeout=20, name="请求问题回答")
+        if results:
+            return results.get("answer", None), results.get("by", None)
+        else:
+            return None, None
+
+    async def gpt(self, prompt: str):
+        """向机器人发送智能回答请求."""
+        results = await self.post(f"/gpt {self.instance} {prompt}", timeout=20, name="请求智能回答")
         if results:
             return results.get("answer", None), results.get("by", None)
         else:

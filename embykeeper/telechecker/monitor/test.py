@@ -4,6 +4,8 @@ from .base import Monitor
 from .pornemby_answer import PornembyAnswerMonitor
 from .pornemby_double import PornembyDoubleMonitor
 from .pornemby_dragon_rain import PornembyDragonRainMonitor
+from .pornemby_nohp import PornembyNoHPMonitor
+from .pornemby_alert import PornembyAlertMonitor
 from .misty import MistyMonitor
 from .bgk import BGKMonitor
 from .polo import PoloMonitor
@@ -42,6 +44,11 @@ class TestMonitor:
         chat_delay = 1
         chat_reply = "我来"
 
+    class TestPornembyAlertMonitor(PornembyAlertMonitor):
+        name = "Pornemby 风险急停 测试"
+        chat_name = "api_group"
+        chat_allow_outgoing = True
+
     class TestPornembyExamMonitor(PornembyAnswerMonitor.PornembyAnswerAnswerMonitor):
         name = "Pornemby 科举 测试"
         chat_name = "api_group"
@@ -56,6 +63,12 @@ class TestMonitor:
 
     class TestPornembyDoubleMonitor(PornembyDoubleMonitor):
         name = "Pornemby 怪兽自动翻倍 测试"
+        chat_name = "api_group"
+        chat_user = "embykeeper_test_bot"
+        chat_allow_outgoing = True
+
+    class TestPornembyNoHPMonitor(PornembyNoHPMonitor):
+        name = "Pornemby 血量耗尽停止发言 测试"
         chat_name = "api_group"
         chat_user = "embykeeper_test_bot"
         chat_allow_outgoing = True

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from logging import handlers
 import random
 import re
 from contextlib import asynccontextmanager
@@ -111,8 +112,9 @@ class Monitor:
         str, Callable[[Message, Optional[Union[str, List[str]]]], Union[str, Awaitable[str]]]
     ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
-    allow_edit: bool = True  # 编辑消息内容后也触发
+    allow_edit: bool = False  # 编辑消息内容后也触发
     additional_auth: List[str] = []  # 额外认证要求
+    debug_no_log = False  # 调试模式不显示冗余日志
 
     def __init__(self, client: Client, nofail=True, basedir=None, proxy=None, config: dict = {}):
         """
@@ -210,6 +212,9 @@ class Monitor:
         if me.status in (ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED):
             self.log.warning(f'初始化错误: 被群组 "{chat.title}" 禁言.')
             return False
+        if not await self.init():
+            self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
+            return False
         if self.additional_auth:
             for a in self.additional_auth:
                 if not await Link(self.client).auth(a):
@@ -218,14 +223,10 @@ class Monitor:
         if self.notify_create_name:
             self.unique_name = self.get_unique_name()
         spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"
-        if await self.init():
-            self.log.info(f"开始监视: {spec}.")
-            async with self.listener():
-                await self.failed.wait()
-                self.log.error(f"发生错误, 不再监视: {spec}.")
-                return False
-        else:
-            self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
+        self.log.info(f"开始监视: {spec}.")
+        async with self.listener():
+            await self.failed.wait()
+            self.log.error(f"发生错误, 不再监视: {spec}.")
             return False
 
     async def init(self):
@@ -296,7 +297,8 @@ class Monitor:
         """消息处理入口函数, 控制是否回复以及等待回复."""
         for key in self.keys(message):
             spec = self.get_spec(key)
-            self.log.debug(f"监听到关键信息: {spec}.")
+            if not self.debug_no_log:
+                self.log.debug(f"监听到关键信息: {spec}.")
             if random.random() >= self.chat_probability:
                 self.log.info(f"由于概率设置, 不予回应: {spec}.")
                 return False
