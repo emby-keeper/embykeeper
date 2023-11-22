@@ -33,6 +33,8 @@ class PornembyAlertMonitor(Monitor):
         return True
 
     async def check_admin(self, chat: Chat, user: User):
+        if not user:
+            return True
         async with self.member_status_cache_lock:
             if not user.id in self.member_status_cache:
                 member = await self.client.get_chat_member(chat.id, user.id)
