@@ -554,6 +554,7 @@ class ClientsSession:
                         in_memory=in_memory,
                         proxy=proxy,
                         workdir=self.basedir,
+                        sleep_threshold=30,
                     )
                     await client.start()
                 except OperationalError:

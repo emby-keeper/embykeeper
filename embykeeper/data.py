@@ -83,6 +83,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                 try:
                     for data_url in cdn_urls:
                         url = f"{data_url}/data/{name}"
+                        logger.debug(f'正在尝试 URL: {url}')
                         if proxy:
                             connector = ProxyConnector(
                                 proxy_type=ProxyType[proxy["scheme"].upper()],
