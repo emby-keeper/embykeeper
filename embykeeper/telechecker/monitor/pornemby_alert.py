@@ -49,7 +49,7 @@ class PornembyAlertMonitor(Monitor):
         content = message.text or message.caption
         if content:
             return any([re.search(k, content) for k in keywords])
-        
+
     async def monitor(self):
         while True:
             await self.lock.acquire()
@@ -121,7 +121,7 @@ class PornembyAlertMonitor(Monitor):
                 if self.check_keyword(pinned, self.user_alert_keywords + self.admin_alert_keywords):
                     await self.set_alert(86400)
                     break
-                    
+
         # 管理员发送消息, 若不在列表中停止 3600 秒, 否则停止 86400 秒
         # 用户发送列表中消息, 停止 1800 秒
         if await self.check_admin(message.chat, message.from_user):
