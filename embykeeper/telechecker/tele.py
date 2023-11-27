@@ -417,7 +417,7 @@ class Client(pyrogram.Client):
         elif isinstance(updates, raw.types.UpdateShort):
             self.dispatcher.updates_queue.put_nowait((updates.update, {}, {}))
         elif isinstance(updates, raw.types.UpdatesTooLong):
-            log.info(updates)
+            logger.info(updates)
 
 
 class ClientsSession:

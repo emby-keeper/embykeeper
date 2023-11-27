@@ -1,3 +1,4 @@
+import random
 from pyrogram.types import Message, InlineKeyboardMarkup
 from pyrogram.errors import RPCError
 from pyrogram.enums import MessageEntityType
@@ -26,6 +27,9 @@ class PornembyDragonRainMonitor:
                     buttons = flatten(message.reply_markup.inline_keyboard)
                     for b in buttons:
                         if "红包奖励" in b.text:
+                            if random.random() < self.config.get("possibility", 1.0):
+                                self.log.info(f"由于概率设置不抢红包.")
+                            return
                             try:
                                 await message.click(b.text)
                             except TimeoutError:

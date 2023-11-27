@@ -142,6 +142,9 @@ class PornembyAnswerMonitor:
             if pornemby_alert.get(self.client.me.id, False):
                 self.log.info(f"由于风险急停不作答: {spec}.")
                 return
+            if random.random() < self.config.get("possibility", 1.0):
+                self.log.info(f"由于概率设置不作答: {spec}.")
+                return
             result = self.cache.get(key[0], None)
             if result:
                 self.log.info(f"从缓存回答问题为{result}: {spec}.")
