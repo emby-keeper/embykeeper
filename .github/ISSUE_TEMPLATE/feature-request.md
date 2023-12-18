@@ -17,7 +17,7 @@ assignees: ''
 <!-- 
 请描述需要自动化的过程, 包括侦测的内容, 执行的方式(点击或回复), 等等.
 对于邀请制 Emby, 请尽量上传截图或视频以说明.
-或者, 您可以使用监控工具记录一次签到过程: 
+或者, 您可以使用监控工具记录一次签到过程: https://github.com/embykeeper/embykeeper/wiki/参与开发#提供信息以帮助-embykeeper-开发
 并发送至: https://t.me/bot_developer_chat_bot
 -->
 
