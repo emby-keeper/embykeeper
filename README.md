@@ -90,6 +90,8 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 更多安装和配置方面的帮助请参考 [Wiki](https://github.com/embykeeper/embykeeper/wiki).
 
+**注意**: 请尽可能使用小号运行本工具, 运行该工具的 Telegram 账号若通过接码注册, 请使用一段时间再接入本工具.
+
 ## 运行截图
 
 ![Screenshot](https://github.com/embykeeper/embykeeper/raw/main/images/screenshot.png)

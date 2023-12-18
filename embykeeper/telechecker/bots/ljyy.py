@@ -6,7 +6,7 @@ from thefuzz import fuzz
 
 
 class LJYYCheckin(AnswerBotCheckin):
-    ocr = "cchars4@v1"
+    ocr = "uchars4@v1"
 
     name = "垃圾影音"
     bot_username = "zckllflbot"

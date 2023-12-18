@@ -46,7 +46,7 @@ class Link:
         return await asyncio.gather(*[delete(m) for m in messages])
 
     async def post(
-        self, cmd, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
+        self, cmd, photo = None, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         向机器人发送请求.
@@ -70,7 +70,10 @@ class Link:
                 messages = []
                 messages.append(await self.client.send_message(self.bot, f"/start quiet"))
                 await asyncio.sleep(0.5)
-                messages.append(await self.client.send_message(self.bot, cmd))
+                if photo:
+                    messages.append(await self.client.send_photo(self.bot, photo, cmd))
+                else:
+                    messages.append(await self.client.send_message(self.bot, cmd))
                 self.log.debug(f"[gray50]-> {cmd}[/]")
                 results = await asyncio.wait_for(future, timeout=timeout)
             except asyncio.CancelledError:
@@ -167,6 +170,17 @@ class Link:
     async def gpt(self, prompt: str):
         """向机器人发送智能回答请求."""
         results = await self.post(f"/gpt {self.instance} {prompt}", timeout=20, name="请求智能回答")
+        if results:
+            return results.get("answer", None), results.get("by", None)
+        else:
+            return None, None
+        
+    async def visual(self, photo, options: List[str], question=None):
+        """向机器人发送视觉问题解答请求."""
+        cmd = f"/visual {self.instance} {'/'.join(options)}"
+        if question:
+            cmd += f' {question}'
+        results = await self.post(cmd, photo=photo, timeout=20, name="请求视觉问题解答")
         if results:
             return results.get("answer", None), results.get("by", None)
         else:

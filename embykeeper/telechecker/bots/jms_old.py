@@ -15,9 +15,9 @@ class JMSCheckin(AnswerBotCheckin):
 
     name = "卷毛鼠"
     bot_username = "jmsembybot"
+    max_retries = 2
 
     async def start(self):
-        self.retries = 2
         async with self.lock:
             if self.idioms is None:
                 file = await get_data(self.basedir, "idioms@v1.txt", proxy=self.proxy, caller=self.name)

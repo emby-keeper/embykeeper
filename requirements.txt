@@ -27,3 +27,4 @@ eventlet
 cryptography
 werkzeug<3
 cachetools
+emoji
