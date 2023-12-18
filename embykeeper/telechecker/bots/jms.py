@@ -1,52 +1,44 @@
-import asyncio
-import random
+import aiohttp
+from aiohttp_socks import ProxyConnector, ProxyType
 from pyrogram.types import Message
-from thefuzz import process
+from pyrogram.raw.functions.messages import AcceptUrlAuth
+from pyrogram.raw.types import UrlAuthResultAccepted
+from faker import Faker
 
-from ...data import get_data
-from .base import AnswerBotCheckin
+from .base import BotCheckin
 
 
-class JMSCheckin(AnswerBotCheckin):
-    ocr = "idioms@v2"
-    idioms = None
-    lock = asyncio.Lock()
-
+class JMSCheckin(BotCheckin):
     name = "卷毛鼠"
     bot_username = "jmsembybot"
-
-    async def start(self):
-        self.retries = 2
-        async with self.lock:
-            if self.idioms is None:
-                file = await get_data(self.basedir, "idioms@v1.txt", proxy=self.proxy, caller=self.name)
-                if not file:
-                    raise FileNotFoundError("无法下载所需数据文件")
-                with open(file, encoding="utf-8") as f:
-                    self.__class__.idioms = [i for i in f.read().splitlines() if len(i) == 4]
-        return await super().start()
-
-    def to_idiom(self, captcha: str):
-        phrase, score = process.extractOne(captcha, self.idioms)
-        if score > 70 or len(captcha) < 4:
-            result = phrase
-            self.log.debug(f'[gray50]已匹配识别验证码 "{captcha}" -> 成语 "{result}".[/]')
-        else:
-            result = captcha
-            self.log.debug(f'[gray50]验证码 "{captcha}" 无法矫正, 使用原词.[/]')
-        return result
-
-    async def on_captcha(self, message: Message, captcha: str):
-        captcha = self.to_idiom(captcha)
-        async with self.operable:
-            if not self.message:
-                await self.operable.wait()
-            await asyncio.sleep(random.uniform(3, 5))
-            for l in captcha:
-                try:
-                    await self.message.click(l)
-                    await asyncio.sleep(random.uniform(3, 5))
-                except ValueError:
-                    self.log.info(f'未能找到对应 "{l}" 的按键, 正在重试.')
-                    await self.retry()
-                    break
+    bot_checked_keywords = "请明天再来签到"
+    
+    async def message_handler(self, client, message: Message):
+        if message.reply_markup:
+            keys = [k for r in message.reply_markup.inline_keyboard for k in r]
+            for k in keys:
+                if "点我签到" in k.text:
+                    r: UrlAuthResultAccepted = await self.client.invoke(
+                        AcceptUrlAuth(
+                            peer = await self.client.resolve_peer(message.chat.id),
+                            msg_id = message.id,
+                            button_id = k.login_url.button_id,
+                            url = k.login_url.url,
+                        )
+                    )
+                    url = r.url
+                    if self.proxy:
+                        connector = ProxyConnector(
+                            proxy_type=ProxyType[self.proxy["scheme"].upper()],
+                            host=self.proxy["hostname"],
+                            port=self.proxy["port"],
+                        )
+                    else:
+                        connector = aiohttp.TCPConnector()
+                    for _ in range(1, 3):
+                        async with aiohttp.ClientSession(connector=connector) as session:
+                            async with session.get(url, headers={"User-Agent": Faker().safari()}) as resp:
+                                if resp.status == 200:
+                                    return
+        return await super().message_handler(client, message)
+        
