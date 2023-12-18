@@ -29,21 +29,21 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
 
 - Telegram 机器人签到
   - 卷毛鼠: [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
-  - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
+  - 终点站: [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot) (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime) 以进行物品识别)
   - 垃圾影音: [群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)
-  - 卡戎: [频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)
   - EmbyHub: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
   - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
-  - 默认禁用:
+  - 默认禁用 (关服或无响应):
+    - 卡戎: ~~[频道](https://t.me/CharonTV) [群组](https://t.me/CharonTV_Talk) [机器人](https://t.me/CharonTV_Bot)~~
     - Peach: ~~[机器人](https://t.me/peach_emby_bot)~~
-    - ~~魔法Emby: [频道](https://t.me/Magic_EmbyChannel) [群组](https://t.me/Magicemby) [机器人](https://t.me/Magic_EmbyBot)~~
-    - ~~Temby: [频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)~~
-    - ~~Misty: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
-    - ~~BlueSea: [群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~
-    - ~~卷毛鼠 IPTV: [频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~
-    - ~~Nebula: [频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot)~~
-    - ~~Singularity: [频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)~~
-    - ~~剧狗: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
+    - 魔法Emby: ~~[频道](https://t.me/Magic_EmbyChannel) [群组](https://t.me/Magicemby) [机器人](https://t.me/Magic_EmbyBot)~~
+    - Temby: ~~[频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)~~
+    - Misty: ~~[频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
+    - BlueSea: ~~[群组](https://t.me/blueseachat) [机器人](https://t.me/blueseamusic_bot)~~
+    - 卷毛鼠 IPTV: ~~[频道](https://t.me/CurlyMouseIPTV) [群组](https://t.me/Curly_MouseIPTV) [机器人](https://t.me/JMSIPTV_bot)~~
+    - Nebula: ~~[频道](https://t.me/Nebula_Emby) [群组](https://t.me/NebulaEmbyUser) [机器人](https://t.me/Nebula_Account_bot)~~
+    - Singularity: ~~[频道](https://t.me/Singularity_Emby_Channel) [群组](https://t.me/Singularity_Emby_Group) [机器人](https://t.me/Singularity_Emby_Bot)~~
+    - 剧狗: ~~[频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
     - 其他非 Emby 相关:
       - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
       - 纸片 DDoS: [频道](https://t.me/PaperBotnet) [机器人](https://t.me/zhipianbot)
@@ -52,8 +52,8 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 播放时间与进度模拟
 - Telegram 自动水群 (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime), 默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
   - Pornemby: [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
-  - 默认禁用:
-    - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
+  - 默认禁用 (关服或无响应):
+    - NakoNako 自动水群: ~~[群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
 - Telegram 自动监控信息 (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime))
   - Pornemby ([定制功能](https://afdian.net/a/jackzzs)):
     - 科举考试: [活动频道](https://t.me/PornembyFun) (可选的[高准确云题库](https://afdian.net/a/jackzzs), 回答准确率 90% 以上)
@@ -62,11 +62,11 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
   - Viper 抢邀请码: [频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)
   - Embyhub 开注自动注册: [频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)
-  - 默认禁用:
-    - ~~全局自动从众: 当在任何群组中发现 5 分钟内 5 条一样内容的消息, 会自动跟一句~~ (影响范围大默认禁用)
-    - ~~Polo 抢邀请码: [频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~
-    - ~~Misty 开注自动注册: [频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
-    - ~~剧狗 开注自动注册: [频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
+  - 默认禁用 (关服或无响应):
+    - 全局自动从众: 当在任何群组中发现 5 分钟内 5 条一样内容的消息, 会自动跟一句 (影响范围大默认禁用)
+    - Polo 抢邀请码: ~~[频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~
+    - Misty 开注自动注册: ~~[频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
+    - 剧狗 开注自动注册: ~~[频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
 
 ## 安装与使用
 
