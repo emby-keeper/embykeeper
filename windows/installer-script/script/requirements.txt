@@ -1,1 +1,1 @@
-embykeeper==3.2.1
+embykeeper==3.2.2
