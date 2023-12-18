@@ -30,42 +30,42 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 3.0.11 生成的.
+# 该部分内容是根据 Embykeeper 3.2.0 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["charon", "embyhub", "jms", "ljyy", "magic", "peach", "pornemby", "sssq", "terminus"]
+# checkiner = ["charon", "embyhub", "jms", "ljyy", "pornemby", "sssq"]
 # monitor = ["bgk", "embyhub", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
 # [service]
-# checkiner = ["bluesea", "charon", "embyhub", "jms", "jms_iptv", "judog", "ljyy", "magic", "misty", "nebula", "peach", "pornemby", "singularity", "sssq", "temby", "terminus", "zhipian"]
+# checkiner = ["bluesea", "charon", "embyhub", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "magic", "misty", "nebula", "peach", "pornemby", "singularity", "sssq", "temby", "terminus", "terminus_old", "zhipian"]
 # monitor = ["bgk", "embyhub", "follow", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8612900008514"
+phone = "+8619236577248"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8615884950857"
+phone = "+8615485454712"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://rodriguez.com/"
-username = "robert33"
-password = "k^J0lSQL*0"
+url = "https://fowler.com/"
+username = "vboyle"
+password = "gv2+IRf^$W"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.flynn-willis.org/"
-username = "benjaminwashington"
-password = "SZ62ULhm(m"
+url = "https://daugherty-richardson.net/"
+username = "kphillips"
+password = "+H47u@Jwh^"
 time = [120, 240] # 模拟观看的时长范围 (秒)
