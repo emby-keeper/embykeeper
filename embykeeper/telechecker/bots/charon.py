@@ -2,6 +2,7 @@ import asyncio
 
 from .base import BotCheckin
 
+__ignore__ = True
 
 class CharonCheckin(BotCheckin):
     name = "卡戎"

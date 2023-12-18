@@ -5,9 +5,6 @@ from pyrogram.errors import RPCError
 from ..link import Link
 from .base import AnswerBotCheckin
 
-__ignore__ = True
-
-
 class TerminusCheckin(AnswerBotCheckin):
     name = "终点站"
     bot_username = "EmbyPublicBot"

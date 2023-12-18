@@ -132,6 +132,13 @@ class BotCheckin(BaseBotCheckin):
     additional_auth: List[str] = []  # 额外认证要求
     max_retries = None  # 最高重试次数
 
+    @property
+    def valid_retries(self):
+        if self.max_retries:
+            return min(self.retries, self.max_retries)
+        else:
+            return self.retries
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self._is_archived = False  # 签到前处于收纳状态
@@ -292,7 +299,7 @@ class BotCheckin(BaseBotCheckin):
             self.log.warning("无法在时限内完成签到.")
             return False
         else:
-            return self._retries <= min(self.retries, self.max_retries)
+            return self._retries <= self.valid_retries
 
     async def init(self):
         """可重写的初始化函数, 在读取聊天后运行, 在执行签到前运行, 返回 False 将视为初始化错误."""
@@ -507,7 +514,7 @@ class BotCheckin(BaseBotCheckin):
     async def retry(self):
         """执行重试, 重新发送签到指令."""
         self._retries += 1
-        if self._retries <= min(self.retries, self.max_retries):
+        if self._retries <= self.valid_retries:
             await asyncio.sleep(self.bot_retry_wait)
             await self.send_checkin(retry=True)
         else:
