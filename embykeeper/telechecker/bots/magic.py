@@ -4,6 +4,7 @@ from .base import BotCheckin
 
 __ignore__ = True
 
+
 class MagicCheckin(BotCheckin):
     name = "魔法Emby"
     bot_username = "Magic_EmbyBot"

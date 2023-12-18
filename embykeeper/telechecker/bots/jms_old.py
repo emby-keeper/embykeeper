@@ -8,6 +8,7 @@ from .base import AnswerBotCheckin
 
 __ignore__ = True
 
+
 class JMSCheckin(AnswerBotCheckin):
     ocr = "idioms@v2"
     idioms = None

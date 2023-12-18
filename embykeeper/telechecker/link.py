@@ -46,7 +46,7 @@ class Link:
         return await asyncio.gather(*[delete(m) for m in messages])
 
     async def post(
-        self, cmd, photo = None, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
+        self, cmd, photo=None, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         向机器人发送请求.
@@ -174,12 +174,12 @@ class Link:
             return results.get("answer", None), results.get("by", None)
         else:
             return None, None
-        
+
     async def visual(self, photo, options: List[str], question=None):
         """向机器人发送视觉问题解答请求."""
         cmd = f"/visual {self.instance} {'/'.join(options)}"
         if question:
-            cmd += f' {question}'
+            cmd += f" {question}"
         results = await self.post(cmd, photo=photo, timeout=20, name="请求视觉问题解答")
         if results:
             return results.get("answer", None), results.get("by", None)

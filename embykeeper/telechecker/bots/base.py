@@ -130,7 +130,7 @@ class BotCheckin(BaseBotCheckin):
     bot_fail_keywords: Union[str, List[str]] = []  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
     additional_auth: List[str] = []  # 额外认证要求
-    max_retries = None # 最高重试次数
+    max_retries = None  # 最高重试次数
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)

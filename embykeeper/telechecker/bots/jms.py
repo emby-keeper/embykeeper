@@ -12,7 +12,7 @@ class JMSCheckin(BotCheckin):
     name = "卷毛鼠"
     bot_username = "jmsembybot"
     bot_checked_keywords = "请明天再来签到"
-    
+
     async def message_handler(self, client, message: Message):
         if message.reply_markup:
             keys = [k for r in message.reply_markup.inline_keyboard for k in r]
@@ -20,10 +20,10 @@ class JMSCheckin(BotCheckin):
                 if "点我签到" in k.text:
                     r: UrlAuthResultAccepted = await self.client.invoke(
                         AcceptUrlAuth(
-                            peer = await self.client.resolve_peer(message.chat.id),
-                            msg_id = message.id,
-                            button_id = k.login_url.button_id,
-                            url = k.login_url.url,
+                            peer=await self.client.resolve_peer(message.chat.id),
+                            msg_id=message.id,
+                            button_id=k.login_url.button_id,
+                            url=k.login_url.url,
                         )
                     )
                     url = r.url
@@ -41,4 +41,3 @@ class JMSCheckin(BotCheckin):
                                 if resp.status == 200:
                                     return
         return await super().message_handler(client, message)
-        

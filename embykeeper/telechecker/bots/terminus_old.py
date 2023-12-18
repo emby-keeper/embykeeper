@@ -1,6 +1,7 @@
 from .base import BotCheckin
 
-__ignore__= True
+__ignore__ = True
+
 
 class TerminusCheckin(BotCheckin):
     name = "终点站"
