@@ -55,8 +55,8 @@ Embykeeper 是一个在中文社群规则下用于 Emby 影视服务器的签到
   - 默认禁用:
     - ~~NakoNako 自动水群: [群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
 - Telegram 自动监控信息 (需要 [Embykeeper 高级用户](https://t.me/embykeeper_bot?start=__prime))
-  - Pornemby ([定制功能](https://afdian.net/item/53d3b4987a6c11eea2ea52540025c377)):
-    - 科举考试: [活动频道](https://t.me/PornembyFun) (可选的[高准确云题库](https://afdian.net/item/eb2319f47b2711ee95305254001e7c00), 回答准确率 90% 以上)
+  - Pornemby ([定制功能](https://afdian.net/a/jackzzs)):
+    - 科举考试: [活动频道](https://t.me/PornembyFun) (可选的[高准确云题库](https://afdian.net/a/jackzzs), 回答准确率 90% 以上)
     - 自动抢注: [群组](https://t.me/Pornemby)
     - 自动抢红包雨: [群组](https://t.me/Pornemby)
   - 不给看 抢邀请码: [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
