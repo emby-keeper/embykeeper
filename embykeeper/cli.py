@@ -28,7 +28,8 @@ def version(version):
 
 
 @app.async_command(
-    cls=FlagValueCommand, help=f"欢迎使用 [orange3]{__name__.capitalize()}[/] {__version__} :cinema: 无参数默认开启全部功能."
+    cls=FlagValueCommand,
+    help=f"欢迎使用 [orange3]{__name__.capitalize()}[/] {__version__} :cinema: 无参数默认开启全部功能.",
 )
 async def main(
     config: Path = typer.Argument(
@@ -75,7 +76,9 @@ async def main(
         rich_help_panel="调试参数",
         help="立刻执行一次任务",
     ),
-    once: bool = typer.Option(False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"),
+    once: bool = typer.Option(
+        False, "--once/--cron", "-o/-O", rich_help_panel="调试参数", help="仅执行一次任务而不计划执行"
+    ),
     verbosity: int = typer.Option(
         False,
         "--debug",
@@ -87,20 +90,34 @@ async def main(
         help="开启调试模式",
     ),
     debug_cron: bool = typer.Option(
-        False, hidden=True, envvar="EK_DEBUG_CRON", show_envvar=False, help="开启任务调试模式, 在三秒后立刻开始执行计划任务"
+        False,
+        hidden=True,
+        envvar="EK_DEBUG_CRON",
+        show_envvar=False,
+        help="开启任务调试模式, 在三秒后立刻开始执行计划任务",
     ),
-    simple_log: bool = typer.Option(False, "--simple-log", "-L", rich_help_panel="调试参数", help="简化日志输出格式"),
+    simple_log: bool = typer.Option(
+        False, "--simple-log", "-L", rich_help_panel="调试参数", help="简化日志输出格式"
+    ),
     follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试工具", help="仅启动消息调试"),
-    analyze: bool = typer.Option(False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"),
-    dump: List[str] = typer.Option([], "--dump", "-D", hidden=True, rich_help_panel="调试工具", help="仅启动更新日志"),
-    save: bool = typer.Option(False, "--save", "-S", hidden=True, rich_help_panel="调试参数", help="记录原始更新日志"),
+    analyze: bool = typer.Option(
+        False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"
+    ),
+    dump: List[str] = typer.Option(
+        [], "--dump", "-D", hidden=True, rich_help_panel="调试工具", help="仅启动更新日志"
+    ),
+    save: bool = typer.Option(
+        False, "--save", "-S", hidden=True, rich_help_panel="调试参数", help="记录原始更新日志"
+    ),
     public: bool = typer.Option(
         False, "--public", "-P", hidden=True, rich_help_panel="调试参数", help="启用公共仓库部署模式"
     ),
     windows: bool = typer.Option(
         False, "--windows", "-W", hidden=True, rich_help_panel="调试参数", help="启用 Windows 安装部署模式"
     ),
-    basedir: Path = typer.Option(None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"),
+    basedir: Path = typer.Option(
+        None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"
+    ),
 ):
     from .log import logger, initialize
 

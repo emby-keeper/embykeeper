@@ -54,7 +54,9 @@ def generate_config(config: Path):
 
     var.console.print(f"等待您编辑配置文件, 请保存关闭编辑器窗口以继续 ...", justify="center")
     p.wait()
-    var.console.print(f"请确认您配置完成, 并按任意键以继续启动 {__product__.capitalize()}...", justify="center")
+    var.console.print(
+        f"请确认您配置完成, 并按任意键以继续启动 {__product__.capitalize()}...", justify="center"
+    )
     var.console.print(f"配置完成, 即将启动 {__product__.capitalize()} ...", justify="center")
 
 

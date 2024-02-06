@@ -77,7 +77,9 @@ class MistyMonitor(Monitor):
                     continue
                 else:
                     if self.captcha and len(self.captcha) == 5:
-                        self.log.info(f"机器人状态初始化完成, 当接收到邀请码时将输入验证码 {self.captcha} 以抢注, 请勿操作 @EmbyMistyBot.")
+                        self.log.info(
+                            f"机器人状态初始化完成, 当接收到邀请码时将输入验证码 {self.captcha} 以抢注, 请勿操作 @EmbyMistyBot."
+                        )
                         return True
                     else:
                         self.log.info(f"机器人状态初始化失败, 正在重试.")

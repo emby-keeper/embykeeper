@@ -161,7 +161,9 @@ async def login(config, continuous=False):
             continue
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
-            loggeruser.info(f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).')
+            loggeruser.info(
+                f'成功登录 ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).'
+            )
             yield emby, a.get("time", None if continuous else [120, 240]), loggeruser
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
@@ -206,7 +208,9 @@ async def watch(emby, time, logger, retries=5):
                         )
 
                         prompt = (
-                            f"[yellow]成功播放视频[/], " + f"当前该视频播放 {obj.play_count} 次, " + f"上次播放于 {last_played}."
+                            f"[yellow]成功播放视频[/], "
+                            + f"当前该视频播放 {obj.play_count} 次, "
+                            + f"上次播放于 {last_played}."
                         )
                         logger.bind(notify="成功保活.").info(prompt)
                         return True
@@ -275,7 +279,9 @@ async def watch_continuous(emby: Emby, logger):
                 totalticks = obj.object_dict.get("RunTimeTicks")
                 if not totalticks:
                     raise PlayError("无法获取视频长度")
-                logger.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totalticks / 10000000:.0f} 秒).')
+                logger.info(
+                    f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totalticks / 10000000:.0f} 秒).'
+                )
                 try:
                     await play(obj, 0)
                 except PlayError as e:
@@ -368,7 +374,9 @@ async def watcher_continuous_schedule(
     t = asyncio.create_task(watcher_continuous(config))
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)
-        logger.bind(scheme="embywatcher").info(f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始.")
+        logger.bind(scheme="embywatcher").info(
+            f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始."
+        )
         await asyncio.sleep((dt - datetime.now()).total_seconds())
         if not t.done():
             t.cancel()

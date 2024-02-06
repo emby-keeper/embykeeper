@@ -267,9 +267,15 @@ async def interactive_config(config: dict = {}):
             more = Confirm.ask(pad + "是否添加 Telegram 账号?", default=True, console=console)
         if not more:
             break
-        phone = Prompt.ask(pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]", console=console)
-        monitor = Confirm.ask(pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False, console=console)
-        send = Confirm.ask(pad + "是否开启该账号的自动水群功能? (需要高级账号)", default=False, console=console)
+        phone = Prompt.ask(
+            pad + "请输入您的 Telegram 账号 (带国家区号) [dark_green](+861xxxxxxxxxx)[/]", console=console
+        )
+        monitor = Confirm.ask(
+            pad + "是否开启该账号的自动监控功能? (需要高级账号)", default=False, console=console
+        )
+        send = Confirm.ask(
+            pad + "是否开启该账号的自动水群功能? (需要高级账号)", default=False, console=console
+        )
         telegrams.append({"phone": phone, "send": False, "monitor": monitor, "send": send})
     if telegrams:
         logger.info(f"即将尝试登录各账户并存储凭据, 请耐心等待.")
@@ -283,12 +289,19 @@ async def interactive_config(config: dict = {}):
             more = Confirm.ask(pad + "是否添加 Emby 账号?", default=True, console=console)
         if not more:
             break
-        url = Prompt.ask(pad + "请输入您的 Emby 站点 URL [dark_green](https://abc.com:443)[/]", console=console)
+        url = Prompt.ask(
+            pad + "请输入您的 Emby 站点 URL [dark_green](https://abc.com:443)[/]", console=console
+        )
         username = Prompt.ask(pad + "请输入您在该 Emby 站点的用户名", console=console)
-        password = Prompt.ask(pad + "请输入您在该 Emby 站点的密码 (不显示, 按回车确认)", password=True, console=console)
+        password = Prompt.ask(
+            pad + "请输入您在该 Emby 站点的密码 (不显示, 按回车确认)", password=True, console=console
+        )
         while True:
             time = Prompt.ask(
-                pad + "设置模拟观看时长范围 (秒), 用空格分隔", default="120 240", show_default=True, console=console
+                pad + "设置模拟观看时长范围 (秒), 用空格分隔",
+                default="120 240",
+                show_default=True,
+                console=console,
             )
             if " " in time:
                 try:
@@ -323,7 +336,10 @@ async def interactive_config(config: dict = {}):
             console=console,
         )
         config["retries"] = IntPrompt.ask(
-            pad + "设置每个 Telegram Bot 签到的最大尝试次数", default=config["retries"], show_default=True, console=console
+            pad + "设置每个 Telegram Bot 签到的最大尝试次数",
+            default=config["retries"],
+            show_default=True,
+            console=console,
         )
         config["concurrent"] = IntPrompt.ask(
             pad + "设置最大可同时进行的 Telegram Bot 签到",
@@ -332,17 +348,24 @@ async def interactive_config(config: dict = {}):
             console=console,
         )
         config["random"] = IntPrompt.ask(
-            pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)", default=config["random"], show_default=True, console=console
+            pad + "设置计划任务时, 各站点之间签到的随机时间差异 (分钟)",
+            default=config["random"],
+            show_default=True,
+            console=console,
         )
     content = item(config).as_string()
     enc = Confirm.ask(pad + "是否生成加密配置", default=False, console=console)
     if enc:
-        enc_password = Prompt.ask(pad + "请输入加密密码, 程序启动时将要求输入 (不显示, 按回车确认)", password=True, console=console)
+        enc_password = Prompt.ask(
+            pad + "请输入加密密码, 程序启动时将要求输入 (不显示, 按回车确认)", password=True, console=console
+        )
         content = encrypt(content, enc_password)
     else:
         content = content.encode()
     content = base64.b64encode(content)
-    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入环境变量配置 (名称: EK_CONFIG), 否则配置将在重启后丢失.")
+    logger.info(
+        f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入环境变量配置 (名称: EK_CONFIG), 否则配置将在重启后丢失."
+    )
     print()
     get_console().rule("EK_CONFIG")
     print(content.decode())
@@ -365,7 +388,12 @@ def load_env_config(data: str):
             logger.info("您正在使用加密配置文件作为输入 (AES).")
             config = tomllib.loads(
                 decrypt(
-                    data, Prompt.ask(" " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)", password=True, console=console)
+                    data,
+                    Prompt.ask(
+                        " " * 23 + "您需要输入您的加密密钥 (不显示, 按回车确认)",
+                        password=True,
+                        console=console,
+                    ),
                 )
             )
         except (tomllib.TOMLDecodeError, UnicodeDecodeError):

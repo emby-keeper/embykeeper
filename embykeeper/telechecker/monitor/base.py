@@ -90,7 +90,9 @@ class UniqueUsername(dict):
         if random_bits:
             random_bits = "".join(random.choice(string.digits) for _ in range(random_bits))
             unique = unique + random_bits
-        log.info(f'([magenta]默认[/]) 当监控到开注时, 将以用户名 "{unique}" 注册, 请[yellow]保证[/]具有一定独特性以避免注册失败.')
+        log.info(
+            f'([magenta]默认[/]) 当监控到开注时, 将以用户名 "{unique}" 注册, 请[yellow]保证[/]具有一定独特性以避免注册失败.'
+        )
         return unique
 
 
@@ -199,7 +201,9 @@ class Monitor:
                     if e.value < 360:
                         await asyncio.sleep(e.value)
                     else:
-                        self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 监控器将停止.")
+                        self.log.info(
+                            f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 监控器将停止."
+                        )
                         return False
                 else:
                     break

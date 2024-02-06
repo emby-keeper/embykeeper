@@ -562,7 +562,9 @@ class ClientsSession:
                     session_file.unlink(missing_ok=True)
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
-                    logger.warning(f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api.")
+                    logger.warning(
+                        f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api."
+                    )
                     break
                 except Unauthorized:
                     try:
@@ -570,7 +572,9 @@ class ClientsSession:
                     except:
                         pass
                 except KeyError as e:
-                    logger.warning(f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.')
+                    logger.warning(
+                        f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.'
+                    )
                     show_exception(e)
                     await asyncio.sleep(3)
                 else:

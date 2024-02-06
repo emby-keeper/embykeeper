@@ -80,7 +80,9 @@ class PornembyAnswerMonitor:
                     finished = True
                     m: Message
                     for g in self.chat_name:
-                        async for m in self.client.search_messages(g, limit=100, offset=count, query="答案为"):
+                        async for m in self.client.search_messages(
+                            g, limit=100, offset=count, query="答案为"
+                        ):
                             if m.date < to_date:
                                 break
                             count += 1
