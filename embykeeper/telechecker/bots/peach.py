@@ -2,9 +2,6 @@ from pyrogram.types import Message
 
 from .base import BotCheckin
 
-__ignore__ = True
-
-
 class PeachCheckin(BotCheckin):
     name = "Peach"
     bot_username = "peach_emby_bot"

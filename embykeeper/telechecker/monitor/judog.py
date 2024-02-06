@@ -33,4 +33,4 @@ class JudogMonitor(Monitor):
         if "目前已无可注册资格" in (msg.caption or msg.text):
             return
         else:
-            self.log.bind(notify=True).info(f"已在{self.name}抢注成功, 请及时登录查看.")
+            self.log.bind(notify=True).info(f'已向 Bot @{self.bot_username} 发送了用户注册申请: "{self.unique_name}", 请检查结果.')

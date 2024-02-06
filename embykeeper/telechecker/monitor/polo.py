@@ -18,4 +18,4 @@ class PoloMonitor(Monitor):
             await self.client.send_message(self.bot_username, f"/invite {code}")
             await self.client.send_message(self.bot_username, self.unique_name)
             await asyncio.sleep(0.5)
-            self.log.bind(notify=True).info(f'已向Bot发送邀请码: "{code}", 请查看.')
+            self.log.bind(notify=True).info(f'已向 Bot @{self.bot_username} 发送了邀请码: "{code}", 请查看.')
