@@ -27,7 +27,7 @@ jobs:
           directory: 'windows/installer-script'
           exclusions: 'python-* desktop.ini'
       - name: Save Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WIN_SCRIPT_ZIP_NAME }}
           path: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
@@ -45,7 +45,7 @@ jobs:
           pynsist installer.cfg
           mv build/nsis/Embykeeper.exe ${{ env.WIN_GUI_EXE_NAME }}
       - name: Save Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WIN_GUI_EXE_NAME }}
           path: ${{ env.WIN_GUI_EXE_NAME }}
