@@ -105,7 +105,9 @@ class MistyMonitor(Monitor):
                         msg = await wr(self.unique_name)
                         if "密码" in msg.text:
                             await self.client.send_message(self.bot_username, "/cancel")
-                            self.log.bind(notify=True).info(f'已向 Bot @{self.bot_username} 发送了用户注册申请: "{self.unique_name}", 请检查结果.')
+                            self.log.bind(notify=True).info(
+                                f'已向 Bot @{self.bot_username} 发送了用户注册申请: "{self.unique_name}", 请检查结果.'
+                            )
                 except asyncio.TimeoutError:
                     pass
             else:

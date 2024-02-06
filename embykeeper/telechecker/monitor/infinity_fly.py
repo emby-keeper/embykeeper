@@ -2,6 +2,7 @@ from pyrogram.types import Message
 
 from .base import Monitor
 
+
 class InfinityFlyMonitor(Monitor):
     name = "Infinity Fly"
     chat_keyword = r"register-[-\w]{36}"

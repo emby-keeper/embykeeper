@@ -6,6 +6,7 @@ from thefuzz import fuzz
 
 __ignore__ = True
 
+
 class LJYYCheckin(AnswerBotCheckin):
     ocr = "uchars4@v1"
 

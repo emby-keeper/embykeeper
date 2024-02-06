@@ -4,6 +4,7 @@ from pyrogram.types import Message
 from pyrogram.errors import RPCError
 from thefuzz import fuzz
 
+
 class LJYYCheckin(AnswerBotCheckin):
     ocr = "uchars4@v1"
 
@@ -32,5 +33,5 @@ class LJYYCheckin(AnswerBotCheckin):
                 await self.operable.wait()
             match = [(k, fuzz.ratio(k, captcha)) for k in self.get_keys(self.message)]
             max_k, max_r = max(match, key=lambda x: x[1])
-            self.log.info(f'识别字符: {captcha}, 选择字符: {max_k}')
+            self.log.info(f"识别字符: {captcha}, 选择字符: {max_k}")
             await self.message.click(max_k)
