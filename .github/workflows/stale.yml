@@ -14,7 +14,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v8
+      - uses: actions/stale@v9
         with:
           stale-issue-message: '该 Issue 长时间无活动将在 5 天后关闭, 回复或移除 `stale` 标签以延迟关闭.'
           close-issue-message: '该 Issue 因长时间无活动而关闭, 若您有疑问请继续评论.'

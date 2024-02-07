@@ -1,0 +1,51 @@
+name: PyPi Publish
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+env:
+  WIN_SCRIPT_ZIP_NAME: 'embykeeper-win-${{ github.ref_name }}.zip'
+  WIN_GUI_EXE_NAME: 'embykeeper-win-${{ github.ref_name }}.exe'
+
+permissions:
+  contents: write
+
+jobs:
+  win-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Archive Windows Installer Script Version
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+          directory: 'windows/installer-script'
+          exclusions: 'python-* desktop.ini'
+      - name: "Upload to GitHub Release"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          gh release upload ${{ github.ref_name }} windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }} --repo ${{ github.repository }}
+      
+  win-gui:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build PyAES
+        run: |
+          pip wheel pyaes==1.6.1 -w windows/installer-gui/Resources
+      - name: Build Windows Installer GUI Version
+        run: |
+          python -m pip install -U pynsistfix
+          pynsist installer.cfg
+          mv build/nsis/Embykeeper.exe ${{ env.WIN_GUI_EXE_NAME }}
+      - name: "Upload to GitHub Release"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          gh release upload ${{ github.ref_name }} ${{ env.WIN_GUI_EXE_NAME }} --repo ${{ github.repository }}

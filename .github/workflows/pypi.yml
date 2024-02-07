@@ -13,11 +13,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  main:
+  build:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Python
         uses: actions/setup-python@v3
@@ -32,26 +32,31 @@ jobs:
         name: Build package
         run: python -m build
       -
-        name: Publish package
-        uses: pypa/gh-action-pypi-publish@release/v1
+        name: Upload dists
+        uses: actions/upload-artifact@v4
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          name: "dist"
+          path: "dist/"
 
-  update-stable-branch:
-    needs: [main]
+  publish:
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       -
-        name: Checkout stable branch
-        uses: actions/checkout@v3
+        name: Download dists
+        uses: actions/download-artifact@v4
         with:
-          ref: stable
-          fetch-depth: 0
+          name: "dist"
+          path: "dist/"
       -
-        name: Update stable branch to release tag & push
+        name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          git reset --hard ${{ github.event.release.tag_name }}
-          git push
+          gh release upload ${{ github.ref_name }} dist/* --repo ${{ github.repository }}
+      -
+        name: Publish to Pypi
+        uses: pypa/gh-action-pypi-publish@release/v1
