@@ -1,4 +1,4 @@
-name: PyPi Publish
+name: Windows Release Build
 
 on:
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           gh release upload ${{ github.ref_name }} windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }} --repo ${{ github.repository }}
-      
+
   win-gui:
     runs-on: windows-latest
     steps:
