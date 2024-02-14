@@ -3,6 +3,7 @@ from pyrogram.raw.types.messages import BotCallbackAnswer
 
 from .base import BotCheckin
 
+
 class LyrebirdCheckin(BotCheckin):
     name = "Lyrebird"
     bot_username = "Lyrebird_bot"

@@ -5,6 +5,7 @@ from thefuzz import fuzz
 
 from .base import AnswerBotCheckin
 
+
 class LJYYCheckin(AnswerBotCheckin):
     ocr = "uchars4@v1"
 
@@ -26,7 +27,7 @@ class LJYYCheckin(AnswerBotCheckin):
                         except TimeoutError:
                             pass
                         try:
-                           await asyncio.wait_for(f, 10)
+                            await asyncio.wait_for(f, 10)
                         except asyncio.TimeoutError:
                             self.log.warning(f"签到失败: 点击签到无响应.")
                             await self.fail()

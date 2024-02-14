@@ -65,20 +65,23 @@ def _chat_name(self: types.Chat):
 setattr(types.User, "name", property(_name))
 setattr(types.Chat, "name", property(_chat_name))
 
+
 class LogRedirector(logging.StreamHandler):
     def emit(self, record):
         try:
             if record.levelno >= logging.WARNING:
-                logger.debug(f'Pyrogram log: {record.getMessage()}')
+                logger.debug(f"Pyrogram log: {record.getMessage()}")
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
             self.handleError(record)
-            
-pyrogram_session_logger = logging.getLogger('pyrogram')
+
+
+pyrogram_session_logger = logging.getLogger("pyrogram")
 for h in pyrogram_session_logger.handlers[:]:
     pyrogram_session_logger.removeHandler(h)
 pyrogram_session_logger.addHandler(LogRedirector())
+
 
 class Dispatcher(dispatcher.Dispatcher):
     def __init__(self, client: Client):
@@ -311,7 +314,9 @@ class Client(pyrogram.Client):
                 offset_peer = await self.resolve_peer(last.chat.id)
 
                 _, cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
-                await self.cache.set(cache_id, ((offset_id, offset_date, offset_peer), cache + dialogs), ttl=120)
+                await self.cache.set(
+                    cache_id, ((offset_id, offset_date, offset_peer), cache + dialogs), ttl=120
+                )
                 for dialog in dialogs:
                     yield dialog
 
