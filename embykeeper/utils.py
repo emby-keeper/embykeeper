@@ -49,7 +49,7 @@ def get_cls_fullpath(c):
 
 
 def format_exception(e, regular=True):
-    if regular:
+    if not regular:
         prompt = "\n请在 Github 或交流群反馈下方错误详情以帮助开发者修复该问题:\n"
     else:
         prompt = ""
@@ -73,7 +73,7 @@ def format_exception(e, regular=True):
 
 
 def show_exception(e, regular=True):
-    if (regular and 1 < var.debug < 2) or (not regular and var.debug < 2):
+    if (regular and var.debug <= 1) or (not regular and var.debug == 0):
         var.console.rule()
         print(format_exception(e, regular=regular), flush=True, file=sys.stderr)
         var.console.rule()

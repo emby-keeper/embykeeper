@@ -356,6 +356,7 @@ class BotCheckin(BaseBotCheckin):
             await self.message_handler(client, message)
         except OSError as e:
             self.log.info(f'发生错误: "{e}", 正在重试.')
+            show_exception(e)
             await self.retry()
             message.continue_propagation()
         except asyncio.CancelledError:

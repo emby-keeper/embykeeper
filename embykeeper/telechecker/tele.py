@@ -12,6 +12,7 @@ import random
 import sys
 from typing import AsyncGenerator, Optional, Union
 from sqlite3 import OperationalError
+import logging
 
 from rich.prompt import Prompt
 from appdirs import user_data_dir
@@ -42,7 +43,6 @@ _id = b"\x80\x04\x95\x15\x00\x00\x00\x00\x00\x00\x00]\x94(K2K2K9K7K9K6K4K8e."
 _hash = b"\x80\x04\x95E\x00\x00\x00\x00\x00\x00\x00]\x94(K7K8KeKeKfKcKfKbK9K8K9KeK1K1K0KcK0KdK3K0K7K8K3K8K5KfK9K9K7KaKeKee."
 _decode = lambda x: "".join(map(chr, to_iterable(pickle.loads(x))))
 
-# 密钥信息
 API_KEY = {
     "_": {"api_id": _decode(_id), "api_hash": _decode(_hash)}
     # "nicegram": {"api_id": "94575", "api_hash": "a3406de8d171bb422bb6ddf3bbd800e2"},
@@ -65,6 +65,20 @@ def _chat_name(self: types.Chat):
 setattr(types.User, "name", property(_name))
 setattr(types.Chat, "name", property(_chat_name))
 
+class LogRedirector(logging.StreamHandler):
+    def emit(self, record):
+        try:
+            if record.levelno >= logging.WARNING:
+                logger.debug(f'Pyrogram log: {record.getMessage()}')
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
+            
+pyrogram_session_logger = logging.getLogger('pyrogram')
+for h in pyrogram_session_logger.handlers[:]:
+    pyrogram_session_logger.removeHandler(h)
+pyrogram_session_logger.addHandler(LogRedirector())
 
 class Dispatcher(dispatcher.Dispatcher):
     def __init__(self, client: Client):
@@ -163,6 +177,7 @@ class Client(pyrogram.Client):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.cache = Cache()
+        self.lock = asyncio.Lock()
         self.dispatcher = Dispatcher(self)
 
     async def authorize(self):
@@ -236,73 +251,74 @@ class Client(pyrogram.Client):
     async def get_dialogs(
         self, limit: int = 0, exclude_pinned=None, folder_id=None
     ) -> Optional[AsyncGenerator["types.Dialog", None]]:
-        cache_id = f"dialogs_{self.phone_number}_{folder_id}_{1 if exclude_pinned else 0}"
-        (offset_id, offset_date, offset_peer), cache = await self.cache.get(
-            cache_id, ((0, 0, raw.types.InputPeerEmpty()), [])
-        )
-
-        current = 0
-        total = limit or (1 << 31) - 1
-        limit = min(100, total)
-
-        for c in cache:
-            yield c
-            current += 1
-            if current >= total:
-                return
-
-        while True:
-            r = await self.invoke(
-                raw.functions.messages.GetDialogs(
-                    offset_date=offset_date,
-                    offset_id=offset_id,
-                    offset_peer=offset_peer,
-                    limit=limit,
-                    hash=0,
-                    exclude_pinned=exclude_pinned,
-                    folder_id=folder_id,
-                ),
-                sleep_threshold=60,
+        async with self.lock:
+            cache_id = f"dialogs_{self.phone_number}_{folder_id}_{1 if exclude_pinned else 0}"
+            (offset_id, offset_date, offset_peer), cache = await self.cache.get(
+                cache_id, ((0, 0, raw.types.InputPeerEmpty()), [])
             )
 
-            users = {i.id: i for i in r.users}
-            chats = {i.id: i for i in r.chats}
+            current = 0
+            total = limit or (1 << 31) - 1
+            limit = min(100, total)
 
-            messages = {}
-
-            for message in r.messages:
-                if isinstance(message, raw.types.MessageEmpty):
-                    continue
-
-                chat_id = utils.get_peer_id(message.peer_id)
-                messages[chat_id] = await types.Message._parse(self, message, users, chats)
-
-            dialogs = []
-
-            for dialog in r.dialogs:
-                if not isinstance(dialog, raw.types.Dialog):
-                    continue
-
-                dialogs.append(types.Dialog._parse(self, dialog, messages, users, chats))
-
-            if not dialogs:
-                return
-
-            last = dialogs[-1]
-
-            offset_id = last.top_message.id
-            offset_date = utils.datetime_to_timestamp(last.top_message.date)
-            offset_peer = await self.resolve_peer(last.chat.id)
-
-            _, cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
-            await self.cache.set(cache_id, ((offset_id, offset_date, offset_peer), cache + dialogs), ttl=120)
-            for dialog in dialogs:
-                yield dialog
-
+            for c in cache:
+                yield c
                 current += 1
-
                 if current >= total:
                     return
+
+            while True:
+                r = await self.invoke(
+                    raw.functions.messages.GetDialogs(
+                        offset_date=offset_date,
+                        offset_id=offset_id,
+                        offset_peer=offset_peer,
+                        limit=limit,
+                        hash=0,
+                        exclude_pinned=exclude_pinned,
+                        folder_id=folder_id,
+                    ),
+                    sleep_threshold=60,
+                )
+
+                users = {i.id: i for i in r.users}
+                chats = {i.id: i for i in r.chats}
+
+                messages = {}
+
+                for message in r.messages:
+                    if isinstance(message, raw.types.MessageEmpty):
+                        continue
+
+                    chat_id = utils.get_peer_id(message.peer_id)
+                    messages[chat_id] = await types.Message._parse(self, message, users, chats)
+
+                dialogs = []
+
+                for dialog in r.dialogs:
+                    if not isinstance(dialog, raw.types.Dialog):
+                        continue
+
+                    dialogs.append(types.Dialog._parse(self, dialog, messages, users, chats))
+
+                if not dialogs:
+                    return
+
+                last = dialogs[-1]
+
+                offset_id = last.top_message.id
+                offset_date = utils.datetime_to_timestamp(last.top_message.date)
+                offset_peer = await self.resolve_peer(last.chat.id)
+
+                _, cache = await self.cache.get(cache_id, ((0, 0, raw.types.InputPeerEmpty()), []))
+                await self.cache.set(cache_id, ((offset_id, offset_date, offset_peer), cache + dialogs), ttl=120)
+                for dialog in dialogs:
+                    yield dialog
+
+                    current += 1
+
+                    if current >= total:
+                        return
 
     @asynccontextmanager
     async def catch_reply(self, chat_id: Union[int, str], outgoing=False):

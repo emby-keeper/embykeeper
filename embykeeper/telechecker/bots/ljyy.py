@@ -1,18 +1,18 @@
-from .base import AnswerBotCheckin
+import asyncio
 
 from pyrogram.types import Message
-from pyrogram.errors import RPCError
 from thefuzz import fuzz
 
+from .base import AnswerBotCheckin
 
 class LJYYCheckin(AnswerBotCheckin):
     ocr = "uchars4@v1"
 
     name = "垃圾影音"
     bot_username = "zckllflbot"
-    bot_checkin_cmd = ["/cz"]
+    bot_checkin_cmd = ["/stop", "/cz"]
     bot_use_history = 20
-    bot_text_ignore = "下列选项"
+    bot_text_ignore = ["下列选项", "退出流程"]
     bot_checkin_button_pat = r"\w\s\w\s\w\s\w"
 
     async def message_handler(self, client, message: Message):
@@ -20,8 +20,16 @@ class LJYYCheckin(AnswerBotCheckin):
             keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
             for k in keys:
                 if "签到" in k:
-                    await message.click(k)
-                    return
+                    async with self.client.catch_reply(self.bot_username) as f:
+                        try:
+                            await message.click(k)
+                        except TimeoutError:
+                            pass
+                        try:
+                           await asyncio.wait_for(f, 10)
+                        except asyncio.TimeoutError:
+                            self.log.warning(f"签到失败: 点击签到无响应.")
+                            await self.fail()
             else:
                 self.log.warning(f"签到失败: 账户错误.")
                 return await self.fail()

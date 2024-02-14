@@ -1,6 +1,6 @@
-from .base import AnswerBotCheckin
-
 from pyrogram.types import Message
+
+from .base import AnswerBotCheckin
 
 __ignore__ = True
 

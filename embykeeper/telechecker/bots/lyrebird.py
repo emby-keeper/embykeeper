@@ -1,23 +1,20 @@
 from pyrogram.types import Message
+from pyrogram.raw.types.messages import BotCallbackAnswer
 
 from .base import BotCheckin
 
-__ignore__ = True
-
-
-class JudogCheckin(BotCheckin):
-    name = "剧狗"
-    bot_username = "mulgorebot"
+class LyrebirdCheckin(BotCheckin):
+    name = "Lyrebird"
+    bot_username = "Lyrebird_bot"
     bot_checkin_cmd = "/start"
-    bot_captcha_len = 4
-    bot_checkin_caption_pat = "请输入验证码"
 
     async def message_handler(self, client, message: Message):
-        if message.caption and "欢迎使用" in message.caption and message.reply_markup:
+        if message.caption and "请选择功能" in message.caption and message.reply_markup:
             keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
             for k in keys:
                 if "签到" in k:
-                    await message.click(k)
+                    answer: BotCallbackAnswer = await message.click(k)
+                    await self.on_text(Message(id=0), answer.message)
                     return
             else:
                 self.log.warning(f"签到失败: 账户错误.")

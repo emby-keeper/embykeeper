@@ -1,8 +1,9 @@
 import asyncio
 import random
-from .base import AnswerBotCheckin
 
 from pyrogram.types import Message
+
+from .base import AnswerBotCheckin
 
 
 class PornEmbyCheckin(AnswerBotCheckin):
@@ -26,5 +27,5 @@ class PornEmbyCheckin(AnswerBotCheckin):
             try:
                 await asyncio.wait_for(f, 10)
             except asyncio.TimeoutError:
-                self.log.warning(f"签到失败: 签到无回应, 您可能还没有注册{self.name}.")
+                self.log.warning(f"签到失败: 签到无回应, 您可能还没有注册 {self.name} Emby 账号.")
                 await self.fail()
