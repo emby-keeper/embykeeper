@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-from logging import handlers
 import random
 import re
 from contextlib import asynccontextmanager

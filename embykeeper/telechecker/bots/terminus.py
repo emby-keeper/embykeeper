@@ -16,6 +16,7 @@ class TerminusCheckin(AnswerBotCheckin):
     bot_checked_keywords = ["今天已签到"]
     additional_auth = ["visual"]
     max_retries = 1
+    bot_use_history = 3
 
     async def on_photo(self, message: Message):
         """分析分析传入的验证码图片并返回验证码."""
