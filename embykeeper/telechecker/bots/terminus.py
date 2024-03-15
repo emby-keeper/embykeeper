@@ -34,6 +34,9 @@ class TerminusCheckin(AnswerBotCheckin):
                     break
                 else:
                     self.log.warning(f"远端解析失败, 正在重试解析 ({i + 1}/3).")
+            else:
+                self.log.warning(f"签到失败: 验证码识别错误.")
+                await self.fail()
             result = options[options_cleaned.index(result)]
             try:
                 await message.click(result)
