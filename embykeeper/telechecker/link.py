@@ -10,6 +10,7 @@ from pyrogram import filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import DeleteHistory
+from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
 from ..utils import async_partial, truncate_str
 from .tele import Client
@@ -92,6 +93,9 @@ class Link:
                 else:
                     self.log.warning(f"{name}超时 ({r + 1}/{retries}).")
                     return None
+            except YouBlockedUser:
+                self.log.error(f"您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用.")
+                return None
             else:
                 await self.delete_messages(messages)
                 status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
