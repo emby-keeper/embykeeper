@@ -94,7 +94,9 @@ class Link:
                     self.log.warning(f"{name}超时 ({r + 1}/{retries}).")
                     return None
             except YouBlockedUser:
-                self.log.error(f"您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用.")
+                self.log.error(
+                    f"您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用."
+                )
                 return None
             else:
                 await self.delete_messages(messages)
