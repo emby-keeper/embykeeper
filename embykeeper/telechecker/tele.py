@@ -668,7 +668,8 @@ class ClientsSession:
         async with self.lock:
             for phone in self.phones:
                 entry = self.pool.get(phone, None)
-                client, ref = entry
-                ref -= 1
-                self.pool[phone] = (client, ref)
-                logger.debug(f"Telegram 账号池计数降低: {phone} => {ref}")
+                if entry:
+                    client, ref = entry
+                    ref -= 1
+                    self.pool[phone] = (client, ref)
+                    logger.debug(f"Telegram 账号池计数降低: {phone} => {ref}")
