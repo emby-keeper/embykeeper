@@ -1,5 +1,6 @@
 from .base import BotCheckin
 
+__ignore__ = True
 
 class SSSQCheckin(BotCheckin):
     name = "搜书神器"
