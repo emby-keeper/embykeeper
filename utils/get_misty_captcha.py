@@ -3,6 +3,8 @@ from pathlib import Path
 from tqdm import tqdm, trange
 import tomli as tomllib
 
+from loguru import logger
+
 from embykeeper.telechecker.monitor.misty import MistyMonitor
 from embykeeper.telechecker.tele import ClientsSession
 from embykeeper.utils import AsyncTyper, async_partial
@@ -22,25 +24,23 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
             m = MistyMonitor(tg)
             wr = async_partial(tg.wait_reply, m.bot_username, timeout=None)
             msg = await wr("/cancel")
-            while True:
-                if msg.caption and "选择您要使用的功能" in msg.caption:
-                    msg = await wr("🌏切换服务器")
-                    if "选择您要使用的服务器" in msg.text:
-                        msg = await wr("✨Misty")
-                        if "选择您要使用的功能" in msg.caption:
-                            msg = await wr("⚡️账号功能")
-                if msg.text and "请选择功能" in msg.text:
-                    break
+            if msg.caption and "选择您要使用的功能" in msg.caption:
+                msg = await wr("⚡️账号功能")
+                if not "请选择功能" in msg.text:
+                    logger.error('账号错误.')
+                    return
             photos = []
             try:
                 for _ in trange(num, desc="获取验证码"):
-                    while True:
-                        msg = await wr("⚡️注册账号")
-                        if msg.text:
-                            continue
-                        if msg.caption and "请输入验证码" in msg.caption:
-                            photos.append(msg.photo.file_id)
-                            break
+                    msg = await wr("⚡️注册账号")
+                    if msg.text:
+                        continue
+                    if msg.caption and "请输入验证码" in msg.caption:
+                        photos.append(msg.photo.file_id)
+                        msg = await wr("/cancel")
+                        if not "请选择功能" in msg.text:
+                            logger.error('账号错误.')
+                            return
             finally:
                 with open(output, "w+", encoding="utf-8") as f:
                     f.writelines(str(photo) + "\n" for photo in photos)

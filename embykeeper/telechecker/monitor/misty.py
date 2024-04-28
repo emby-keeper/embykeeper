@@ -17,7 +17,7 @@ misty_monitor_pool = {}
 
 
 class MistyMonitor(Monitor):
-    ocr = "digit5-teko@v1"
+    ocr = "digit5-large@v1"
     lock = asyncio.Lock()
 
     name = "Misty"

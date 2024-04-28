@@ -12,7 +12,7 @@ __ignore__ = True
 
 
 class MistyCheckin(BotCheckin):
-    ocr = "digit5-teko@v1"
+    ocr = "digit5-large@v1"
 
     name = "Misty"
     bot_username = "EmbyMistyBot"

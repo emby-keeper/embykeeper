@@ -6,6 +6,7 @@
 *.session-journal
 *.msgs.yaml
 *.updates.json
+*.txt
 
 # Data files
 /utils/data
