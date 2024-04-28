@@ -27,7 +27,7 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
             if msg.caption and "选择您要使用的功能" in msg.caption:
                 msg = await wr("⚡️账号功能")
                 if not "请选择功能" in msg.text:
-                    logger.error('账号错误.')
+                    logger.error("账号错误.")
                     return
             photos = []
             try:
@@ -39,7 +39,7 @@ async def generate(config: Path, num: int = 200, output: Path = "captchas.txt"):
                         photos.append(msg.photo.file_id)
                         msg = await wr("/cancel")
                         if not "请选择功能" in msg.text:
-                            logger.error('账号错误.')
+                            logger.error("账号错误.")
                             return
             finally:
                 with open(output, "w+", encoding="utf-8") as f:
