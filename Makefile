@@ -28,6 +28,7 @@ help/simple:
 >   @echo "  develop - install embykeeper and also dev-related tools."
 >   @echo "  run - run embykeeper with config.toml."
 >   @echo "  systemd - make embykeeper autostart on current user first login after reboot."
+>   @echo "  dev - run install "
 >   @echo "  lint - check style with black and pre-commit."
 >   @echo "  test - run pytest using current python."
 >   @echo "  help/all - show all subcommands."
@@ -79,6 +80,9 @@ else
     venv: conda/venv
 endif
 
+venv/require:
+>   @[ ! -d "$(VENV)" ] && echo "Error: 尚未安装, 请先运行 make run 以安装!" && exit 1 || :
+
 venv/clean:
 >   rm -R -f venv conda &>/dev/null
 
@@ -112,15 +116,15 @@ conda/install:
 
 run: run/cli
 
-run/cli: venv
+run/cli: venv/require
 >   @"$(VENV)/bin/python" -m embykeeper
 
-run/web: venv
+run/web: venv/require
 >   @"$(VENV)/bin/python" -m embykeeperweb --public
 
 systemd: systemd/install
 
-systemd/install: venv
+systemd/install: venv/require
 >   @if ! type systemctl > /dev/null; then \
 >       echo "Error: 找不到 systemctl 命令."; \
 >       exit 1; \
@@ -185,35 +189,32 @@ systemd/uninstall:
 >       echo 'Info: 已移除 systemd 配置. Embykeeper 不再自动启动.'; \
 >   fi
 
-dev: venv
->   "$(VENV)/bin/python" -m pip install -r requirements_dev.txt
-
-lint: venv
+lint: venv/require
 >   "$(VENV)/bin/python" -m black .
 >   "$(VENV)/bin/python" -m pre_commit run -a
 
-test: venv
+test: venv/require
 >   "$(VENV)/bin/python" -m pytest
 
 debugpy: debugpy/cli
 
-debugpy/cli: venv
+debugpy/cli: venv/require
 >   "$(VENV)/bin/python" -m debugpy --listen localhost:5678 --wait-for-client cli.py
 
-debugpy/web: venv
+debugpy/web: venv/require
 >   "$(VENV)/bin/python" -m debugpy --listen localhost:5678 --wait-for-client web.py --public
 
 version: version/patch
 
-version/patch: venv
+version/patch: venv/require
 >   "$(VENV)/bin/python" -m bump2version patch
 >   git push && git push --tags
 
-version/minor: venv
+version/minor: venv/require
 >   "$(VENV)/bin/python" -m bump2version minor
 >   git push && git push --tags
 
-version/major: venv
+version/major: venv/require
 >   "$(VENV)/bin/python" -m bump2version major
 >   git push && git push --tags
 
