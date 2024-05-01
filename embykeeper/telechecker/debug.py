@@ -106,8 +106,8 @@ async def follower(config: dict):
         table = Table(*columns, header_style="bold magenta", box=box.SIMPLE)
         func = async_partial(_dump_message, table=table)
         async for tg in clients:
-            tg.add_handler(MessageHandler(func))
-            tg.add_handler(EditedMessageHandler(func))
+            await tg.add_handler(MessageHandler(func))
+            await tg.add_handler(EditedMessageHandler(func))
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
@@ -142,7 +142,7 @@ async def dumper(config: dict, specs=["message"]):
                 try:
                     handler = type_handler[t]
                     handler.filters = filters.chat(c) if c else None
-                    tg.add_handler(handler)
+                    await tg.add_handler(handler)
                 except KeyError:
                     log.warning(f'更新类型 {t} 不可用, 请选择: {", ".join(list(type_handler.keys()))}')
                     continue
@@ -178,7 +178,7 @@ async def saver(config: dict):
         async for tg in clients:
             tg.saver_queue = queue = asyncio.Queue()
             output = f"{tg.me.phone_number}.updates.json"
-            tg.add_handler(RawUpdateHandler(_saver_raw), group=10000)
+            await tg.add_handler(RawUpdateHandler(_saver_raw), group=10000)
             tasks.append(_saver_dumper(queue, output))
         await asyncio.gather(*tasks)
 

@@ -111,10 +111,10 @@ async def main(config: Path, updates_file: Path):
         api_hash=api_hash,
     )
     async with bot:
-        bot.add_handler(MessageHandler(dump), group=1)
-        bot.add_handler(MessageHandler(start, filters.command("start")))
-        bot.add_handler(MessageHandler(partial(parse, updates=updates), filters.command("parse")))
-        bot.add_handler(CallbackQueryHandler(callback))
+        await bot.add_handler(MessageHandler(dump), group=1)
+        await bot.add_handler(MessageHandler(start, filters.command("start")))
+        await bot.add_handler(MessageHandler(partial(parse, updates=updates), filters.command("parse")))
+        await bot.add_handler(CallbackQueryHandler(callback))
         await bot.set_bot_commands(
             [
                 BotCommand("start", "Start the bot"),

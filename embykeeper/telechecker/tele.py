@@ -339,7 +339,7 @@ class Client(pyrogram.Client):
         try:
             yield future
         finally:
-            self.remove_handler(handler, group=0)
+            await self.remove_handler(handler, group=0)
 
     async def wait_reply(
         self, chat_id: Union[int, str], send: str = None, timeout: float = 10, outgoing=False

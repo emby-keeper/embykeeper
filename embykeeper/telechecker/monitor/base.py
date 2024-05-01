@@ -158,11 +158,11 @@ class Monitor:
         group = await self.group_pool.append(self)
         handlers = self.get_handlers()
         for h in handlers:
-            self.client.add_handler(h, group=group)
+            await self.client.add_handler(h, group=group)
         yield
         for h in handlers:
             try:
-                self.client.remove_handler(h, group=group)
+                await self.client.remove_handler(h, group=group)
             except ValueError:
                 pass
 

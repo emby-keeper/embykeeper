@@ -58,10 +58,10 @@ async def main(config: Path):
         workdir=Path(__file__).parent,
     )
     async with bot:
-        bot.add_handler(MessageHandler(dump), group=1)
-        bot.add_handler(MessageHandler(start, filters.command("start")))
-        bot.add_handler(MessageHandler(send_captcha, filters.command("checkin")))
-        bot.add_handler(MessageHandler(check_captcha, filters.text))
+        await bot.add_handler(MessageHandler(dump), group=1)
+        await bot.add_handler(MessageHandler(start, filters.command("start")))
+        await bot.add_handler(MessageHandler(send_captcha, filters.command("checkin")))
+        await bot.add_handler(MessageHandler(check_captcha, filters.text))
         await bot.set_bot_commands(
             [
                 BotCommand("start", "Start the bot"),
