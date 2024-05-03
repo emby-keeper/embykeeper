@@ -30,42 +30,42 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 3.2.3 生成的.
+# 该部分内容是根据 Embykeeper 3.2.12 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["embyhub", "jms", "ljyy", "peach", "pornemby", "sssq"]
+# checkiner = ["apop", "feiyue", "jms", "ljyy", "lyrebird", "peach", "pornemby", "terminus"]
 # monitor = ["bgk", "embyhub", "infinity_fly", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
 # [service]
-# checkiner = ["bluesea", "charon", "embyhub", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "magic", "misty", "nebula", "peach", "pornemby", "singularity", "sssq", "temby", "terminus", "terminus_old", "zhipian"]
+# checkiner = ["apop", "bluesea", "charon", "embyhub", "feiyue", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "misty", "nebula", "peach", "pornemby", "singularity", "sssq", "temby", "terminus", "terminus_old", "zhipian"]
 # monitor = ["bgk", "embyhub", "follow", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8613353567042"
+phone = "+8618037591079"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8612922011745"
+phone = "+8612359542038"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://johnson.com/"
-username = "scott37"
-password = "qc7YSDwG)^"
+url = "https://hart.com/"
+username = "whitakerjennifer"
+password = "6G0BjdalF@"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://atkinson-burns.com/"
-username = "annmiller"
-password = "Of%5Nmc3+6"
+url = "https://le-davis.info/"
+username = "xjohnson"
+password = "4!bDpfPO%$"
 time = [120, 240] # 模拟观看的时长范围 (秒)
