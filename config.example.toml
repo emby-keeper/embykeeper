@@ -3,7 +3,7 @@
 # 查看帮助与详情: https://github.com/embykeeper/embykeeper#安装与使用
 
 # 每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.
-time = "<6:00PM,10:00PM>"
+time = "<8:00AM,10:00AM>"
 
 # 每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.
 interval = 3

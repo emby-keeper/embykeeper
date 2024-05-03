@@ -45,7 +45,7 @@ async def main(
         "--checkin",
         "-c",
         rich_help_panel="模块开关",
-        show_default="不指定值时默认为6:00PM-10:00PM之间随机时间",
+        show_default="不指定值时默认为8:00AM-10:00AM之间随机时间",
         help="启用每日指定时间签到",
     ),
     emby: int = typer.Option(
@@ -146,7 +146,7 @@ async def main(
     if debug_cron:
         logger.warning("您当前处于计划任务调试模式, 将在 10 秒后运行计划任务.")
 
-    default_time = config.get("time", "<6:00PM,10:00PM>")
+    default_time = config.get("time", "<8:00AM,10:00AM>")
     default_interval = config.get("interval", 3)
     logger.debug(f"采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.")
 

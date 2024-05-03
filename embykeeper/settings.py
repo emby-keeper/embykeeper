@@ -116,7 +116,7 @@ def write_faked_config(path, quiet=False):
     doc.add(comment(f"查看帮助与详情: {__url__}#安装与使用"))
     doc.add(nl())
     doc.add(comment('每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.'))
-    doc["time"] = "<6:00PM,10:00PM>"
+    doc["time"] = "<8:00AM,10:00AM>"
     doc.add(nl())
     doc.add(comment('每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.'))
     doc["interval"] = 3

@@ -14,3 +14,5 @@ pornemby_nohp = {}  # uid: date
 pornemby_messager_enabled = {}  # uid: bool
 pornemby_alert = {}  # uid: bool
 pornemby_messager_mids = {}  # uid: list(mid)
+pornemby_checkiner_enabled = {}  # uid: bool
+pornemby_checkined = {} # uid: date

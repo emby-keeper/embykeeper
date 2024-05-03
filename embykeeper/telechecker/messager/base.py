@@ -265,15 +265,8 @@ class Messager:
         """可重写的初始化函数, 返回 False 将视为初始化错误."""
         return True
 
-    async def prepare_send(self, message):
-        """可重写的信息改写函数, 发送前执行, 返回 None 以取消发送."""
-        return message
-
     async def send(self, message):
         """自动水群器的发信器的入口函数."""
-        message = await self.prepare_send(message)
-        if not message:
-            return
         if self.site_last_message_time:
             need_sec = random.randint(5, 10)
             while self.site_last_message_time > datetime.now() - timedelta(seconds=need_sec):
