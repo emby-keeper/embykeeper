@@ -8,7 +8,7 @@ import random
 import sys
 import site
 import traceback
-from typing import Any, Coroutine, Iterable, Union
+from typing import Any, Coroutine, Iterable, Optional, Union
 
 import click
 from loguru import logger
@@ -252,7 +252,6 @@ def flatten(l):
 
 def async_partial(f, *args1, **kw1):
     """Partial 函数的异步形式."""
-
     async def func(*args2, **kw2):
         return await f(*args1, *args2, **kw1, **kw2)
 
@@ -293,7 +292,6 @@ def next_random_datetime(start_time: time = None, end_time: time = None, interva
 
 def humanbytes(B: float):
     """将字节数转换为人类可读形式."""
-    """Return the given bytes as a human friendly KB, MB, GB, or TB string."""
     B = float(B)
     KB = float(1024)
     MB = float(KB**2)  # 1,048,576
@@ -314,6 +312,7 @@ def humanbytes(B: float):
 
 @asynccontextmanager
 async def no_waiting(lock: asyncio.Lock):
+    """如果锁需要等待释放, 就跳过该部分."""
     try:
         await asyncio.wait_for(lock.acquire(), 0)
     except asyncio.TimeoutError:
@@ -326,8 +325,17 @@ async def no_waiting(lock: asyncio.Lock):
         if acquired:
             lock.release()
 
+@asynccontextmanager
+async def optional(lock: Optional[asyncio.Lock]):
+    if lock is None:
+        yield
+    else:
+        async with lock:
+            yield
+
 
 def distribute_numbers(min_value, max_value, num_elements=1, min_distance=0, max_distance=None, base=[]):
+    """随机将一定数量的元素分布在最大最小值之间, 同时限定两元素之间的最小距离和最大距离, 生成起始元素由 `base` 定义."""
     if max_value < min_value:
         raise ValueError("invalid value range.")
 
