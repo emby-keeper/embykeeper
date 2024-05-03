@@ -1,0 +1,39 @@
+name: Update Stable Branch
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+
+jobs:
+  update-stable:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if stable branch exists
+        id: check-stable
+        run: |
+          if git ls-remote --heads origin stable &>/dev/null; then
+            echo "Stable branch already exists."
+          else
+            echo "Stable branch does not exist. Creating one..."
+            git checkout -b stable
+            git push origin stable
+          fi
+
+      - name: Force-update stable branch to release tag
+        run: |
+          git fetch --prune
+          git checkout stable
+          git reset --hard ${GITHUB_REF#refs/tags/} # Reset branch to the latest release tag
+          git push origin stable --force
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
