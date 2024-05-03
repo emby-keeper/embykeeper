@@ -7,6 +7,7 @@ from .base import AnswerBotCheckin
 
 __ignore__ = True
 
+
 class LJYYCheckin(AnswerBotCheckin):
     ocr = "uchars4@v1"
 

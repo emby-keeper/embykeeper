@@ -1,5 +1,12 @@
 from datetime import datetime
-from ..lock import pornemby_nohp, pornemby_messager_enabled, pornemby_messager_mids, pornemby_alert, pornemby_checkiner_enabled, pornemby_checkined
+from ..lock import (
+    pornemby_nohp,
+    pornemby_messager_enabled,
+    pornemby_messager_mids,
+    pornemby_alert,
+    pornemby_checkiner_enabled,
+    pornemby_checkined,
+)
 from .base import Messager
 
 
@@ -21,7 +28,10 @@ class PornembyMessager(Messager):
         if nohp_date and nohp_date >= datetime.today().date():
             self.log.info(f"取消发送: 血量已耗尽.")
             return
-        if pornemby_checkiner_enabled.get(self.me.id, False) and not pornemby_checkined.get(self.me.id, None) == datetime.now().date():
+        if (
+            pornemby_checkiner_enabled.get(self.me.id, False)
+            and not pornemby_checkined.get(self.me.id, None) == datetime.now().date()
+        ):
             self.log.info("取消发送: 今日尚未签到.")
             return
         msg = await super().send(message)

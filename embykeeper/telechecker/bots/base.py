@@ -457,7 +457,9 @@ class BotCheckin(BaseBotCheckin):
                 matches = re.search(self.bot_success_pat, text)
                 if matches:
                     try:
-                        self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
+                        self.log.info(
+                            f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分."
+                        )
                     except IndexError:
                         self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
                 else:
@@ -553,10 +555,11 @@ class BotCheckin(BaseBotCheckin):
     async def before_success(self):
         """签到成功前钩子, 返回值为 True 将继续执行并显示成功信息."""
         return True
-    
+
     async def after_success(self):
         """签到成功后钩子."""
         pass
+
 
 class AnswerBotCheckin(BotCheckin):
     """签到类, 用于按钮模式签到."""

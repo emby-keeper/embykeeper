@@ -252,6 +252,7 @@ def flatten(l):
 
 def async_partial(f, *args1, **kw1):
     """Partial 函数的异步形式."""
+
     async def func(*args2, **kw2):
         return await f(*args1, *args2, **kw1, **kw2)
 
@@ -324,6 +325,7 @@ async def no_waiting(lock: asyncio.Lock):
     finally:
         if acquired:
             lock.release()
+
 
 @asynccontextmanager
 async def optional(lock: Optional[asyncio.Lock]):
