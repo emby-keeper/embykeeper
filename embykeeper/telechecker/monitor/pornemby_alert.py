@@ -84,15 +84,15 @@ class PornembyAlertMonitor(Monitor):
                 else:
                     msg = f"Pornemby 风险急停被触发, 停止操作 {time} 秒"
                     if reason:
-                        msg += f' (原因: {reason})'
-                    msg += '.'
+                        msg += f" (原因: {reason})"
+                    msg += "."
                     self.log.warning(msg)
                     self.alert_remaining = time
         else:
             msg = "Pornemby 风险急停被触发, 所有操作永久停止"
             if reason:
-                msg += f' (原因: {reason})'
-            msg += '.'
+                msg += f" (原因: {reason})"
+            msg += "."
             self.log.bind(notify=True).error(msg)
             async with self.lock:
                 self.alert_remaining = float("inf")
@@ -150,7 +150,7 @@ class PornembyAlertMonitor(Monitor):
             if keyword:
                 await self.set_alert(86400, reason=f'管理员发送了消息, 且包含风险关键词: "{keyword}"')
             else:
-                await self.set_alert(3600, reason='管理员发送了消息')
+                await self.set_alert(3600, reason="管理员发送了消息")
         else:
             keyword = self.check_keyword(message, self.user_alert_keywords)
             if keyword:
