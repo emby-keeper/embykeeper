@@ -8,7 +8,7 @@ loguru
 faker
 aiofiles
 aiohttp
-aiohttp_socks
+aiohttp-socks
 python-dateutil
 ddddocrfix
 embypyfix
@@ -20,8 +20,8 @@ schema
 aiocache
 pycryptodome
 flask<3
-flask_socketio
-flask_login
+flask-socketio
+flask-login
 simple-websocket
 eventlet
 cryptography
