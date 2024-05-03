@@ -453,19 +453,21 @@ class BotCheckin(BaseBotCheckin):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
         elif any(s in text for s in self.bot_success_keywords or default_keywords["success"]):
-            matches = re.search(self.bot_success_pat, text)
-            if matches:
-                try:
-                    self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
-                except IndexError:
-                    self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
-            else:
-                matches = re.search(r"\d+", text)
+            if await self.before_success():
+                matches = re.search(self.bot_success_pat, text)
                 if matches:
-                    self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
+                    try:
+                        self.log.info(f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分.")
+                    except IndexError:
+                        self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
                 else:
-                    self.log.info(f"[yellow]签到成功[/].")
-            self.finished.set()
+                    matches = re.search(r"\d+", text)
+                    if matches:
+                        self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
+                    else:
+                        self.log.info(f"[yellow]签到成功[/].")
+                await self.after_success()
+                self.finished.set()
         else:
             await self.on_unexpected_text(message)
 
@@ -548,6 +550,13 @@ class BotCheckin(BaseBotCheckin):
             msg: Message = self._waiting[pattern]
             return msg
 
+    async def before_success(self):
+        """签到成功前钩子, 返回值为 True 将继续执行并显示成功信息."""
+        return True
+    
+    async def after_success(self):
+        """签到成功后钩子."""
+        pass
 
 class AnswerBotCheckin(BotCheckin):
     """签到类, 用于按钮模式签到."""
