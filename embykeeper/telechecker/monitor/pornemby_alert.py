@@ -3,9 +3,11 @@ import random
 import re
 
 import asyncio
+from typing import List
 from cachetools import TTLCache
 from pyrogram.types import Message, User, Chat
 from pyrogram.enums import ChatMemberStatus, MessageServiceType, MessagesFilter
+from pyrogram.errors import BadRequest
 
 from ..lock import pornemby_alert, pornemby_messager_mids
 from .base import Monitor
@@ -40,15 +42,24 @@ class PornembyAlertMonitor(Monitor):
             return True
         async with self.member_status_cache_lock:
             if not user.id in self.member_status_cache:
-                member = await self.client.get_chat_member(chat.id, user.id)
-                self.member_status_cache[user.id] = member.status
+                try:
+                    member = await self.client.get_chat_member(chat.id, user.id)
+                    self.member_status_cache[user.id] = member.status
+                except BadRequest:
+                    return False
         if self.member_status_cache[user.id] in (ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER):
-            return True
+            if user.is_bot:
+                return False
+            else:
+                return True
 
-    def check_keyword(self, message: Message, keywords):
+    def check_keyword(self, message: Message, keywords: List[str]):
         content = message.text or message.caption
         if content:
-            return any([re.search(k, content) for k in keywords])
+            for k in keywords:
+                match = re.search(k, content)
+                if match:
+                    return match.group(0)
 
     async def monitor(self):
         while True:
@@ -65,16 +76,24 @@ class PornembyAlertMonitor(Monitor):
             self.lock.release()
             await asyncio.sleep(1)
 
-    async def set_alert(self, time: float = None):
+    async def set_alert(self, time: float = None, reason: str = None):
         if time:
             async with self.lock:
                 if self.alert_remaining > time:
                     return
                 else:
-                    self.log.warning(f"Pornemby 风险急停被触发, 停止操作 {time} 秒.")
+                    msg = f"Pornemby 风险急停被触发, 停止操作 {time} 秒"
+                    if reason:
+                        msg += f' (原因: {reason})'
+                    msg += '.'
+                    self.log.warning(msg)
                     self.alert_remaining = time
         else:
-            self.log.bind(notify=True).error("Pornemby 风险急停被触发, 所有操作永久停止.")
+            msg = "Pornemby 风险急停被触发, 所有操作永久停止"
+            if reason:
+                msg += f' (原因: {reason})'
+            msg += '.'
+            self.log.bind(notify=True).error(msg)
             async with self.lock:
                 self.alert_remaining = float("inf")
 
@@ -92,9 +111,9 @@ class PornembyAlertMonitor(Monitor):
         # 用户回复水群消息, 停止 3600 秒, 若存在关键词即回复
         if message.reply_to_message_id in pornemby_messager_mids.get(self.client.me.id, []):
             if await self.check_admin(message.chat, message.from_user):
-                await self.set_alert()
+                await self.set_alert(reason="管理员回复了水群消息")
             else:
-                await self.set_alert(3600)
+                await self.set_alert(3600, reason="非管理员回复了水群消息")
             if self.check_keyword(message, self.alert_reply_keywords):
                 if not self.check_keyword(message, self.alert_reply_except_keywords):
                     if (not self.last_reply) or (
@@ -109,26 +128,30 @@ class PornembyAlertMonitor(Monitor):
         pinned = await self.check_pinned(message)
         if pinned:
             self.pin_checked = True
-            if self.check_keyword(pinned, self.user_alert_keywords + self.admin_alert_keywords):
-                await self.set_alert(86400)
+            keyword = self.check_keyword(pinned, self.user_alert_keywords + self.admin_alert_keywords)
+            if keyword:
+                await self.set_alert(86400, reason=f'有新消息被置顶, 且包含风险关键词: "{keyword}"')
             else:
-                await self.set_alert(3600)
+                await self.set_alert(3600, reason="有新消息被置顶")
             return
 
         if not self.pin_checked:
             async for pinned in self.client.search_messages(message.chat.id, filter=MessagesFilter.PINNED):
                 self.pin_checked = True
-                if self.check_keyword(pinned, self.user_alert_keywords + self.admin_alert_keywords):
-                    await self.set_alert(86400)
+                keyword = self.check_keyword(pinned, self.user_alert_keywords + self.admin_alert_keywords)
+                if keyword:
+                    await self.set_alert(86400, reason=f'检查到现有置顶消息中包含风险关键词: "{keyword}"')
                     break
 
         # 管理员发送消息, 若不在列表中停止 3600 秒, 否则停止 86400 秒
         # 用户发送列表中消息, 停止 1800 秒
         if await self.check_admin(message.chat, message.from_user):
-            if self.check_keyword(message, self.user_alert_keywords + self.admin_alert_keywords):
-                await self.set_alert(86400)
+            keyword = self.check_keyword(message, self.user_alert_keywords + self.admin_alert_keywords)
+            if keyword:
+                await self.set_alert(86400, reason=f'管理员发送了消息, 且包含风险关键词: "{keyword}"')
             else:
-                await self.set_alert(3600)
+                await self.set_alert(3600, reason='管理员发送了消息')
         else:
-            if self.check_keyword(message, self.user_alert_keywords):
-                await self.set_alert(1800)
+            keyword = self.check_keyword(message, self.user_alert_keywords)
+            if keyword:
+                await self.set_alert(1800, reason=f'非管理员发送了消息, 且包含风险关键词: "{keyword}"')
