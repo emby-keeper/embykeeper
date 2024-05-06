@@ -22,54 +22,57 @@ VENV := venv
 help: help/simple
 
 help/simple:
->   @echo "Welcome to embykeeper!"
->   @echo "\nUsage: make <subcommand>"
->   @echo "  install - create a venv and install embykeeper in it."
->   @echo "  develop - install embykeeper and also dev-related tools."
->   @echo "  run - run embykeeper with config.toml."
->   @echo "  systemd - make embykeeper autostart on current user first login after reboot."
->   @echo "  dev - run install "
->   @echo "  lint - check style with black and pre-commit."
->   @echo "  test - run pytest using current python."
->   @echo "  help/all - show all subcommands."
->   @echo "\nFor using embykeeper, you can run:"
+>   @echo "欢迎您使用 Embykeeper!"
+>   @echo "\n使用方法: make <子命令>"
+>   @echo "子命令:"
+>   @echo "  install - 创建一个 Python 环境并在其中安装 Embykeeper"
+>   @echo "  develop - 创建一个 Python 环境并在其中安装 Embykeeper, 同时安装开发相关工具"
+>   @echo "  run - 运行 Embykeeper (使用默认配置文件 config.toml)"
+>   @echo "  systemd - 启用 Embykeeper 自动启动"
+>   @echo "  lint - 使用 black 和 pre-commit 检查代码风格"
+>   @echo "  test - 使用 pytest 运行代码测试"
+>   @echo "  help/all - 显示所有子命令"
+>   @echo "\n例如, 运行以下命令以启动 Embykeeper:"
 >   @echo "  make install && make run"
 
 help/all:
->   @echo "Welcome to embykeeper!"
->   @echo "Usage: make <subcommand>"
->   @echo "  install - create a venv and install embykeeper in it."
->   @echo "  develop - install embykeeper and also dev-related tools."
->   @echo "  venv - create a venv (if python compatible) or conda (if not)."
->   @echo "  venv/clean - remove all created venv."
->   @echo '  python/venv - create a venv using current python in "<CWD>/venv".'
->   @echo '  conda/venv - create a conda venv in "<CWD>/venv".'
->   @echo '  conda/install - install conda in "<CWD>/conda".'
->   @echo "  run - run embykeeper with config.toml."
->   @echo "  run/web - run embykeeperweb in public mode."
->   @echo "  systemd - make embykeeper autostart on current user first login after reboot."
->   @echo "  systemd/uninstall - remove systemd config and stop embykeeper from autostart."
->   @echo "  lint - check style with black and pre-commit."
->   @echo "  test - run pytest using current python."
->   @echo "  debugpy - start embykeeper with debugpy (vscode debug module) for remote connection at localhost:5678."
->   @echo "  debugpy/web - start embykeeperweb with debugpy (vscode debug module) for remote connection at localhost:5678."
->   @echo "  version - same as version/patch."
->   @echo "  version/patch - run bump2version patch and push."
->   @echo "  version/minor - run bump2version minor and push."
->   @echo "  version/major - run bump2version major and push."
->   @echo "  push - git push both commits and tags."
->   @echo "  clean - remove build and test caches."
->   @echo "  clean/build - remove build caches."
->   @echo "  clean/pyc - remove python caches."
->   @echo "  clean/test - remove test caches."
+>   @echo "欢迎您使用 Embykeeper!"
+>   @echo "\n使用方法: make <子命令>"
+>   @echo "子命令:"
+>   @echo "  install - 创建一个 Python 环境并在其中安装 Embykeeper"
+>   @echo "  develop - 创建一个 Python 环境并在其中安装 Embykeeper, 同时安装开发相关工具"
+>   @echo "  venv - 创建一个 Python 环境 (若未检测到可用 Python 将会通过 Conda 安装)"
+>   @echo "  venv/clean - 删除所有创建的 Python 环境"
+>   @echo '  python/venv - 使用可用 Python 在 "<CWD>/venv" 创建 Virtualvenv 虚拟环境'
+>   @echo '  conda/venv - 使用 Conda 在 "<CWD>/venv" 中创建 Conda 虚拟环境'
+>   @echo '  conda/install - 在 "<CWD>/conda" 安装 Conda.
+>   @echo "  run - 运行 Embykeeper (使用默认配置文件 config.toml)"
+>   @echo "  run/web - 运行 Embykeeper 的在线网页服务器"
+>   @echo "  systemd - 启用 Embykeeper 自动启动 (当前用户登录时)"
+>   @echo "  systemd (当 sudo / root) - 启用 Embykeeper 自动启动 (系统启动时)"
+>   @echo "  systemd/uninstall - 停止 Embykeeper 自动启动 (当前用户登录时)"
+>   @echo "  systemd/uninstall (当 sudo / root) - 停止 Embykeeper 自动启动 (系统启动时)"
+>   @echo "  lint - 使用 black 和 pre-commit 检查代码风格"
+>   @echo "  test - 使用 pytest 运行代码测试"
+>   @echo "  debugpy - 以远程连接方式在本地主机上启动 Embykeeper 的 Debugpy 调试服务器 (vscode 调试模块)"
+>   @echo "  debugpy/web - 以远程连接方式在本地主机上启动 Embykeeper 在线网页服务器的 Debugpy 调试服务器"
+>   @echo "  version - 等同于 version/patch"
+>   @echo "  version/patch - 运行 bump2version 版本更新 (patch, 例如 1.0.0 -> 1.0.1)"
+>   @echo "  version/minor - 运行 bump2version 版本更新 (minor, 例如 1.0.0 -> 1.1.0)"
+>   @echo "  version/major - 运行 bump2version 版本更新 (major, 例如 1.0.0 -> 2.0.0)"
+>   @echo "  push - 推送提交和标签"
+>   @echo "  clean - 删除所有 Python 缓存, 构建缓存和测试缓存 (不包括 Python 虚拟环境)"
+>   @echo "  clean/build - 删除构建缓存"
+>   @echo "  clean/pyc - 删除 Python 缓存"
+>   @echo "  clean/test - 删除测试缓存"
 
 install: venv
 >   @"$(VENV)/bin/python" -m pip install -i "$(PYPI_URL)" -U pip && \
 >   "$(VENV)/bin/python" -m pip install -i "$(PYPI_URL)" -e . \
->   && echo "Info: Embykeeper has been installed successfully." \
->   && echo 'Info: Run "make run" to run embykeeper.' \
->   && echo 'Info: Run "make systemd" to enable autostart.' \
->   || echo "Error: Fail to install embykeeper."
+>   && echo "Info: 已经成功在 "$(VENV)" 安装了 Embykeeper." \
+>   && echo 'Info: 运行 "make run" 以启动 Embykeeper.' \
+>   && echo 'Info: 运行 "make systemd" 以设置自动启动.' \
+>   || echo "Error: Embykeeper 安装失败."
 
 develop: install
 >   "$(VENV)/bin/python" -m pip install -i "$(PYPI_URL)" -r requirements_dev.txt
@@ -81,7 +84,7 @@ else
 endif
 
 venv/require:
->   @[ ! -d "$(VENV)" ] && echo "Error: 尚未安装, 请先运行 make run 以安装!" && exit 1 || :
+>   @[ ! -d "$(VENV)" ] && echo "Error: 尚未安装, 请先运行 make install 以安装!" && exit 1 || :
 
 venv/clean:
 >   rm -R -f venv conda &>/dev/null
