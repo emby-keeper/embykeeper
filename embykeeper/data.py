@@ -89,6 +89,8 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                                 proxy_type=ProxyType[proxy["scheme"].upper()],
                                 host=proxy["hostname"],
                                 port=proxy["port"],
+                                username=proxy.get("username", None),
+                                password=proxy.get("password", None),
                             )
                         else:
                             connector = aiohttp.TCPConnector()

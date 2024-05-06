@@ -96,6 +96,8 @@ class Connector(_Connector):
                         proxy_type=ProxyType[self.proxy["scheme"].upper()],
                         host=self.proxy["hostname"],
                         port=self.proxy["port"],
+                        username=self.proxy.get("username", None),
+                        password=self.proxy.get("password", None),
                         ssl_context=self.ssl,
                     )
                 else:

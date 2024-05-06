@@ -32,6 +32,8 @@ class JMSCheckin(BotCheckin):
                             proxy_type=ProxyType[self.proxy["scheme"].upper()],
                             host=self.proxy["hostname"],
                             port=self.proxy["port"],
+                            username=self.proxy.get("username", None),
+                            password=self.proxy.get("password", None),
                         )
                     else:
                         connector = aiohttp.TCPConnector()
