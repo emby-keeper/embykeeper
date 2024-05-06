@@ -423,9 +423,6 @@ Section "un.程序文件" SectionUninstallProgram
     ; Clean up "Pkgs"
     RMDir /r "$INSTDIR\pkgs"
 
-	; Clean up "Icon"
-	!insertmacro DeleteRetryAbort "${ICON}"
-
 	; Clean up "Program Group"
 	RMDir /r "$SMPROGRAMS\${PRODUCT_NAME}$0"
 
