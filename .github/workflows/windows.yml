@@ -25,7 +25,14 @@ jobs:
           filename: ${{ env.WIN_SCRIPT_ZIP_NAME }}
           directory: 'windows/installer-script'
           exclusions: 'python-* desktop.ini'
+      - name: "Upload to Artifact"
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: ${{ env.WIN_SCRIPT_ZIP_NAME }}
+          path: windows/installer-script/${{ env.WIN_SCRIPT_ZIP_NAME }}
       - name: "Upload to GitHub Release"
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
@@ -44,7 +51,14 @@ jobs:
           python -m pip install -U pynsistfix
           pynsist installer.cfg
           mv build/nsis/Embykeeper.exe ${{ env.WIN_GUI_EXE_NAME }}
+      - name: "Upload to Artifact"
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: ${{ env.WIN_GUI_EXE_NAME }}
+          path: ${{ env.WIN_GUI_EXE_NAME }}
       - name: "Upload to GitHub Release"
+        if: github.event_name == 'release'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
