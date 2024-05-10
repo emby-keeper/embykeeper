@@ -17,6 +17,7 @@ class LJYYCheckin(AnswerBotCheckin):
     bot_use_history = 20
     bot_text_ignore = ["下列选项", "退出流程"]
     bot_checkin_button_pat = r"\w\s\w\s\w\s\w"
+    additional_auth = ["prime"]
 
     async def message_handler(self, client, message: Message):
         if message.text and "请选择操作项" in message.text and message.reply_markup:

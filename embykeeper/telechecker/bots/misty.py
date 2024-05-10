@@ -19,6 +19,7 @@ class MistyCheckin(BotCheckin):
     bot_captcha_len = 5
     bot_checkin_caption_pat = "请输入验证码"
     bot_text_ignore = ["选择您要使用的功能", "欢迎使用", "选择功能"]
+    additional_auth = ["super"]
 
     async def start(self):
         misty_locks.setdefault(self.client.me.id, asyncio.Lock())

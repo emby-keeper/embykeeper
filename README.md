@@ -54,6 +54,10 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
       - 搜书神器 ([@chneez](https://github.com/embykeeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot)
       - 纸片 DDoS: [频道](https://t.me/PaperBotnet) [机器人](https://t.me/zhipianbot)
       - 情报局社工库: [频道1](https://t.me/CIA_cd) [频道2](https://t.me/wanghong_sgk) [群组](https://t.me/heikeciadgk) [机器人](https://t.me/InfSGK_bot)
+      - AI 社工库: [频道](https://t.me/AISGKChannel) [机器人](https://t.me/aishegongkubot)
+      - 狗狗社工库: [频道](https://t.me/DogeSGK) [机器人](https://t.me/DogeSGK_bot)
+      - Data 007 社工库: [频道](https://t.me/DATA007_dev) [机器人](https://t.me/DATA_007bot)
+      - 花花社工库: [频道](https://t.me/sgkhua) [机器人](https://t.me/sgkvipbot)
 - Emby 保活
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
