@@ -194,8 +194,6 @@ Section "Embykeeper 核心文件 (必须)" SectionCoreFiles
 		RMDir "$3"
 	${endif}
 
-	File "${ICON}"
-
 	[% block install_pkgs %]
 		SetOutPath "$INSTDIR\pkgs"
 		File /r "pkgs\*.*"
