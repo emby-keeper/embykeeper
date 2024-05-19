@@ -23,9 +23,10 @@ faker = Faker()
 class Connector(_Connector):
     """重写的 Emby 连接器, 以支持代理."""
 
-    def __init__(self, url, proxy=None, **kargs):
+    def __init__(self, url, proxy=None, ua=None, **kargs):
         super().__init__(url, **kargs)
         self.proxy = proxy
+        self.ua = ua
         self.fake_headers = self.get_fake_headers()
         self.watch = asyncio.create_task(self.watchdog())
 
@@ -71,7 +72,7 @@ class Connector(_Connector):
         client = "Filebox"
         device = f"{faker.first_name()}'s iPhone"
         version = f"1.2.{random.randint(0, 32)}"
-        ua = f"Fileball/200 {random.choice(ios_uas)}"
+        ua = f"Fileball/200 {random.choice(ios_uas)}" if not self.ua else self.ua
         auth_header = (
             f'MediaBrowser Client="{client}",'
             + f'Device="{device}",'
@@ -177,9 +178,9 @@ class Connector(_Connector):
 
 
 class Emby(_Emby):
-    def __init__(self, url, **kargs):
+    def __init__(self, url, **kw):
         """重写的 Emby 类, 以支持代理."""
-        connector = Connector(url, **kargs)
+        connector = Connector(url, **kw)
         EmbyObject.__init__(self, {"ItemId": "", "Name": ""}, connector)
         self._partial_cache = {}
         self._cache_lock = asyncio.Condition()

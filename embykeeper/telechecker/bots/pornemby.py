@@ -4,7 +4,7 @@ import random
 
 from pyrogram.types import Message
 
-from ..lock import pornemby_checkined, pornemby_checkiner_enabled
+from ..lock import pornemby_checkined
 from .base import AnswerBotCheckin
 
 
@@ -12,10 +12,6 @@ class PornembyCheckin(AnswerBotCheckin):
     name = "Pornemby"
     bot_username = "Porn_Emby_Bot"
     bot_success_pat = r".*?(\d+)$"
-
-    async def init(self):
-        pornemby_checkiner_enabled[self.client.me.id] = True
-        return True
 
     async def start(self):
         if not self.client.me.username:

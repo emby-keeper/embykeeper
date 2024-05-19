@@ -2,7 +2,7 @@ import asyncio
 from urllib.parse import parse_qs, urlencode, urlparse
 
 from aiohttp import ClientSession
-from aiohttp_socks import ProxyConnector
+from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError
 from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram.raw.functions.users import GetFullUser
 from faker import Faker
@@ -66,21 +66,25 @@ class NebulaCheckin(BaseBotCheckin):
         query["token"] = token
         url_checkin = scheme._replace(query=urlencode(query, True)).geturl()
         connector = ProxyConnector.from_url(proxy)
-        async with ClientSession(connector=connector) as session:
-            async with session.get(url_checkin, headers={"User-Agent": useragent}) as resp:
-                results = await resp.json()
-            message = results["message"]
-            if any(s in message for s in ("未找到用户", "权限错误")):
-                self.log.info("签到失败: 账户错误.")
-                await self.fail()
-            if "失败" in message:
-                self.log.info("签到失败.")
-                await self.fail()
-            if "重复" in message:
-                self.log.info("今日已经签到过了.")
-                self.finished.set()
-            elif "成功" in message:
-                self.log.info(f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分.")
-                self.finished.set()
-            else:
-                self.log.warning(f"接收到异常返回信息: {message}")
+        try:
+            async with ClientSession(connector=connector) as session:
+                async with session.get(url_checkin, headers={"User-Agent": useragent}) as resp:
+                    results = await resp.json()
+                message = results["message"]
+                if any(s in message for s in ("未找到用户", "权限错误")):
+                    self.log.info("签到失败: 账户错误.")
+                    await self.fail()
+                if "失败" in message:
+                    self.log.info("签到失败.")
+                    await self.fail()
+                if "重复" in message:
+                    self.log.info("今日已经签到过了.")
+                    self.finished.set()
+                elif "成功" in message:
+                    self.log.info(f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分.")
+                    self.finished.set()
+                else:
+                    self.log.warning(f"接收到异常返回信息: {message}")
+        except (ProxyTimeoutError, ProxyError, OSError):
+            self.log.info("签到失败: 无法连接签到页面.")
+            await self.fail()

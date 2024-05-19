@@ -196,7 +196,7 @@ async def main(
     from .embywatcher.main import (
         watcher,
         watcher_schedule,
-        watcher_continuous,
+        watcher_continuous_schedule,
     )
     from .telechecker.main import (
         checkiner,
@@ -229,7 +229,7 @@ async def main(
                 pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0))
             else:
                 pool.add(watcher_schedule(config, days=emby))
-            pool.add(watcher_continuous(config))
+            pool.add(watcher_continuous_schedule(config))
         if checkin:
             if debug_cron:
                 start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()

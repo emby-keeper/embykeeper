@@ -112,6 +112,7 @@ class BotCheckin(BaseBotCheckin):
     group_pool = AsyncCountPool(base=2000)
     ocr = None
 
+    # fmt: off
     name: str = None  # 签到器的名称
     bot_username: Union[int, str] = None  # Bot 的 UserID 或 用户名 (不带 @ 或 https://t.me/)
     bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
@@ -123,22 +124,15 @@ class BotCheckin(BaseBotCheckin):
     bot_retry_wait: int = 2  # 失败时等待的秒数
     bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条, 置空禁用
     bot_allow_from_scratch: bool = False  # 允许从未聊天情况下启动
-    bot_success_keywords: Union[str, List[str]] = (
-        []
-    )  # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_success_keywords: Union[str, List[str]] = ([])  # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     bot_checked_keywords: Union[str, List[str]] = []  # 今日已签到时检测的关键词, 置空使用内置关键词表
-    bot_account_fail_keywords: Union[str, List[str]] = (
-        []
-    )  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_too_many_tries_fail_keywords: Union[str, List[str]] = (
-        []
-    )  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_fail_keywords: Union[str, List[str]] = (
-        []
-    )  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_account_fail_keywords: Union[str, List[str]] = ([])  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_too_many_tries_fail_keywords: Union[str, List[str]] = ([])  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_fail_keywords: Union[str, List[str]] = ([])  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
     additional_auth: List[str] = []  # 额外认证要求
     max_retries = None  # 最高重试次数
+    # fmt: on
 
     @property
     def valid_retries(self):

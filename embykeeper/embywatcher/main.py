@@ -152,6 +152,7 @@ async def login(config, continuous=False):
             password=a["password"],
             jellyfin=a.get("jellyfin", False),
             proxy=config.get("proxy", None),
+            ua=a.get("ua", None),
             device_id=str(uuid.uuid4()).upper(),
         )
         try:
@@ -278,7 +279,10 @@ async def watch_continuous(emby: Emby, logger):
             async for obj in get_random_media(emby):
                 totalticks = obj.object_dict.get("RunTimeTicks")
                 if not totalticks:
-                    raise PlayError("无法获取视频长度")
+                    rt = random.uniform(30, 60)
+                    logger.info(f"无法获取视频长度, 等待 {rt:.0f} 秒后重试.")
+                    await asyncio.sleep(rt)
+                    continue
                 logger.info(
                     f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totalticks / 10000000:.0f} 秒).'
                 )
@@ -370,7 +374,6 @@ async def watcher_continuous_schedule(
 ):
     """计划任务 - 持续观看."""
 
-    dt = datetime.now() + 10
     t = asyncio.create_task(watcher_continuous(config))
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)
@@ -380,4 +383,4 @@ async def watcher_continuous_schedule(
         await asyncio.sleep((dt - datetime.now()).total_seconds())
         if not t.done():
             t.cancel()
-        await watcher(config)
+        t = asyncio.create_task(watcher_continuous(config))

@@ -45,6 +45,8 @@ def check_config(config):
                     ),
                     Optional("port"): And(int, lambda n: n > 1024 and n < 65536),
                     Optional("scheme"): Schema(Or("socks5", "http")),
+                    Optional("username"): str,
+                    Optional("password"): str,
                 }
             ),
             Optional("service"): Schema(
@@ -76,6 +78,8 @@ def check_config(config):
                         "password": str,
                         Optional("time"): Or(PositiveInt(), [PositiveInt()]),
                         Optional("continuous"): bool,
+                        Optional("jellyfin"): bool,
+                        Optional("ua"): str,
                     }
                 )
             ],
