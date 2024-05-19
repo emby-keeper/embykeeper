@@ -81,7 +81,9 @@ class NebulaCheckin(BaseBotCheckin):
                     self.log.info("今日已经签到过了.")
                     self.finished.set()
                 elif "成功" in message:
-                    self.log.info(f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分.")
+                    self.log.info(
+                        f"[yellow]签到成功[/]: + {results['get_credit']} 分 -> {results['credit']} 分."
+                    )
                     self.finished.set()
                 else:
                     self.log.warning(f"接收到异常返回信息: {message}")

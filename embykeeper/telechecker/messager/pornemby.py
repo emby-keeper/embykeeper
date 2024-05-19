@@ -32,17 +32,18 @@ class PornembyMessager(Messager):
             self.log.info(f"取消发送: 血量已耗尽.")
             return
         async with self.lock:
-            if not pornemby_checkined.get(self.me.id, None) == datetime.now().date():  
+            if not pornemby_checkined.get(self.me.id, None) == datetime.now().date():
                 self.log.info("等待发送: 今日尚未签到, 正在签到.")
                 from ..bots.pornemby import PornembyCheckin
+
                 async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
                     async for tg in clients:
                         result = await PornembyCheckin(
-                            client = tg,
-                            retries = 1,
-                            nofail = True,
-                            basedir = self.basedir,
-                            proxy = self.proxy,
+                            client=tg,
+                            retries=1,
+                            nofail=True,
+                            basedir=self.basedir,
+                            proxy=self.proxy,
                         )._start()
                         if not result:
                             self.log.info("取消发送: 今日尚未签到, 且签到失败.")
