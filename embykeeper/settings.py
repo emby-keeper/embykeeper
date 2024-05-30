@@ -419,7 +419,6 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
     """
     config = {}
     basedir = Path(basedir or user_data_dir(__name__))
-    config["basedir"] = basedir
     basedir.mkdir(parents=True, exist_ok=True)
     logger.debug(f'工作目录: "{basedir}".')
     env_config = os.environ.get(f"EK_CONFIG", None)
@@ -475,4 +474,5 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
         proxy.setdefault("scheme", "socks5")
         proxy.setdefault("hostname", "127.0.0.1")
         proxy.setdefault("port", 1080)
+    config["basedir"] = basedir
     return config

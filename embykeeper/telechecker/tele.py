@@ -29,6 +29,7 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     CodeInvalid,
     PhoneCodeInvalid,
+    BadMsgNotification,
 )
 from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler
 from pyrogram.handlers.handler import Handler
