@@ -137,7 +137,7 @@ async def main(
         logger.warning(f"您当前处于调试模式: 日志等级 {verbosity}.")
         app.pretty_exceptions_enable = True
 
-    config: dict = await prepare_config(config, public=public, windows=windows)
+    config: dict = await prepare_config(config, basedir=basedir, public=public, windows=windows)
 
     if verbosity >= 2:
         config["nofail"] = False
@@ -164,11 +164,6 @@ async def main(
 
     if emby < 0:
         emby = -emby
-
-    basedir = Path(basedir or user_data_dir(__name__))
-    basedir.mkdir(parents=True, exist_ok=True)
-    config["basedir"] = basedir
-    logger.debug(f'工作目录: "{basedir}".')
 
     if follow:
         from .telechecker.debug import follower

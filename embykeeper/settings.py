@@ -410,20 +410,23 @@ def load_env_config(data: str):
     return config
 
 
-async def prepare_config(config_file=None, public=False, windows=False):
+async def prepare_config(config_file=None, basedir=None, public=False, windows=False):
     """
     准备配置
     参数:
         config_file: 配置文件
         public: 公共服务器模式, 将提示交互式配置生成
     """
+    config = {}
+    basedir = Path(basedir or user_data_dir(__name__))
+    config["basedir"] = basedir
+    basedir.mkdir(parents=True, exist_ok=True)
+    logger.debug(f'工作目录: "{basedir}".')
     env_config = os.environ.get(f"EK_CONFIG", None)
     if env_config:
         config = load_env_config(env_config)
     else:
         if public:
-            # logger.warning("您正在使用公共仓库, 因此[red]请勿[/]将密钥存储于[red]任何配置文件[/].")
-            config = {}
             if config_file:
                 try:
                     with open(config_file, "rb") as f:
@@ -438,8 +441,6 @@ async def prepare_config(config_file=None, public=False, windows=False):
                 sys.exit(250)
         else:
             if windows:
-                basedir = Path(user_data_dir(__product__))
-                basedir.mkdir(parents=True, exist_ok=True)
                 default_config_file = basedir / "config.toml"
             else:
                 default_config_file = Path("config.toml")

@@ -167,6 +167,9 @@ class Dispatcher(dispatcher.Dispatcher):
                             logger.error(f"更新回调函数内发生错误.")
                             show_exception(e, regular=False)
                         break
+                    else:
+                        continue
+                    break
             except pyrogram.StopPropagation:
                 pass
             except TimeoutError:
