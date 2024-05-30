@@ -15,10 +15,10 @@ from .var import console
 from .telechecker.tele import ClientsSession
 
 
-async def convert_session(accounts, basedir = None):
+async def convert_session(accounts, basedir=None):
     results = []
     for a in accounts:
-        async with ClientsSession.from_config({"telegram": [a], 'basedir': basedir}) as clients:
+        async with ClientsSession.from_config({"telegram": [a], "basedir": basedir}) as clients:
             async for tg in clients:
                 session_string = await tg.export_session_string()
                 results.append({**a, "session": session_string})
@@ -248,7 +248,7 @@ def decrypt(data: bytes, password: str):
     return data.decode()
 
 
-async def interactive_config(config: dict = {}, basedir = None):
+async def interactive_config(config: dict = {}, basedir=None):
     """交互式配置生成器."""
 
     from tomlkit import item
