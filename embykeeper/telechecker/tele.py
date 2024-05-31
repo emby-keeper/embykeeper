@@ -226,6 +226,10 @@ class Client(pyrogram.Client):
                     except BadRequest:
                         self.password = None
                         retry = True
+            except Exception as e:
+                logger.error(f"登录时出现异常错误!")
+                show_exception(e, regular=False)
+                retry = True
             else:
                 break
         if isinstance(signed_in, types.User):
