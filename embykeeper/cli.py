@@ -6,7 +6,6 @@ from typing import List
 
 import typer
 import asyncio
-from appdirs import user_data_dir
 from dateutil import parser
 
 from . import var, __author__, __name__, __url__, __version__
