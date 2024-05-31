@@ -104,7 +104,7 @@ def write_faked_config(path, quiet=False):
     from faker.providers import internet, profile
 
     from .telechecker.main import get_names
-    from . import __name__ as __product__, __version__, __url__
+    from . import __version__, __url__
 
     if not quiet:
         logger.warning("需要输入一个toml格式的config文件.")
@@ -418,7 +418,7 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
         public: 公共服务器模式, 将提示交互式配置生成
     """
     config = {}
-    basedir = Path(basedir or user_data_dir(__name__))
+    basedir = Path(basedir or user_data_dir(__product__))
     basedir.mkdir(parents=True, exist_ok=True)
     logger.debug(f'工作目录: "{basedir}".')
     env_config = os.environ.get(f"EK_CONFIG", None)

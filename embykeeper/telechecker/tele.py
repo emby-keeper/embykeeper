@@ -29,14 +29,13 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     CodeInvalid,
     PhoneCodeInvalid,
-    BadMsgNotification,
 )
 from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler
 from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 
-from .. import var, __name__, __version__
-from ..utils import async_partial, show_exception, to_iterable
+from embykeeper import var, __name__ as __product__, __version__
+from embykeeper.utils import async_partial, show_exception, to_iterable
 
 logger = logger.bind(scheme="telegram")
 
@@ -538,7 +537,7 @@ class ClientsSession:
     def __init__(self, accounts, proxy=None, basedir=None, in_memory=None, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
-        self.basedir = basedir or user_data_dir(__name__)
+        self.basedir = basedir or user_data_dir(__product__)
         self.phones = []
         self.done = asyncio.Queue()
         self.in_memory = in_memory

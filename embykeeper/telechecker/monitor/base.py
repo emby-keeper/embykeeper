@@ -15,7 +15,9 @@ from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message, User
 
-from ...utils import show_exception, to_iterable, truncate_str, AsyncCountPool
+from embykeeper import __name__ as __product__
+from embykeeper.utils import show_exception, to_iterable, truncate_str, AsyncCountPool
+
 from ..tele import Client
 from ..link import Link
 
@@ -129,7 +131,7 @@ class Monitor:
         """
         self.client = client
         self.nofail = nofail
-        self.basedir = basedir or user_data_dir(__name__)
+        self.basedir = basedir or user_data_dir(__product__)
         self.proxy = proxy
         self.config = config
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)

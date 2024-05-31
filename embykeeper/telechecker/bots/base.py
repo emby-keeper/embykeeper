@@ -20,8 +20,10 @@ from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
 from thefuzz import fuzz, process
 
-from ...data import get_datas
-from ...utils import show_exception, to_iterable, AsyncCountPool, truncate_str
+from embykeeper import __name__ as __product__
+from embykeeper.data import get_datas
+from embykeeper.utils import show_exception, to_iterable, AsyncCountPool
+
 from ..lock import ocrs, ocrs_lock
 from ..tele import Client
 from ..link import Link
@@ -81,7 +83,7 @@ class BaseBotCheckin(ABC):
         self.retries = retries
         self.timeout = timeout
         self.nofail = nofail
-        self.basedir = basedir or user_data_dir(__name__)
+        self.basedir = basedir or user_data_dir(__product__)
         self.proxy = proxy
         self.config = config
         self.finished = asyncio.Event()  # 签到完成事件
