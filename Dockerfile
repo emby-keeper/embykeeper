@@ -14,7 +14,7 @@ COPY --from=builder /src/scripts/docker-entrypoint.sh /entrypoint.sh
 
 ENV TZ="Asia/Shanghai"
 RUN useradd -m -u 1000 embykeeper
-RUN mkdir /app & chown -R embykeeper:embykeeper /app
+RUN mkdir /app && chown -R embykeeper:embykeeper /app
 RUN chmod +x /entrypoint.sh && touch config.toml
 USER user
 WORKDIR /app
