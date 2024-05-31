@@ -582,8 +582,9 @@ class ClientsSession:
                         sleep_threshold=30,
                     )
                     await client.start()
-                except OperationalError:
+                except OperationalError as e:
                     logger.warning(f"内部数据库错误, 正在重置, 您可能需要重新登录.")
+                    show_exception(e)
                     session_file.unlink(missing_ok=True)
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
