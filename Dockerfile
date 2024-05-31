@@ -13,12 +13,9 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /src/scripts/docker-entrypoint.sh /entrypoint.sh
 
 ENV TZ="Asia/Shanghai"
-RUN useradd -m -u 1000 embykeeper
-RUN mkdir /app && chown -R embykeeper:embykeeper /app
-RUN chmod +x /entrypoint.sh && touch config.toml
-USER user
 WORKDIR /app
-ENV HOME=/app
+RUN chmod +x /entrypoint.sh \
+    && touch config.toml
 ENV PATH="/opt/venv/bin:$PATH"
 
 ENTRYPOINT ["/entrypoint.sh"]
