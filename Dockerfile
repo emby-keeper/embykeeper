@@ -12,7 +12,6 @@ FROM python:3.8-slim
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /src/scripts/docker-entrypoint.sh /entrypoint.sh
 
-USER root
 ENV TZ="Asia/Shanghai"
 WORKDIR /app
 RUN chmod +x /entrypoint.sh \

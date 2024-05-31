@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from contextlib import asynccontextmanager
-import os
 import uuid
 from datetime import datetime
 import asyncio
@@ -586,7 +585,6 @@ class ClientsSession:
                 except OperationalError as e:
                     logger.warning(f"内部数据库错误, 正在重置, 您可能需要重新登录.")
                     show_exception(e)
-                    os.system('bash')
                     session_file.unlink(missing_ok=True)
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')

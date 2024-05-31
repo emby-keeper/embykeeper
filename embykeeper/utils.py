@@ -80,6 +80,7 @@ def show_exception(e, regular=True):
     else:
         logger.opt(exception=e).debug("错误详情:")
 
+
 class AsyncTyper(Typer):
     """Typer 的异步版本, 所有命令函数都将以异步形式调用."""
 
