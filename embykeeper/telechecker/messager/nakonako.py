@@ -1,4 +1,4 @@
-from .base import Messager
+from ._base import Messager
 
 __ignore__ = True
 

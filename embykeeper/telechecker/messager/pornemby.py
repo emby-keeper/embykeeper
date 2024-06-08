@@ -8,7 +8,7 @@ from ..lock import (
     pornemby_alert,
 )
 from ..tele import ClientsSession
-from .base import Messager
+from ._base import Messager
 
 
 class PornembyMessager(Messager):

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 from datetime import datetime
 from functools import lru_cache
@@ -5,7 +7,7 @@ import inspect
 import logging
 import pkgutil
 import random
-from typing import List, Type
+from typing import TYPE_CHECKING, List, Type
 from importlib import import_module
 
 from loguru import logger
@@ -16,7 +18,9 @@ from . import __name__ as __product__
 from .link import Link
 from .log import TelegramStream
 from .tele import ClientsSession
-from .bots.base import BaseBotCheckin
+
+if TYPE_CHECKING:
+    from .bots._base import BaseBotCheckin
 
 logger = logger.bind(scheme="telegram")
 

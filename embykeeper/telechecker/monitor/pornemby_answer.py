@@ -10,7 +10,7 @@ from pyrogram.errors import RPCError
 from ...utils import truncate_str
 from ..link import Link
 from ..lock import pornemby_alert
-from .base import Monitor
+from ._base import Monitor
 
 
 class PornembyAnswerMonitor:

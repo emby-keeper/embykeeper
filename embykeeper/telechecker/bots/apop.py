@@ -1,7 +1,7 @@
 from pyrogram.types import Message
 from pyrogram.raw.types.messages import BotCallbackAnswer
 
-from .base import BotCheckin
+from ._base import BotCheckin
 
 
 class ApopCheckin(BotCheckin):

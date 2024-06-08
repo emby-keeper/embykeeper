@@ -5,7 +5,7 @@ from pyrogram.raw.functions.messages import AcceptUrlAuth
 from pyrogram.raw.types import UrlAuthResultAccepted
 from faker import Faker
 
-from .base import BotCheckin
+from ._base import BotCheckin
 
 
 class JMSCheckin(BotCheckin):

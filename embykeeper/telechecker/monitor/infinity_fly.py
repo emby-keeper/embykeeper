@@ -1,6 +1,6 @@
 from pyrogram.types import Message
 
-from .base import Monitor
+from ._base import Monitor
 
 
 class InfinityFlyMonitor(Monitor):

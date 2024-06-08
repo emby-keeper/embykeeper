@@ -6,7 +6,7 @@ from pyrogram.types import Message
 from pyrogram.errors import RPCError
 from cachetools import TTLCache
 
-from .base import Monitor
+from ._base import Monitor
 
 __ignore__ = True
 

@@ -6,7 +6,7 @@ from pyrogram.types import Message
 from ...utils import async_partial
 from ..lock import misty_monitors, misty_locks
 
-from .base import BotCheckin
+from ._base import BotCheckin
 
 __ignore__ = True
 

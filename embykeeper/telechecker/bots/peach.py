@@ -1,6 +1,6 @@
 from pyrogram.types import Message
 
-from .base import BotCheckin
+from ._base import BotCheckin
 
 
 class PeachCheckin(BotCheckin):

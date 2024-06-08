@@ -4,7 +4,7 @@ from pyrogram.enums import MessageEntityType
 from pyrogram.errors import RPCError
 
 from ..lock import pornemby_messager_enabled, pornemby_alert
-from .base import Monitor
+from ._base import Monitor
 
 
 class PornembyDoubleMonitor(Monitor):

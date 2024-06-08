@@ -6,7 +6,7 @@ from pyrogram.enums import MessageEntityType
 
 from ..lock import pornemby_nohp, pornemby_messager_enabled
 
-from .base import Monitor
+from ._base import Monitor
 
 
 class PornembyNoHPMonitor(Monitor):

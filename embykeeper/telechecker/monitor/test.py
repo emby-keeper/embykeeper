@@ -1,6 +1,6 @@
 from pyrogram.types import Message
 
-from .base import Monitor
+from ._base import Monitor
 from .pornemby_answer import PornembyAnswerMonitor
 from .pornemby_double import PornembyDoubleMonitor
 from .pornemby_dragon_rain import PornembyDragonRainMonitor

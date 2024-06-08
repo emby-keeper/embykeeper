@@ -9,7 +9,7 @@ from faker import Faker
 
 from ...utils import remove_prefix
 from ..link import Link
-from .base import BaseBotCheckin
+from ._base import BaseBotCheckin
 
 __ignore__ = True
 

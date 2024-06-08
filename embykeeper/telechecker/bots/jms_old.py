@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from thefuzz import process
 
 from ...data import get_data
-from .base import AnswerBotCheckin
+from ._base import AnswerBotCheckin
 
 __ignore__ = True
 

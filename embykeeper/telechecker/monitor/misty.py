@@ -9,7 +9,7 @@ from ddddocr import DdddOcr
 from ...utils import async_partial
 from ...data import get_datas
 from ..lock import misty_locks
-from .base import Monitor
+from ._base import Monitor
 
 __ignore__ = True
 

@@ -4,7 +4,7 @@ import random
 from pyrogram.types import Message
 from pyrogram.errors import BadRequest
 
-from .base import AnswerBotCheckin
+from ._base import AnswerBotCheckin
 
 
 class PornembyCheckin(AnswerBotCheckin):

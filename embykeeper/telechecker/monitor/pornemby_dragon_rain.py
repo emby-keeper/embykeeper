@@ -5,7 +5,7 @@ from pyrogram.enums import MessageEntityType
 
 from ...utils import flatten
 from ..lock import pornemby_alert
-from .base import Monitor
+from ._base import Monitor
 
 
 class PornembyDragonRainMonitor:

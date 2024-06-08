@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from pyrogram.errors import RPCError
 
 from ..link import Link
-from .base import AnswerBotCheckin
+from ._base import AnswerBotCheckin
 
 
 class TerminusCheckin(AnswerBotCheckin):

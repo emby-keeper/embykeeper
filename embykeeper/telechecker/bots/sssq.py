@@ -1,4 +1,4 @@
-from .base import BotCheckin
+from ._base import BotCheckin
 
 __ignore__ = True
 

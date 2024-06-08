@@ -2,7 +2,7 @@ import asyncio
 import random
 from pyrogram.types import Message
 
-from .base import Monitor
+from ._base import Monitor
 from ...utils import async_partial
 
 __ignore__ = True

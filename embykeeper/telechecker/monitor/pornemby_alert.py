@@ -10,7 +10,7 @@ from pyrogram.enums import ChatMemberStatus, MessageServiceType, MessagesFilter
 from pyrogram.errors import BadRequest
 
 from ..lock import pornemby_alert, pornemby_messager_mids
-from .base import Monitor
+from ._base import Monitor
 
 
 class PornembyAlertMonitor(Monitor):
