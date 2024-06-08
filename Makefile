@@ -210,15 +210,15 @@ debugpy/web: venv/require
 version: version/patch
 
 version/patch: venv/require
->   "$(VENV)/bin/python" -m bump2version patch
+>   "$(VENV)/bin/python" -m bumpversion patch
 >   git push && git push --tags
 
 version/minor: venv/require
->   "$(VENV)/bin/python" -m bump2version minor
+>   "$(VENV)/bin/python" -m bumpversion minor
 >   git push && git push --tags
 
 version/major: venv/require
->   "$(VENV)/bin/python" -m bump2version major
+>   "$(VENV)/bin/python" -m bumpversion major
 >   git push && git push --tags
 
 push:

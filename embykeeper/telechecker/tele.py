@@ -454,7 +454,7 @@ class ClientsSession:
     watch = None
 
     @classmethod
-    def from_config(cls, config, in_memory=False, quiet=False, **kw):
+    def from_config(cls, config, in_memory=True, quiet=False, **kw):
         accounts = config.get("telegram", [])
         for k, v in kw.items():
             accounts = [a for a in accounts if a.get(k, None) in to_iterable(v)]
@@ -534,7 +534,7 @@ class ClientsSession:
                 await client.storage.close()
                 logger.debug(f'登出账号 "{client.phone_number}".')
 
-    def __init__(self, accounts, proxy=None, basedir=None, in_memory=None, quiet=False):
+    def __init__(self, accounts, proxy=None, basedir=None, in_memory=True, quiet=False):
         self.accounts = accounts
         self.proxy = proxy
         self.basedir = basedir or user_data_dir(__product__)
@@ -585,7 +585,7 @@ class ClientsSession:
                         sleep_threshold=30,
                     )
                     try:
-                        await asyncio.wait_for(client.start(), 10)
+                        await asyncio.wait_for(client.start(), 120)
                     except asyncio.TimeoutError:
                         if proxy:
                             logger.error(f"无法连接到 Telegram 服务器, 请检查您代理的可用性.")
@@ -599,9 +599,6 @@ class ClientsSession:
                     session_file.unlink(missing_ok=True)
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
-                    logger.warning(
-                        f"请您申请自己的 API, 参考: https://blog.iair.top/2023/10/15/embykeeper-api."
-                    )
                     break
                 except Unauthorized:
                     try:
