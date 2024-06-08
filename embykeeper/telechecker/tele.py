@@ -547,8 +547,7 @@ class ClientsSession:
         self.quiet = quiet
         if not self.watch:
             self.__class__.watch = asyncio.create_task(self.watchdog())
-            
-            
+
     def get_connector(self, proxy=None):
         if proxy:
             connector = ProxyConnector(
@@ -561,7 +560,7 @@ class ClientsSession:
         else:
             connector = aiohttp.TCPConnector()
         return connector
-    
+
     async def test_network(self, proxy=None):
         url = "https://www.gstatic.com/generate_204"
         connector = self.get_connector(proxy=proxy)
@@ -576,9 +575,11 @@ class ClientsSession:
             except (ProxyConnectionError, ProxyTimeoutError) as e:
                 un = connector._proxy_username
                 pw = connector._proxy_password
-                auth = f'{un}:{pw}@' if un or pw else ''
+                auth = f"{un}:{pw}@" if un or pw else ""
                 proxy_url = f"{connector._proxy_type.name.lower()}://{auth}{connector._proxy_host}:{connector._proxy_port}"
-                logger.warning(f"无法连接到您的代理 ({proxy_url}), 您的网络状态可能不好, 敬请注意. 程序将继续运行.")
+                logger.warning(
+                    f"无法连接到您的代理 ({proxy_url}), 您的网络状态可能不好, 敬请注意. 程序将继续运行."
+                )
             except OSError as e:
                 logger.warning(f"无法连接到网络 (Google), 您的网络状态可能不好, 敬请注意. 程序将继续运行.")
                 return False
@@ -586,7 +587,7 @@ class ClientsSession:
                 logger.warning(f"检测网络状态时发生错误, 网络检测将被跳过.")
                 show_exception(e)
                 return False
-                
+
     async def test_time(self, proxy=None):
         url = "http://worldtimeapi.org/api/timezone/Etc/UTC"
         connector = self.get_connector(proxy=proxy)
@@ -597,10 +598,12 @@ class ClientsSession:
                         resp_dict: dict = await resp.json()
                     else:
                         raise RuntimeError()
-                unixtime = int(resp_dict.get('unixtime', None))
+                unixtime = int(resp_dict.get("unixtime", None))
                 nowtime = datetime.now().timestamp()
-                if abs(nowtime-unixtime) > 30:
-                    logger.warning(f"您的系统时间设置不正确, 与世界时间差距过大, 可能会导致连接失败失败, 敬请注意. 程序将继续运行.")
+                if abs(nowtime - unixtime) > 30:
+                    logger.warning(
+                        f"您的系统时间设置不正确, 与世界时间差距过大, 可能会导致连接失败失败, 敬请注意. 程序将继续运行."
+                    )
             except Exception:
                 logger.warning(f"检测世界时间发生错误, 时间检测将被跳过.")
                 return False
@@ -631,9 +634,13 @@ class ClientsSession:
                 else:
                     in_memory = self.in_memory
                 if session_string or session_file.is_file():
-                    logger.debug(f'账号 "{account["phone"]}" 登录凭据存在, 仅内存模式{"启用" if in_memory else "禁用"}.')
+                    logger.debug(
+                        f'账号 "{account["phone"]}" 登录凭据存在, 仅内存模式{"启用" if in_memory else "禁用"}.'
+                    )
                 else:
-                    logger.debug(f'账号 "{account["phone"]}" 登录凭据不存在, 即将进入登录流程, 仅内存模式{"启用" if in_memory else "禁用"}.')
+                    logger.debug(
+                        f'账号 "{account["phone"]}" 登录凭据不存在, 即将进入登录流程, 仅内存模式{"启用" if in_memory else "禁用"}.'
+                    )
                 try:
                     client = Client(
                         app_version=__version__,
@@ -686,8 +693,10 @@ class ClientsSession:
             logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
             return None
         except BadMsgNotification as e:
-            if 'synchronized' in str(e):
-                logger.error(f'登录账号 "{account["phone"]}" 时发生异常, 可能是因为您的系统时间与世界时间差距过大, 将被跳过.')
+            if "synchronized" in str(e):
+                logger.error(
+                    f'登录账号 "{account["phone"]}" 时发生异常, 可能是因为您的系统时间与世界时间差距过大, 将被跳过.'
+                )
                 return None
             else:
                 logger.error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过.')
