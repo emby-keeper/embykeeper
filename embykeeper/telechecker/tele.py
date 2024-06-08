@@ -584,7 +584,15 @@ class ClientsSession:
                         workdir=self.basedir,
                         sleep_threshold=30,
                     )
-                    await client.start()
+                    try:
+                        await asyncio.wait_for(client.start(), 10)
+                    except asyncio.TimeoutError:
+                        if proxy:
+                            logger.error(f"无法连接到 Telegram 服务器, 请检查您代理的可用性.")
+                            continue
+                        else:
+                            logger.error(f"无法连接到 Telegram 服务器, 请检查您的网络.")
+                            continue
                 except OperationalError as e:
                     logger.warning(f"内部数据库错误, 正在重置, 您可能需要重新登录.")
                     show_exception(e)
@@ -610,13 +618,16 @@ class ClientsSession:
                     break
             else:
                 logger.error(f'登录账号 "{account["phone"]}" 失败次数超限, 将被跳过.')
+                return None
         except asyncio.CancelledError:
             raise
         except RPCError as e:
             logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
+            return None
         except Exception as e:
             logger.error(f'登录账号 "{account["phone"]}" 时发生异常, 将被跳过.')
             show_exception(e, regular=False)
+            return None
         else:
             if not session_string_file.exists():
                 with open(session_string_file, "w+", encoding="utf-8") as f:
