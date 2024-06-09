@@ -260,6 +260,7 @@ async def interactive_config(config: dict = {}, basedir=None):
     pad = " " * 23
     logger.info("我们将为您生成配置, 需要您根据提示填入信息, 并按回车确认.")
     logger.info(f"配置帮助详见: {__url__}.")
+    logger.info(f"若需要重新开始, 请点击右上方的刷新按钮.")
     telegrams = config.get("telegram", [])
     while True:
         if len(telegrams) > 0:

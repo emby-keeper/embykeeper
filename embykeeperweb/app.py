@@ -1,10 +1,14 @@
+from eventlet.patcher import monkey_patch
+
+monkey_patch()
+
+import atexit
 import os
 import pty
 import select
 import fcntl
 import struct
-import subprocess
-import sys
+from subprocess import Popen
 import termios
 import threading
 import time
@@ -26,13 +30,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-app.config["args"] = None
+app.config["lock"] = threading.Lock()
+app.config["args"] = []
 app.config["fd"] = None
-app.config["pid"] = None
+app.config["proc"] = None
 app.config["hist"] = ""
 app.config["faillog"] = []
-
-lock = threading.Lock()
 
 version = f"V{__version__}"
 
@@ -55,11 +58,21 @@ class DummyUser:
 def load_user(_):
     return DummyUser()
 
+def exit_handler():
+    proc = app.config["proc"]
+    if proc:
+        kill_proc(proc)
 
 @app.route("/")
 def index():
     return redirect(url_for("console"))
 
+def is_authenticated():
+    webpass = app.config.get("webpass", None)
+    if (not webpass) or current_user.is_authenticated:
+        return True
+    else:
+        return False
 
 @app.route("/console")
 @login_required
@@ -94,7 +107,6 @@ def login_submit():
 def healthz():
     return "200 OK"
 
-
 @app.route("/heartbeat")
 def heartbeat():
     webpass = os.environ.get("EK_WEBPASS", "")
@@ -102,11 +114,11 @@ def heartbeat():
     if (not password) or (not webpass):
         return abort(403)
     if password == webpass:
-        if app.config["pid"] is None:
-            start({"rows": 32, "cols": 106}, auth=False)
-            return jsonify({"status": "restarted", "pid": app.config["pid"]}), 201
+        if app.config["proc"] is None:
+            start_proc()
+            return jsonify({"status": "restarted", "pid": app.config["proc"].pid}), 201
         else:
-            return jsonify({"status": "running", "pid": app.config["pid"]}), 200
+            return jsonify({"status": "running", "pid": app.config["proc"].pid}), 200
     else:
         return abort(403)
 
@@ -118,101 +130,111 @@ def page_not_found(e):
 
 @socketio.on("pty-input", namespace="/pty")
 def pty_input(data):
-    if not current_user.is_authenticated():
+    if not is_authenticated():
         return
-    if app.config["fd"]:
-        os.write(app.config["fd"], data["input"].encode())
-
+    with app.config["lock"]:
+        if app.config["fd"]:
+            i = data["input"].encode()
+            os.write(app.config["fd"], i)
 
 def set_size(fd, row, col, xpix=0, ypix=0):
     logger.debug(f"Resizing pty to: {row} {col}.")
     size = struct.pack("HHHH", row, col, xpix, ypix)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, size)
 
-
 @socketio.on("resize", namespace="/pty")
 def resize(data):
-    if not current_user.is_authenticated():
+    logger.debug("Received resize socketio signal.")
+    if not is_authenticated():
         return
-    if app.config["fd"]:
-        set_size(app.config["fd"], data["rows"], data["cols"])
-
-
-def read_and_forward_pty_output():
-    max_read_bytes = 1024 * 20
-    while True:
-        socketio.sleep(0.01)
+    with app.config["lock"]:
         if app.config["fd"]:
-            (data, _, _) = select.select([app.config["fd"]], [], [], 0)
-            if data:
-                output = os.read(app.config["fd"], max_read_bytes).decode(errors="ignore")
-                app.config["hist"] += output
-                socketio.emit("pty-output", {"output": output}, namespace="/pty")
-
+            set_size(app.config["fd"], data["rows"], data["cols"])
 
 @socketio.on("connect", namespace="/pty")
 def connected():
     logger.debug(f"Console connected.")
 
-
 @socketio.on("disconnect", namespace="/pty")
 def connected():
     logger.debug(f"Console disconnected.")
 
+def read_and_forward_pty_output():
+    max_read_bytes = 1024 * 20
+    while True:
+        if app.config["fd"]:
+            (data, _, _) = select.select([app.config["fd"]], [], [])
+            if data:
+                with app.config["lock"]:
+                    if app.config["fd"]:
+                        output = os.read(app.config["fd"], max_read_bytes).decode(errors="ignore")
+                        app.config["hist"] += output
+                        socketio.emit("pty-output", {"output": output}, namespace="/pty")
+                    else:
+                        break
+        else:
+            break
+
+def disconnect_on_proc_exit(proc: Popen):
+    returncode = proc.wait()
+    if proc == app.config["proc"]:
+        logger.debug(f"Command exited with return code {returncode}.")
+        output = (
+            f"\r\n\nThe program has exited with returncode {returncode}. "
+            "\r\nRefresh the page to restart the program."
+        )
+        app.config["hist"] += output
+        socketio.emit("pty-output", {"output": output}, namespace="/pty")
+
+
+def start_proc():
+    master_fd, slave_fd = pty.openpty()
+    p = Popen(["embykeeper", *app.config["args"]], stdin=slave_fd, stdout=slave_fd, stderr=slave_fd, preexec_fn=os.setsid)
+    socketio.start_background_task(target=disconnect_on_proc_exit, proc=p)
+    atexit.register(exit_handler)
+    app.config["fd"] = master_fd
+    app.config["proc"] = p
+    logger.debug(f"Embykeeper started at: {p.pid}.")
+    socketio.start_background_task(target=read_and_forward_pty_output)
 
 @socketio.on("embykeeper_start", namespace="/pty")
 def start(data, auth=True):
-    if auth and (not current_user.is_authenticated()):
+    logger.debug("Received embykeeper_start socketio signal.")
+    if not is_authenticated():
         return
-    with lock:
-        if app.config["fd"]:
+    with app.config["lock"]:
+        if app.config["fd"] and app.config["proc"] and app.config["proc"].poll() is None:
             set_size(app.config["fd"], data["rows"], data["cols"])
             socketio.emit("pty-output", {"output": app.config["hist"]}, namespace="/pty")
         else:
-            (pid, fd) = pty.fork()
-            if pid == 0:
-                while True:
-                    try:
-                        p = subprocess.run(["embykeeper", *app.config["args"]])
-                        if p.returncode:
-                            raise RuntimeError()
-                    except (KeyboardInterrupt, RuntimeError):
-                        print()
-                        while True:
-                            try:
-                                input("Embykeeper 已退出, 请按 Enter 以重新开始 ...")
-                                print()
-                                break
-                            except KeyboardInterrupt:
-                                print()
-            else:
-                app.config["fd"] = fd
-                app.config["pid"] = pid
-                logger.debug(f"Embykeeper started at: {pid}.")
-                set_size(app.config["fd"], data["rows"], data["cols"])
-                socketio.start_background_task(target=read_and_forward_pty_output)
+            start_proc()
+            set_size(app.config["fd"], data["rows"], data["cols"])
+
+
+def kill_proc(proc: Popen):
+    proc.send_signal(signal.SIGINT)
+    for _ in range(10):
+        poll = proc.poll()
+        if poll is not None:
+            break
+    else:
+        proc.kill()
+    logger.debug(f"Embykeeper killed: {proc.pid}.")
 
 
 @socketio.on("embykeeper_kill", namespace="/pty")
-def stop():
-    if not current_user.is_authenticated():
+def kill():
+    logger.debug("Received embykeeper_kill socketio signal.")
+    if not is_authenticated():
         return
-    with lock:
-        if app.config["pid"] is not None:
-            os.kill(app.config["pid"], signal.SIGINT)
-            for _ in range(50):
-                try:
-                    os.kill(app.config["pid"], 0)
-                except OSError:
-                    break
-                else:
-                    time.sleep(0.1)
-            else:
-                os.kill(app.config["pid"], signal.SIGKILL)
+    with app.config["lock"]:
+        proc = app.config["proc"]
+        if proc is not None:
             app.config["fd"] = None
-            app.config["pid"] = None
+            app.config["proc"] = None
             app.config["hist"] = ""
-            logger.debug(f"Embykeeper stopped.")
+    if proc is not None:
+        socketio.start_background_task(target=kill_proc, proc=proc)
 
 
 @cli.command(context_settings={"ignore_unknown_options": True, "allow_extra_args": True})
@@ -221,8 +243,11 @@ def run(
     port: int = typer.Option(1818, envvar="PORT", show_envvar=False),
     host: str = "0.0.0.0",
     debug: bool = False,
+    wait: bool = False,
 ):
     app.config["args"] = ctx.args
+    if not wait:
+        start_proc()
     logger.info(f"Embykeeper webserver started at {host}:{port}.")
     socketio.run(app, port=port, host=host, debug=debug)
 
