@@ -58,14 +58,17 @@ class DummyUser:
 def load_user(_):
     return DummyUser()
 
+
 def exit_handler():
     proc = app.config["proc"]
     if proc:
         kill_proc(proc)
 
+
 @app.route("/")
 def index():
     return redirect(url_for("console"))
+
 
 def is_authenticated():
     webpass = app.config.get("webpass", None)
@@ -73,6 +76,7 @@ def is_authenticated():
         return True
     else:
         return False
+
 
 @app.route("/console")
 @login_required
@@ -107,6 +111,7 @@ def login_submit():
 def healthz():
     return "200 OK"
 
+
 @app.route("/heartbeat")
 def heartbeat():
     webpass = os.environ.get("EK_WEBPASS", "")
@@ -137,10 +142,12 @@ def pty_input(data):
             i = data["input"].encode()
             os.write(app.config["fd"], i)
 
+
 def set_size(fd, row, col, xpix=0, ypix=0):
     logger.debug(f"Resizing pty to: {row} {col}.")
     size = struct.pack("HHHH", row, col, xpix, ypix)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, size)
+
 
 @socketio.on("resize", namespace="/pty")
 def resize(data):
@@ -151,13 +158,16 @@ def resize(data):
         if app.config["fd"]:
             set_size(app.config["fd"], data["rows"], data["cols"])
 
+
 @socketio.on("connect", namespace="/pty")
 def connected():
     logger.debug(f"Console connected.")
 
+
 @socketio.on("disconnect", namespace="/pty")
 def connected():
     logger.debug(f"Console disconnected.")
+
 
 def read_and_forward_pty_output():
     max_read_bytes = 1024 * 20
@@ -175,6 +185,7 @@ def read_and_forward_pty_output():
         else:
             break
 
+
 def disconnect_on_proc_exit(proc: Popen):
     returncode = proc.wait()
     if proc == app.config["proc"]:
@@ -189,13 +200,20 @@ def disconnect_on_proc_exit(proc: Popen):
 
 def start_proc():
     master_fd, slave_fd = pty.openpty()
-    p = Popen(["embykeeper", *app.config["args"]], stdin=slave_fd, stdout=slave_fd, stderr=slave_fd, preexec_fn=os.setsid)
+    p = Popen(
+        ["embykeeper", *app.config["args"]],
+        stdin=slave_fd,
+        stdout=slave_fd,
+        stderr=slave_fd,
+        preexec_fn=os.setsid,
+    )
     socketio.start_background_task(target=disconnect_on_proc_exit, proc=p)
     atexit.register(exit_handler)
     app.config["fd"] = master_fd
     app.config["proc"] = p
     logger.debug(f"Embykeeper started at: {p.pid}.")
     socketio.start_background_task(target=read_and_forward_pty_output)
+
 
 @socketio.on("embykeeper_start", namespace="/pty")
 def start(data, auth=True):
