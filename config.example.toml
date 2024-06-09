@@ -30,42 +30,42 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 3.2.17 生成的.
+# 该部分内容是根据 Embykeeper 3.2.30 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["akuai", "apop", "feiyue", "jms", "lyrebird", "pandatv", "peach", "pornemby", "skysink", "terminus", "theend"]
+# checkiner = ["akuai", "apop", "feiyue", "heisi", "jms", "lyrebird", "pandatv", "peach", "pornemby", "skysink", "terminus", "theend"]
 # monitor = ["bgk", "embyhub", "infinity_fly", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
 # [service]
-# checkiner = ["aisgk", "akuai", "apop", "bluesea", "charon", "data007sgk", "dogsgk", "embyhub", "feiyue", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "misty", "nebula", "pandatv", "peach", "pornemby", "singularity", "skysink", "sssq", "temby", "terminus", "terminus_old", "theend", "zhipian"]
+# checkiner = ["aisgk", "akuai", "apop", "bluesea", "charon", "data007sgk", "dogsgk", "embyhub", "feiyue", "heisi", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "misty", "nebula", "pandatv", "peach", "pornemby", "singularity", "skysink", "sssq", "temby", "terminus", "terminus_old", "theend", "zhipian"]
 # monitor = ["bgk", "embyhub", "follow", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8611477258367"
+phone = "+8616769882276"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8616722938003"
+phone = "+8618830448246"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://rogers.com/"
-username = "smartin"
-password = "2jzNp6Ue%9"
+url = "https://www.pearson-freeman.info/"
+username = "rlopez"
+password = "rPPSxFjy(6"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.lawson-camacho.com/"
-username = "katherinekennedy"
-password = "4+up&9mi%Y"
+url = "https://mcfarland.com/"
+username = "lopezchristopher"
+password = "@11aOs4lp7"
 time = [120, 240] # 模拟观看的时长范围 (秒)
