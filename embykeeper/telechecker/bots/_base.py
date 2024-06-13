@@ -1,10 +1,11 @@
 import asyncio
+from datetime import datetime, timedelta
 from pathlib import Path
 import random
 import re
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
-from enum import Flag, auto
+from enum import Flag, IntEnum, auto
 import string
 import time
 from typing import Iterable, List, Union
@@ -22,7 +23,7 @@ from thefuzz import fuzz, process
 
 from embykeeper import __name__ as __product__
 from embykeeper.data import get_datas
-from embykeeper.utils import show_exception, to_iterable, AsyncCountPool
+from embykeeper.utils import show_exception, to_iterable, format_timedelta_human, AsyncCountPool
 
 from ..lock import ocrs, ocrs_lock
 from ..tele import Client
@@ -58,7 +59,12 @@ class MessageType(Flag):
     CAPTION = auto()
     CAPTCHA = auto()
     ANSWER = auto()
-
+    
+class CheckinResult(IntEnum):
+    SUCCESS = auto()
+    CHECKED = auto()
+    FAIL = auto()
+    IGNORE = auto()
 
 class BaseBotCheckin(ABC):
     """基础签到类."""
@@ -133,7 +139,8 @@ class BotCheckin(BaseBotCheckin):
     bot_fail_keywords: Union[str, List[str]] = ([])  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
     additional_auth: List[str] = []  # 额外认证要求
-    max_retries = None  # 最高重试次数
+    max_retries = None  # 验证码错误或网络错误时最高重试次数 (默认无限)
+    checked_retries = None # 今日已签到时最高重试次数 (默认不重试)
     # fmt: on
 
     @property
@@ -145,8 +152,9 @@ class BotCheckin(BaseBotCheckin):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self._is_archived = False  # 签到前处于收纳状态
+        self._checked = False # 当前结束状态为已签到
         self._retries = 0  # 当前重试次数
+        self._checked_retries = 0
         self._waiting = {}  # 当前等待的消息
 
     def get_filter(self):
@@ -216,25 +224,26 @@ class BotCheckin(BaseBotCheckin):
                 chat = await self.client.get_chat(ident)
             except UsernameNotOccupied:
                 self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
-                return False
+                return CheckinResult.FAIL
             except KeyError as e:
                 self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
                 show_exception(e)
-                return False
+                return CheckinResult.FAIL
             except FloodWait as e:
-                self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
                 if e.value < 360:
+                    self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
                     await asyncio.sleep(e.value)
                 else:
                     self.log.info(
                         f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 签到器将停止."
                     )
-                    return False
+                    return CheckinResult.FAIL
             else:
                 break
+        _is_archived = False
         async for d in self.client.get_dialogs(folder_id=1):
             if d.chat.id == chat.id:
-                self._is_archived = True
+                _is_archived = True
                 break
         else:
             async for d in self.client.get_dialogs(folder_id=0):
@@ -243,69 +252,90 @@ class BotCheckin(BaseBotCheckin):
             else:
                 if not self.bot_allow_from_scratch:
                     self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
-                    return None
+                    return CheckinResult.IGNORE
 
-        if not await self.init():
-            self.log.warning(f"初始化错误.")
-            return False
+        while True:
+            if not await self.init():
+                self.log.warning(f"初始化错误.")
+                return CheckinResult.FAIL
 
-        if self.additional_auth:
-            for a in self.additional_auth:
-                if not await Link(self.client).auth(a):
-                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
-                    return False
+            if self.additional_auth:
+                for a in self.additional_auth:
+                    if not await Link(self.client).auth(a):
+                        self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                        return CheckinResult.IGNORE
 
-        bot = await self.client.get_users(self.bot_username)
-        msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
-        if chat.title:
-            msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
-        self.log.info(msg + ".")
+            bot = await self.client.get_users(self.bot_username)
+            msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
+            if chat.title:
+                msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
+            self.log.info(msg + ".")
 
-        if not self.chat_name:
-            self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
-            await self.client.mute_chat(ident, time.time() + self.timeout + 10)
+            if not self.chat_name:
+                self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
+                await self.client.mute_chat(ident, time.time() + self.timeout + 10)
 
-        try:
-            async with self.listener():
-                cancelled = False
-                try:
-                    if self.bot_use_history is None:
-                        await self.send_checkin()
-                    elif not await self.walk_history(self.bot_use_history):
-                        await self.send_checkin()
-                    await asyncio.wait_for(self.finished.wait(), self.timeout)
-                except asyncio.CancelledError:
-                    cancelled = True
-                    raise
-                finally:
-                    if not cancelled:
-                        if not await self.cleanup():
-                            self.log.debug(f"[gray50]执行清理失败: {ident}[/]")
-                        if self._is_archived:
-                            self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
-                            try:
-                                if await chat.archive():
-                                    self.log.debug(f"[gray50]重新归档成功: {ident}[/]")
-                            except asyncio.TimeoutError:
-                                self.log.debug(f"[gray50]归档失败: {ident}[/]")
-                        if not self.chat_name:
-                            self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
-                            try:
-                                if await self.client.read_chat_history(ident):
-                                    self.log.debug(f"[gray50]设为已读成功: {ident}[/]")
-                            except asyncio.TimeoutError:
-                                self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
-        except OSError as e:
-            self.log.warning(f'初始化错误: "{e}", 签到器将停止.')
-            show_exception(e)
-            return False
-        except asyncio.TimeoutError:
-            pass
-        if not self.finished.is_set():
-            self.log.warning("无法在时限内完成签到.")
-            return False
-        else:
-            return self._retries <= self.valid_retries
+            try:
+                async with self.listener():
+                    cancelled = False
+                    try:
+                        if self.bot_use_history is None:
+                            await self.send_checkin()
+                        elif not await self.walk_history(self.bot_use_history):
+                            await self.send_checkin()
+                        await asyncio.wait_for(self.finished.wait(), self.timeout)
+                    except asyncio.CancelledError:
+                        cancelled = True
+                        raise
+                    finally:
+                        if not cancelled:
+                            if not await self.cleanup():
+                                self.log.debug(f"[gray50]执行清理失败: {ident}[/]")
+                            if _is_archived:
+                                self.log.debug(f"[gray50]将会话重新归档: {ident}[/]")
+                                try:
+                                    if await chat.archive():
+                                        self.log.debug(f"[gray50]重新归档成功: {ident}[/]")
+                                except asyncio.TimeoutError:
+                                    self.log.debug(f"[gray50]归档失败: {ident}[/]")
+                            if not self.chat_name:
+                                self.log.debug(f"[gray50]将会话设为已读: {ident}[/]")
+                                try:
+                                    if await self.client.read_chat_history(ident):
+                                        self.log.debug(f"[gray50]设为已读成功: {ident}[/]")
+                                except asyncio.TimeoutError:
+                                    self.log.debug(f"[gray50]设为已读失败: {ident}[/]")
+            except OSError as e:
+                self.log.warning(f'初始化错误: "{e}", 签到器将停止.')
+                show_exception(e)
+                return CheckinResult.FAIL
+            except asyncio.TimeoutError:
+                pass
+            if not self.finished.is_set():
+                self.log.warning("无法在时限内完成签到.")
+                return CheckinResult.FAIL
+            elif self._retries <= self.valid_retries:
+                if self._checked:
+                    if self.checked_retries and self._checked_retries < self.checked_retries:
+                        self._checked_retries += 1
+                        now = datetime.now()
+                        midnight = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+                        max_sleep = midnight - now
+                        sleep = timedelta(hours=self._checked_retries)
+                        if sleep > max_sleep:
+                            return CheckinResult.CHECKED
+                        else:
+                            self.log.info(f"今日已签到, 即将在 {format_timedelta_human(sleep)} 后重试.")
+                            await asyncio.sleep(sleep.total_seconds())
+                            self._checked = False
+                            self._retries = 0
+                            self._waiting = {}
+                    else:
+                        return CheckinResult.CHECKED
+                else:
+                    return CheckinResult.SUCCESS
+            else:
+                return CheckinResult.FAIL
 
     async def init(self):
         """可重写的初始化函数, 在读取聊天后运行, 在执行签到前运行, 返回 False 将视为初始化错误."""
@@ -444,6 +474,7 @@ class BotCheckin(BaseBotCheckin):
             await self.fail()
         elif any(s in text for s in self.bot_checked_keywords or default_keywords["checked"]):
             self.log.info(f"今日已经签到过了.")
+            self._checked = True
             self.finished.set()
         elif any(s in text for s in self.bot_fail_keywords or default_keywords["fail"]):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
@@ -534,8 +565,8 @@ class BotCheckin(BaseBotCheckin):
 
     async def fail(self):
         """设定签到器失败."""
-        self.finished.set()
         self._retries = float("inf")
+        self.finished.set()
 
     async def wait_until(self, pattern: str = ".", timeout: float = None):
         """等待特定消息出现."""

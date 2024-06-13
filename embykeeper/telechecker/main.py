@@ -7,7 +7,7 @@ import inspect
 import logging
 import pkgutil
 import random
-from typing import TYPE_CHECKING, List, Type
+from typing import List, Type
 from importlib import import_module
 
 from loguru import logger
@@ -19,8 +19,7 @@ from .link import Link
 from .log import TelegramStream
 from .tele import ClientsSession
 
-if TYPE_CHECKING:
-    from .bots._base import BaseBotCheckin
+from .bots._base import BaseBotCheckin, CheckinResult
 
 logger = logger.bind(scheme="telegram")
 
@@ -147,22 +146,31 @@ async def checkiner(config: dict, instant=False):
                 failed = []
                 ignored = []
                 successful = []
+                checked = []
                 for i, c in enumerate(checkiners):
-                    if results[i] == False:
-                        failed.append(c)
-                    elif results[i] is None:
+                    if results[i] == CheckinResult.IGNORE:
                         ignored.append(c)
-                    else:
+                    elif results[i] == CheckinResult.SUCCESS:
                         successful.append(c)
+                    elif results[i] == CheckinResult.CHECKED:
+                        checked.append(c)
+                    else:
+                        failed.append(c)
                 spec = f"共{len(checkiners)}个"
                 if successful:
                     spec += f", {len(successful)}成功"
+                if checked:
+                    spec += f", {len(checked)}已签到而跳过"
                 if failed:
                     spec += f", {len(failed)}失败"
                 if ignored:
                     spec += f", {len(ignored)}跳过"
                 if failed:
-                    log.error(f"签到失败 ({spec}): {', '.join([f.name for f in failed])}")
+                    if successful:
+                        msg = "签到部分失败"
+                    else:
+                        msg = "签到失败"
+                    log.error(f"{msg} ({spec}): {', '.join([f.name for f in failed])}")
                 else:
                     log.bind(notify=True).info(f"签到成功 ({spec}).")
 
