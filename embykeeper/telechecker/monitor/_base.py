@@ -214,9 +214,6 @@ class Monitor:
         except UserNotParticipant:
             self.log.info(f'跳过监控: 尚未加入群组 "{chat.title}".')
             return False
-        if me.status in (ChatMemberStatus.LEFT, ChatMemberStatus.RESTRICTED):
-            self.log.warning(f'初始化错误: 被群组 "{chat.title}" 禁言.')
-            return False
         if not await self.init():
             self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
             return False
