@@ -9,7 +9,7 @@ from aiohttp_socks import ProxyConnector, ProxyType
 from cachetools import TTLCache
 from loguru import logger
 
-from .utils import humanbytes, no_waiting, show_exception, to_iterable
+from .utils import format_byte_human, no_waiting, show_exception, to_iterable
 
 logger = logger.bind(scheme="datamanager")
 
@@ -99,7 +99,7 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                                 async with session.get(url) as resp:
                                     if resp.status == 200:
                                         file_size = int(resp.headers.get("Content-Length", 0))
-                                        logger.info(f"开始下载: {name} ({humanbytes(file_size)})")
+                                        logger.info(f"开始下载: {name} ({format_byte_human(file_size)})")
                                         async with aiofiles.open(basedir / name, mode="wb+") as f:
                                             timer = time.time()
                                             length = 0
@@ -107,11 +107,11 @@ async def get_datas(basedir: Path, names: Union[Iterable[str], str], proxy: dict
                                                 if time.time() - timer > 3:
                                                     timer = time.time()
                                                     logger.info(
-                                                        f"正在下载: {name} ({humanbytes(length)} / {humanbytes(file_size)})"
+                                                        f"正在下载: {name} ({format_byte_human(length)} / {format_byte_human(file_size)})"
                                                     )
                                                 await f.write(chunk)
                                                 length += len(chunk)
-                                        logger.info(f"下载完成: {name} ({humanbytes(file_size)})")
+                                        logger.info(f"下载完成: {name} ({format_byte_human(file_size)})")
                                         yield basedir / name
                                         break
                                     elif resp.status in (403, 404) and not version_matching:
