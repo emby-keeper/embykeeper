@@ -14,4 +14,14 @@ class TembyCheckin(AnswerBotCheckin):
 
     async def on_answer(self, message: Message):
         await super().on_answer(message)
-        await message.click(0)
+        keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
+        if len(keys) == 1:
+            await message.click(k)
+        else:
+            for k in keys:
+                if "签到" in k:
+                    await message.click(k)
+                    return
+            else:
+                self.log.warning(f"签到失败: 账户错误.")
+                return await self.fail()
