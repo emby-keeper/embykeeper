@@ -98,7 +98,16 @@ async def main(config: Path, updates_file: Path):
     with open(config, "rb") as f:
         config = tomllib.load(f)
     with open(updates_file, "r") as f:
-        updates = json.load(f)
+        try:
+            updates = json.load(f)
+        except json.JSONDecodeError:
+            updates = []
+            f.seek(0)
+            for chunk in f.read().split('\n}\n'):
+                chunk = chunk.strip()
+                if chunk:
+                    updates.append(json.loads(chunk + '\n}'))
+    logger.info(f'更新文件内有 {len(updates)} 条消息.')
     for k in API_KEY.values():
         api_id = k["api_id"]
         api_hash = k["api_hash"]
@@ -109,6 +118,7 @@ async def main(config: Path, updates_file: Path):
         workdir=Path(__file__).parent,
         api_id=api_id,
         api_hash=api_hash,
+        in_memory=True,
     )
     async with bot:
         await bot.add_handler(MessageHandler(dump), group=1)
