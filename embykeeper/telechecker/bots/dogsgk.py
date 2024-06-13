@@ -10,3 +10,4 @@ class DogSGKCheckin(BotCheckin):
     additional_auth = ["prime"]
     bot_success_pat = r".*\+(\d+)"
     bot_checked_keywords = "请勿重复签到"
+    checked_retries = 6

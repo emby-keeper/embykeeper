@@ -8,3 +8,4 @@ class HuaSGKCheckin(BotCheckin):
     bot_username = "sgkvipbot"
     bot_checkin_cmd = "/sign"
     additional_auth = ["prime"]
+    checked_retries = 6

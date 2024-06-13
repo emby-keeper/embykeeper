@@ -9,3 +9,4 @@ class InfSGKCheckin(BotCheckin):
     bot_checkin_cmd = "/sign"
     bot_success_keywords = ["签到成功"]
     bot_checked_keywords = ["您已经签到过了"]
+    checked_retries = 6

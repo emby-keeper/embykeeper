@@ -8,3 +8,4 @@ class ZhipianCheckin(BotCheckin):
     bot_username = "zhipianbot"
     bot_checkin_cmd = "/qd"
     additional_auth = ["prime"]
+    checked_retries = 6
