@@ -9,7 +9,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
     />
-    <title>Embykeeper</title>
+    <title>Embykeeper | 配置编辑</title>
     <meta
       name="description"
       content="Embykeeper: 中文社群规则下用于 Emby 影视服务器签到和保号的自动执行工具"
@@ -27,7 +27,36 @@
     />
     <link rel="stylesheet" href="assets/css/icons.css" />
     <link rel="stylesheet" href="assets/css/styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/scroll/simplescrollbars.css">
+    <style>
+      .CodeMirror {
+        font-family: var(--bs-font-monospace);
+        font-size: 16px;
+        width: 100%;
+        height: 100%;
+      }
+      .CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div {
+        width: 7px;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.2);
+      }
+      .CodeMirror-overlayscroll-horizontal, .CodeMirror-overlayscroll-vertical {
+        width: 7px;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.1);
+      }
+      .CodeMirror-overlayscroll-horizontal div :hover, .CodeMirror-overlayscroll-vertical div :hover {
+        background: rgba(0,0,0,0.2);
+      }
+      .CodeMirror-overlayscroll-horizontal :hover, .CodeMirror-overlayscroll-vertical :hover{
+        background: rgba(0,0,0,0.45);
+      }
+      #modal-data-box {
+        background-color: rgb(206, 206, 206);
+        border-radius: 20px;
+      }
+    </style>
   </head>
 
   <body>
@@ -52,61 +81,61 @@
         </button>
         <div class="collapse navbar-collapse" id="navcol-1">
           <ul class="navbar-nav mx-auto"></ul>
-          <a class="btn btn-primary shadow" role="button" href="/config">
-            配置文件
+          <a class="btn btn-primary shadow" role="button" href="/console">
+            控制台
           </a>
         </div>
       </div>
     </nav>
     <section class="py-5 mt-5">
       <div class="container">
-        <div class="row">
-          <div class="col-10 mx-auto">
+        <div class="d-flex">
+          <div
+            class="d-inline-flex reccircle bg-light my-2 px-3 align-items-center"
+          >
             <div
-              class="d-inline-flex reccircle bg-light my-2 px-3 align-items-center"
-            >
-              <div
-                id="status-icon"
-                class="small-dot"
-                style="border-radius: 50%"
-              ></div>
-              <div class="text-center">
-                <p class="my-0 ms-2" id="status-msg">
-                  正在连接中
-                </p>
-              </div>
+              id="status-icon"
+              class="small-dot"
+              style="border-radius: 50%"
+            ></div>
+            <div class="text-center">
+              <p class="my-0 ms-2">
+                配置文件编辑器
+              </p>
             </div>
           </div>
           <div
-            class="col d-flex d-lg-flex justify-content-end"
-            id="restart-btn"
+            class="d-none reccircle bg-light my-2 px-3 align-middle"
+            id="status-msg-badge"
           >
-            <div class="bs-icon-circle bs-icon my-2 bg-light">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                fill="currentColor"
-                viewBox="0 0 16 16"
-                class="bi bi-arrow-repeat"
-                id="restart-icon"
-              >
-                <path
-                  d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
-                ></path>
-                <path
-                  fill-rule="evenodd"
-                  d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
-                ></path>
-              </svg>
-            </div>
+            <span id="status-msg"></span>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <div class="card" style="border-radius: 5px; height: 65vh">
-              <div class="card-body">
-                <div id="terminal" class="h-100"></div>
+            <div class="card p-4" style="border-radius:5px;height:65vh">
+              <div id="toml-box" class=" h-100 w-100"></div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <button id="save-btn" class="btn btn-primary shadow">保存</button>
+          <button id="example-btn" class="btn btn-primary shadow">示例</button>
+        </div>
+      </div>
+      <div class="modal" tabindex="-1" id="saveModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">保存成功</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>请回到<a href="/console">控制台</a>并点击右上方的重启按钮以测试配置</p>
+              <hr>
+              <p>请将下方内容写入托管平台的 <span class="text-info">EK_CONFIG</span> 环境变量，否则配置将在重启后丢失.</p>
+              <div id="modal-data-box" class="p-3">
+                <code class="text-dark" id="modal-data"></code>
               </div>
             </div>
           </div>
@@ -215,10 +244,10 @@
     </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-search@0.15.0/lib/addon-search.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.5/client-dist/socket.io.min.js"></script>
-    <script src="assets/js/console.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/scroll/simplescrollbars.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/toml/toml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.2/dist/axios.min.js"></script>
+    <script src="assets/js/config.js"></script>
   </body>
 </html>

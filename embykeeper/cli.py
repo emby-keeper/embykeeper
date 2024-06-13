@@ -20,9 +20,22 @@ app = AsyncTyper(
 )
 
 
-def version(version):
-    if version:
+def version(flag):
+    if flag:
         print(__version__)
+        raise typer.Exit()
+
+
+def print_example_config(flag):
+    if flag:
+        import io
+
+        from .settings import write_faked_config
+
+        file = io.StringIO()
+        write_faked_config(file, quiet=True)
+        file.seek(0)
+        print(file.read())
         raise typer.Exit()
 
 
@@ -65,6 +78,15 @@ async def main(
         callback=version,
         is_eager=True,
         help=f"打印 {__name__.capitalize()} 版本",
+    ),
+    example_config: bool = typer.Option(
+        None,
+        "--example-config",
+        "-E",
+        hidden=True,
+        callback=print_example_config,
+        is_eager=True,
+        help=f"输出范例配置文件",
     ),
     instant: bool = typer.Option(
         True,

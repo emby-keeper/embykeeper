@@ -290,24 +290,26 @@ def next_random_datetime(start_time: time = None, end_time: time = None, interva
             offset_date += 1
     return t
 
+
 def format_timedelta_human(delta):
     """将时间差转换为人类可读形式."""
     d = delta.days
     h, s = divmod(delta.seconds, 3600)
     m, s = divmod(s, 60)
-    labels = ['天', '小时', '分钟', '秒']   
-    dhms = ['%s %s%s' % (i, lbl, 's' if i != 1 else '') for i, lbl in zip([d, h, m, s], labels)]
+    labels = ["天", "小时", "分钟", "秒"]
+    dhms = ["%s %s%s" % (i, lbl, "s" if i != 1 else "") for i, lbl in zip([d, h, m, s], labels)]
     for start in range(len(dhms)):
-        if not dhms[start].startswith('0'):
+        if not dhms[start].startswith("0"):
             break
-    for end in range(len(dhms)-1, -1, -1):
-        if not dhms[end].startswith('0'):
+    for end in range(len(dhms) - 1, -1, -1):
+        if not dhms[end].startswith("0"):
             break
-    parts = dhms[start:end+1]
+    parts = dhms[start : end + 1]
     if not parts:
-        return '0 秒'
+        return "0 秒"
     else:
-        return ', '.join(parts)
+        return ", ".join(parts)
+
 
 def format_byte_human(B: float):
     """将字节数转换为人类可读形式."""

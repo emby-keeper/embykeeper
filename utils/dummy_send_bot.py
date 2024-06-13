@@ -103,11 +103,11 @@ async def main(config: Path, updates_file: Path):
         except json.JSONDecodeError:
             updates = []
             f.seek(0)
-            for chunk in f.read().split('\n}\n'):
+            for chunk in f.read().split("\n}\n"):
                 chunk = chunk.strip()
                 if chunk:
-                    updates.append(json.loads(chunk + '\n}'))
-    logger.info(f'更新文件内有 {len(updates)} 条消息.')
+                    updates.append(json.loads(chunk + "\n}"))
+    logger.info(f"更新文件内有 {len(updates)} 条消息.")
     for k in API_KEY.values():
         api_id = k["api_id"]
         api_hash = k["api_hash"]

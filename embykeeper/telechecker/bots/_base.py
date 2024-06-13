@@ -59,12 +59,14 @@ class MessageType(Flag):
     CAPTION = auto()
     CAPTCHA = auto()
     ANSWER = auto()
-    
+
+
 class CheckinResult(IntEnum):
     SUCCESS = auto()
     CHECKED = auto()
     FAIL = auto()
     IGNORE = auto()
+
 
 class BaseBotCheckin(ABC):
     """基础签到类."""
@@ -152,7 +154,7 @@ class BotCheckin(BaseBotCheckin):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self._checked = False # 当前结束状态为已签到
+        self._checked = False  # 当前结束状态为已签到
         self._retries = 0  # 当前重试次数
         self._checked_retries = 0
         self._waiting = {}  # 当前等待的消息
@@ -251,7 +253,7 @@ class BotCheckin(BaseBotCheckin):
                     break
             else:
                 if not self.bot_allow_from_scratch:
-                    self.log.info(f'跳过签到: 从未与 "{ident}" 交流.')
+                    self.log.debug(f'跳过签到: 从未与 "{ident}" 交流.')
                     return CheckinResult.IGNORE
 
         while True:

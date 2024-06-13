@@ -34,7 +34,7 @@ window.addEventListener('DOMContentLoaded', function() {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "green";
         var statusMsg = document.getElementById("status-msg");
-        statusMsg.textContent = "Program Connected";
+        statusMsg.textContent = "程序已连接";
         var restartIcon = document.getElementById("restart-icon");
         restartIcon.style.animationPlayState = "paused";
         console.info("Web console connected: ", term.cols, term.rows);
@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', function() {
         var statusIcon = document.getElementById("status-icon");
         statusIcon.style.backgroundColor = "red";
         var statusMsg = document.getElementById("status-msg");
-        statusMsg.textContent = "Program Disconnected";
+        statusMsg.textContent = "已断开连接";
         var restartIcon = document.getElementById("restart-icon");
         restartIcon.style.animationPlayState = "running";
         console.info("Web console disconnected: ", reason);
@@ -60,7 +60,7 @@ window.addEventListener('DOMContentLoaded', function() {
         socket.emit("embykeeper_kill");
         socket.disconnect();
         var statusMsg = document.getElementById("status-msg");
-        statusMsg.textContent = "Program Restarting"
+        statusMsg.textContent = "程序正在重启"
         console.info("Web console restarting.");
         socket.open();
     });

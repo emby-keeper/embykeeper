@@ -2,13 +2,16 @@ from eventlet.patcher import monkey_patch
 
 monkey_patch()
 
+import binascii
+import base64
+import re
 import atexit
 import os
 import pty
 import select
 import fcntl
 import struct
-from subprocess import Popen
+from subprocess import Popen, PIPE
 import termios
 import threading
 import time
@@ -16,7 +19,7 @@ import signal
 
 import typer
 from loguru import logger
-from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
+from flask import Flask, json, render_template, request, redirect, url_for, jsonify, abort
 from flask_socketio import SocketIO
 from flask_login import LoginManager, login_user, login_required, current_user
 
@@ -36,6 +39,7 @@ app.config["fd"] = None
 app.config["proc"] = None
 app.config["hist"] = ""
 app.config["faillog"] = []
+app.config["config"] = os.environ.get("EK_CONFIG", "")
 
 version = f"V{__version__}"
 
@@ -94,17 +98,59 @@ def login_submit():
     password = request.form.get("password", "")
     webpass = os.environ.get("EK_WEBPASS", "")
     if not webpass:
-        emsg = "Web console password not set."
+        emsg = "后台没有设置控制台密码, 无法登录."
     elif sum(t > time.time() - 3600 for t in app.config["faillog"][-5:]) == 5:
-        emsg = "Too many login trials in one hour."
+        emsg = "一小时内有过多次失败登录, 请稍后再试."
     else:
         if password == webpass:
             login_user(DummyUser())
             return redirect(request.args.get("next") or url_for("index"))
         else:
-            emsg = "Wrong password."
+            emsg = "密码错误, 请重试."
             app.config["faillog"].append(time.time())
     return render_template("login.html", emsg=emsg, version=version)
+
+
+@app.route("/config", methods=["GET"])
+@login_required
+def config():
+    return render_template("config.html", version=version)
+
+
+@app.route("/config/current", methods=["GET"])
+def config_current():
+    if not is_authenticated():
+        return "Not authenticated", 401
+    data = app.config["config"]
+    if not data:
+        return "Config missing", 404
+    try:
+        data = base64.b64decode(re.sub(r"\s+", "", data).encode()).decode()
+    except binascii.Error:
+        logger.error("Config string malformed.")
+        return "Config malformed", 400
+    if isinstance(data, bytes):
+        logger.error("Config string malformed.")
+        return "Config malformed", 400
+    return jsonify(data), 200
+
+
+@app.route("/config/example", methods=["GET"])
+def config_example():
+    if not is_authenticated():
+        return "Not authenticated", 401
+    example, _ = Popen(["embykeeper", "--example-config"], stdout=PIPE, text=True).communicate()
+    return jsonify(example), 200
+
+
+@app.route("/config/save", methods=["POST"])
+def config_save():
+    if not is_authenticated():
+        return "Not authenticated", 401
+    data = request.get_json().get("config")
+    encoded_data = base64.b64encode(data.encode()).decode()
+    app.config["config"] = encoded_data
+    return jsonify(encoded_data), 200
 
 
 @app.route("/healthz")
@@ -205,6 +251,7 @@ def start_proc():
         stdin=slave_fd,
         stdout=slave_fd,
         stderr=slave_fd,
+        env={**os.environ, "EK_CONFIG": app.config["config"]},
         preexec_fn=os.setsid,
     )
     socketio.start_background_task(target=disconnect_on_proc_exit, proc=p)

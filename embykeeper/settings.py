@@ -213,8 +213,12 @@ def write_faked_config(path, quiet=False):
         t["time"].comment("模拟观看的时长范围 (秒)")
         emby.append(t)
     doc["emby"] = emby
-    with open(path, "w+", encoding="utf-8") as f:
-        dump(doc, f)
+    if isinstance(path, (str, Path)):
+        with open(path, "w+", encoding="utf-8") as f:
+            dump(doc, f)
+    else:
+        dump(doc, path)
+
 
 async def interactive_config(config: dict = {}, basedir=None):
     """交互式配置生成器."""
@@ -329,9 +333,11 @@ async def interactive_config(config: dict = {}, basedir=None):
         )
     content = item(config).as_string().encode()
     content = base64.b64encode(content)
-    logger.info(f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入托管平台的环境变量 ([red]SECRET[/]) 配置, 否则配置将在重启后丢失.")
+    logger.info(
+        f"您的配置[green]已生成完毕[/]! 您需要将以下内容写入托管平台的 EK_CONFIG 环境变量 ([red]SECRET[/]), 否则配置将在重启后丢失."
+    )
     print()
-    get_console().rule("变量名称: EK_CONFIG")
+    get_console().rule("EK_CONFIG")
     print(content.decode())
     get_console().rule()
     print()
