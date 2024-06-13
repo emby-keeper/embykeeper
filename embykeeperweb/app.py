@@ -17,9 +17,10 @@ import threading
 import time
 import signal
 
+import tomlkit
 import typer
 from loguru import logger
-from flask import Flask, json, render_template, request, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_socketio import SocketIO
 from flask_login import LoginManager, login_user, login_required, current_user
 
@@ -141,14 +142,15 @@ def config_example():
         return "Not authenticated", 401
     example, _ = Popen(["embykeeper", "--example-config"], stdout=PIPE, text=True).communicate()
     return jsonify(example), 200
-
+    
 
 @app.route("/config/save", methods=["POST"])
 def config_save():
     if not is_authenticated():
         return "Not authenticated", 401
     data = request.get_json().get("config")
-    encoded_data = base64.b64encode(data.encode()).decode()
+    clean_data = tomlkit.dumps(tomlkit.parse(data))
+    encoded_data = base64.b64encode(clean_data.encode()).decode()
     app.config["config"] = encoded_data
     return jsonify(encoded_data), 200
 
@@ -237,8 +239,8 @@ def disconnect_on_proc_exit(proc: Popen):
     if proc == app.config["proc"]:
         logger.debug(f"Command exited with return code {returncode}.")
         output = (
-            f"\r\n\nThe program has exited with returncode {returncode}. "
-            "\r\nRefresh the page to restart the program."
+            f"\r\n\n程序已退出, 返回值 {returncode}. "
+            "\r\n请您刷新页面以重新启动程序."
         )
         app.config["hist"] += output
         socketio.emit("pty-output", {"output": output}, namespace="/pty")
