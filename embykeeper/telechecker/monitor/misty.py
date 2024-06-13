@@ -11,8 +11,6 @@ from ...data import get_datas
 from ..lock import misty_locks
 from ._base import Monitor
 
-__ignore__ = True
-
 misty_monitor_pool = {}
 
 
@@ -52,12 +50,6 @@ class MistyMonitor(Monitor):
             for _ in range(20 if initial else 3):
                 try:
                     msg: Message = await wr("/cancel")
-                    if "选择您要使用的功能" in (msg.caption or msg.text):
-                        await asyncio.sleep(random.uniform(2, 4))
-                        msg = await wr("🌏切换服务器")
-                    if "选择您要使用的服务器" in (msg.text or msg.caption):
-                        await asyncio.sleep(random.uniform(2, 4))
-                        msg = await wr("✨Misty")
                     if "选择您要使用的功能" in (msg.caption or msg.text):
                         await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("⚡️账号功能")
