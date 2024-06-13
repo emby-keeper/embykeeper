@@ -89,7 +89,7 @@
     </nav>
     <section class="py-5 mt-5">
       <div class="container">
-        <div class="d-flex">
+        <div class="d-flex gap-1">
           <div
             class="d-inline-flex reccircle bg-light my-2 px-3 align-items-center"
           >
@@ -124,17 +124,17 @@
         </div>
       </div>
       <div class="modal" tabindex="-1" id="saveModal">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">保存成功</h5>
+              <h5 class="modal-title mx-3">保存成功</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <p>请回到<a href="/console">控制台</a>并点击右上方的重启按钮以测试配置</p>
+              <p class="mx-3">请回到<a href="/console">控制台</a>并点击右上方的重启按钮以测试配置.</p>
               <hr>
-              <p>请将下方内容写入托管平台的 <span class="text-info">EK_CONFIG</span> 环境变量，否则配置将在重启后丢失.</p>
-              <div id="modal-data-box" class="p-3">
+              <p class="mx-3">请将下方内容写入托管平台的 <span class="text-info">EK_CONFIG</span> 环境变量，否则配置将在重启后丢失.</p>
+              <div id="modal-data-box" class="mx-3 p-3">
                 <code class="text-dark" id="modal-data"></code>
               </div>
             </div>
