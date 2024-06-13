@@ -142,7 +142,7 @@ def config_example():
         return "Not authenticated", 401
     example, _ = Popen(["embykeeper", "--example-config"], stdout=PIPE, text=True).communicate()
     return jsonify(example), 200
-    
+
 
 @app.route("/config/save", methods=["POST"])
 def config_save():
@@ -238,10 +238,7 @@ def disconnect_on_proc_exit(proc: Popen):
     returncode = proc.wait()
     if proc == app.config["proc"]:
         logger.debug(f"Command exited with return code {returncode}.")
-        output = (
-            f"\r\n\n程序已退出, 返回值 {returncode}. "
-            "\r\n请您刷新页面以重新启动程序."
-        )
+        output = f"\r\n\n程序已退出, 返回值 {returncode}. " "\r\n请您刷新页面以重新启动程序."
         app.config["hist"] += output
         socketio.emit("pty-output", {"output": output}, namespace="/pty")
 
