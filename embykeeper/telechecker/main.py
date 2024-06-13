@@ -122,6 +122,7 @@ async def checkiner(config: dict, instant=False):
                     basedir=config.get("basedir", None),
                     proxy=config.get("proxy", None),
                     config=config.get("checkiner", {}).get(cls.__module__.rsplit(".", 1)[-1], {}),
+                    instant=instant,
                 )
                 for cls in clses
             ]

@@ -152,12 +152,14 @@ class BotCheckin(BaseBotCheckin):
         else:
             return self.retries
 
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, instant=False, **kw):
         super().__init__(*args, **kw)
         self._checked = False  # 当前结束状态为已签到
         self._retries = 0  # 当前重试次数
         self._checked_retries = 0
         self._waiting = {}  # 当前等待的消息
+        if instant:
+            self.checked_retries = None
 
     def get_filter(self):
         """设定要签到的目标."""
