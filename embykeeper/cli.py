@@ -120,6 +120,9 @@ async def main(
     simple_log: bool = typer.Option(
         False, "--simple-log", "-L", rich_help_panel="调试参数", help="简化日志输出格式"
     ),
+    disable_color: bool = typer.Option(
+        False, "--disable-color", "-C", rich_help_panel="调试参数", help="禁用日志颜色"
+    ),
     follow: bool = typer.Option(False, "--follow", "-F", rich_help_panel="调试工具", help="仅启动消息调试"),
     analyze: bool = typer.Option(
         False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"
@@ -147,7 +150,10 @@ async def main(
         level = "DEBUG"
     else:
         level = "INFO"
+    
     initialize(level=level, show_path=verbosity and (not simple_log), show_time=not simple_log)
+    if disable_color:
+        var.console.no_color = True
 
     msg = " 您可以通过 Ctrl+C 以结束运行." if not public else ""
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等.{msg}")
