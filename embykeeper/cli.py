@@ -150,7 +150,7 @@ async def main(
         level = "DEBUG"
     else:
         level = "INFO"
-    
+
     initialize(level=level, show_path=verbosity and (not simple_log), show_time=not simple_log)
     if disable_color:
         var.console.no_color = True
