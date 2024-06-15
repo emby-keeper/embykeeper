@@ -74,7 +74,15 @@ class BaseBotCheckin(ABC):
     name = None
 
     def __init__(
-        self, client: Client, retries=4, timeout=120, nofail=True, basedir=None, proxy=None, config: dict = {}
+        self,
+        client: Client,
+        retries=4,
+        timeout=120,
+        nofail=True,
+        basedir=None,
+        proxy=None,
+        config: dict = {},
+        **kw,
     ):
         """
         基础签到类.
