@@ -66,7 +66,8 @@ class CheckinResult(IntEnum):
     CHECKED = auto()
     FAIL = auto()
     IGNORE = auto()
-    
+
+
 class CharRange(IntEnum):
     NUMBER = 0
     LLETTER = 1
@@ -76,6 +77,7 @@ class CharRange(IntEnum):
     NUMBER_ULETTER = 5
     NUMBER_LLETTER_ULETTER = 6
     NOT_NUMBER_LLETTER_ULETTER = 7
+
 
 class BaseBotCheckin(ABC):
     """基础签到类."""
@@ -464,9 +466,9 @@ class BotCheckin(BaseBotCheckin):
         ocr, use_probability = await self.get_ocr(self.ocr)
         if use_probability:
             ocr_result = ocr.classification(image, probability=True)
-            ocr_text = ''
-            for i in ocr_result['probability']:
-                ocr_text += ocr_result['charsets'][i.index(max(i))]
+            ocr_text = ""
+            for i in ocr_result["probability"]:
+                ocr_text += ocr_result["charsets"][i.index(max(i))]
         else:
             ocr_text = ocr_result = ocr.classification(image)
         captcha = ocr_text.translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
