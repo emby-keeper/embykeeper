@@ -3,10 +3,14 @@ import random
 from typing import Iterable, Union
 from datetime import datetime, time, timedelta, timezone, tzinfo
 import uuid
+import warnings
 
 from aiohttp import ClientError, ClientConnectionError
 from loguru import logger
-from embypy.objects import Episode, Movie
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from embypy.objects import Episode, Movie
 
 from ..utils import show_exception, next_random_datetime, truncate_str
 from ..var import debug

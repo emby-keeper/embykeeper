@@ -3,13 +3,17 @@ import random
 import re
 from urllib.parse import urlencode, urlunparse
 import uuid
+import warnings
 
 import aiohttp
 from aiohttp_socks import ProxyConnector, ProxyType
-from embypy.emby import Emby as _Emby
-from embypy.objects import EmbyObject
-from embypy.utils.asyncio import async_func
-from embypy.utils.connector import Connector as _Connector
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from embypy.emby import Emby as _Emby
+    from embypy.objects import EmbyObject
+    from embypy.utils.asyncio import async_func
+    from embypy.utils.connector import Connector as _Connector
 from loguru import logger
 from faker import Faker
 
