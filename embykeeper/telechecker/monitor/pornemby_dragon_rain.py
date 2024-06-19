@@ -44,7 +44,7 @@ class PornembyDragonRainMonitor:
         name = "Pornemby 红包雨结果"
         chat_user = ["PronembyTGBot2_bot", "PronembyTGBot3_bot", "PornembyBot"]
         chat_name = "Pornemby"
-        chat_keyword = "恭喜\s+(.*):本次获得(\d+)豆"
+        chat_keyword = r"恭喜\s+(.*):本次获得(\d+)豆"
         allow_edit = True
 
         async def on_trigger(self, message: Message, key, reply):
