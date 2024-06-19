@@ -10,7 +10,7 @@ aiofiles
 aiohttp
 aiohttp-socks
 python-dateutil
-ddddocrfix
+ddddocr>=1.5.5
 embypyfix
 pyrogram
 tgcrypto
@@ -27,3 +27,4 @@ cryptography
 werkzeug==3.0.3
 cachetools
 emoji
+numpy<2.0.0

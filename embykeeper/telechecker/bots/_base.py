@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from enum import Flag, IntEnum, auto
 import string
 import time
-from typing import Iterable, List, Union
+from typing import Iterable, List, Optional, Union
 
 from ddddocr import DdddOcr
 from appdirs import user_data_dir
@@ -66,7 +66,16 @@ class CheckinResult(IntEnum):
     CHECKED = auto()
     FAIL = auto()
     IGNORE = auto()
-
+    
+class CharRange(IntEnum):
+    NUMBER = 0
+    LLETTER = 1
+    ULETTER = 2
+    LLETTER_ULETTER = 3
+    NUMBER_LLETTER = 4
+    NUMBER_ULETTER = 5
+    NUMBER_LLETTER_ULETTER = 6
+    NOT_NUMBER_LLETTER_ULETTER = 7
 
 class BaseBotCheckin(ABC):
     """基础签到类."""
@@ -128,7 +137,6 @@ class BotCheckin(BaseBotCheckin):
     """签到类, 用于回复模式签到."""
 
     group_pool = AsyncCountPool(base=2000)
-    ocr = None
 
     # fmt: off
     name: str = None  # 签到器的名称
@@ -137,6 +145,8 @@ class BotCheckin(BaseBotCheckin):
     bot_send_interval: int = 1  # 签到命令间等待的秒数
     bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码, 置空不限制
     bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息, 置空不限制
+    ocr: Optional[str] = None # OCR 模型, None = 默认模型, str = 自定义模型
+    bot_captcha_char_range: Optional[Union[CharRange, str]] = None # OCR 字符范围, 仅当默认模型可用, None = 默认范围, OCRRanges = 预定义范围, str = 自定义范围
     bot_captcha_len: Union[int, Iterable[int]] = []  # 验证码的可能范围, 例如 [1, 2, 3], 置空不限制
     bot_success_pat: str = r"(\d+)[^\d]*(\d+)"  # 当接收到成功消息后, 从消息中提取数字的模式
     bot_retry_wait: int = 2  # 失败时等待的秒数
@@ -199,14 +209,18 @@ class BotCheckin(BaseBotCheckin):
             except ValueError:
                 pass
 
-    async def get_ocr(self, ocr: str = None):
+    async def get_ocr(self, ocr: str = None, range: Optional[Union[CharRange, str]] = None):
         """加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型."""
         while True:
             async with ocrs_lock:
                 if ocr in ocrs:
                     return ocrs[ocr]
+                use_probability = False
                 if not ocr:
                     model = DdddOcr(beta=True, show_ad=False)
+                    if range:
+                        use_probability = True
+                        model.set_ranges(range)
                 else:
                     data = []
                     files = (f"{ocr}.onnx", f"{ocr}.json")
@@ -225,8 +239,8 @@ class BotCheckin(BaseBotCheckin):
                         Path(str(data[0])).unlink()
                         Path(str(data[1])).unlink()
                         continue
-                ocrs[ocr] = model
-                return model
+                ocrs[ocr] = model, use_probability
+                return model, use_probability
 
     async def start(self):
         """签到器的入口函数."""
@@ -447,10 +461,15 @@ class BotCheckin(BaseBotCheckin):
         """分析分析传入的验证码图片并返回验证码."""
         data = await self.client.download_media(message, in_memory=True)
         image = Image.open(data)
-        ocr = await self.get_ocr(self.ocr)
-        captcha = (
-            ocr.classification(image).translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
-        )
+        ocr, use_probability = await self.get_ocr(self.ocr)
+        if use_probability:
+            ocr_result = ocr.classification(image, probability=True)
+            ocr_text = ''
+            for i in ocr_result['probability']:
+                ocr_text += ocr_result['charsets'][i.index(max(i))]
+        else:
+            ocr_text = ocr_result = ocr.classification(image)
+        captcha = ocr_text.translate(str.maketrans("", "", string.punctuation)).replace(" ", "")
         if captcha:
             self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
             if self.bot_captcha_len and len(captcha) not in to_iterable(self.bot_captcha_len):
