@@ -128,10 +128,10 @@ async def main(
         False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"
     ),
     dump: List[str] = typer.Option(
-        [], "--dump", "-D", hidden=True, rich_help_panel="调试工具", help="仅启动更新日志"
+        [], "--dump", "-D", rich_help_panel="调试工具", help="仅启动更新日志"
     ),
     save: bool = typer.Option(
-        False, "--save", "-S", hidden=True, rich_help_panel="调试参数", help="记录原始更新日志"
+        False, "--save", "-S", rich_help_panel="调试参数", help="记录执行过程中的原始更新日志"
     ),
     public: bool = typer.Option(
         False, "--public", "-P", hidden=True, rich_help_panel="调试参数", help="启用公共仓库部署模式"
@@ -140,7 +140,7 @@ async def main(
         False, "--windows", "-W", hidden=True, rich_help_panel="调试参数", help="启用 Windows 安装部署模式"
     ),
     basedir: Path = typer.Option(
-        None, "--basedir", "-B", rich_help_panel="调试参数", help="设定输出文件位置"
+        None, "--basedir", "-B", rich_help_panel="调试参数", help="设定账号文件和模型文件的位置"
     ),
 ):
     from .log import logger, initialize
