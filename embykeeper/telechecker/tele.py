@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import binascii
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 import uuid
@@ -619,11 +620,12 @@ class ClientsSession:
             for _ in range(3):
                 if account.get("api_id", None) is None or account.get("api_hash", None) is None:
                     account.update(random.choice(list(API_KEY.values())))
-                session_string = account.get("session", None)
+                config_session_string = session_string = account.get("session", None)
+                file_session_string = None
                 if not session_string:
                     if session_string_file.is_file():
                         with open(session_string_file, encoding="utf-8") as f:
-                            session_string = f.read().strip()
+                            file_session_string = session_string = f.read().strip()
                 if self.in_memory is None:
                     in_memory = True
                     if not session_string:
@@ -671,11 +673,24 @@ class ClientsSession:
                 except ApiIdPublishedFlood:
                     logger.warning(f'登录账号 "{account["phone"]}" 时发生 API key 限制, 将被跳过.')
                     break
-                except Unauthorized:
-                    try:
+                except Unauthorized as e:
+                    if config_session_string:
+                        logger.error(f'账号 "{account["phone"]}" 由于配置中提供的 session 已被注销, 将被跳过.')
+                        show_exception(e)
+                        break
+                    elif file_session_string:
+                        logger.error(f'账号 "{account["phone"]}" 已被注销, 将在 3 秒后重新登录.')
+                        show_exception(e)
+                        session_string_file.unlink(missing_ok=True)
+                        continue
+                    elif client.in_memory:
+                        logger.error(f'账号 "{account["phone"]}" 已被注销, 将在 3 秒后重新登录.')
+                        show_exception(e)
+                        continue
+                    else:
+                        logger.error(f'账号 "{account["phone"]}" 已被注销, 将在 3 秒后重新登录.')
+                        show_exception(e)
                         await client.storage.delete()
-                    except:
-                        pass
                 except KeyError as e:
                     logger.warning(
                         f'登录账号 "{account["phone"]}" 时发生异常, 可能是由于网络错误, 将在 3 秒后重试.'
@@ -689,6 +704,8 @@ class ClientsSession:
                 return None
         except asyncio.CancelledError:
             raise
+        except binascii.Error:
+            logger.error(f'登录账号 "{account["phone"]}" 失败, 由于您在配置文件中提供的 session 无效, 将被跳过.')
         except RPCError as e:
             logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
             return None
