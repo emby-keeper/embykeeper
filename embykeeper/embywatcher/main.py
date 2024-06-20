@@ -331,9 +331,12 @@ async def watcher(config: dict):
             logger.warning(f"一定时间内未完成播放, 保活失败.")
             return False
 
+    logger.info("开始执行 Emby 保活.")
     tasks = []
     async for emby, time, loggeruser in login(config):
         tasks.append(wrapper(emby, time, loggeruser))
+    if not tasks:
+        logger.info("没有指定有效的 Emby 服务器, 跳过保活.")
     results = await asyncio.gather(*tasks)
     fails = len(tasks) - sum(results)
     if fails:
@@ -381,9 +384,7 @@ async def watcher_continuous_schedule(
     t = asyncio.create_task(watcher_continuous(config))
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)
-        logger.bind(scheme="embywatcher").info(
-            f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始."
-        )
+        logger.bind(scheme="embywatcher").info(f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始.")
         await asyncio.sleep((dt - datetime.now()).total_seconds())
         if not t.done():
             t.cancel()

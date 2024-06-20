@@ -370,7 +370,10 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
     config = {}
     basedir = Path(basedir or user_data_dir(__product__))
     basedir.mkdir(parents=True, exist_ok=True)
-    logger.debug(f'工作目录: "{basedir}".')
+    if public:
+        logger.info(f'工作目录: "{basedir}"')
+    else:
+        logger.info(f'工作目录: "{basedir}", 您的用户数据相关文件将存储在此处, 请妥善保管.')
     env_config = os.environ.get(f"EK_CONFIG", None)
     if env_config:
         config = load_env_config(env_config)

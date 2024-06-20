@@ -108,6 +108,7 @@ async def checkiner(config: dict, instant=False):
         coros = []
         async for tg in clients:
             log = logger.bind(scheme="telechecker", username=tg.me.name)
+            logger.info('已连接到 Telegram, 签到器正在初始化.')
             if not await Link(tg).auth("checkiner"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -192,6 +193,7 @@ async def monitorer(config: dict):
     async with ClientsSession.from_config(config, monitor=True) as clients:
         async for tg in clients:
             log = logger.bind(scheme="telemonitor", username=tg.me.name)
+            logger.info('已连接到 Telegram, 监控器正在初始化.')
             if not await Link(tg).auth("monitorer"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue
@@ -217,12 +219,13 @@ async def monitorer(config: dict):
 
 
 async def messager(config: dict):
-    """自动回复器入口函数."""
+    """自动水群入口函数."""
     logger.debug("正在启动自动水群模块.")
     messagers = []
     async with ClientsSession.from_config(config, send=True) as clients:
         async for tg in clients:
             log = logger.bind(scheme="telemessager", username=tg.me.name)
+            logger.info('已连接到 Telegram, 自动水群正在初始化.')
             if not await Link(tg).auth("messager"):
                 log.error(f"功能初始化失败: 权限校验不通过.")
                 continue

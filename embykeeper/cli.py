@@ -251,7 +251,10 @@ async def main(
                 pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0))
             else:
                 pool.add(watcher_schedule(config, days=emby))
-            pool.add(watcher_continuous_schedule(config))
+            for a in config.get("emby", ()):
+                if a.get("continuous", False):
+                    pool.add(watcher_continuous_schedule(config))
+                    break
         if checkin:
             if debug_cron:
                 start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
