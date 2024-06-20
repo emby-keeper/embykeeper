@@ -127,9 +127,7 @@ async def main(
     analyze: bool = typer.Option(
         False, "--analyze", "-A", rich_help_panel="调试工具", help="仅启动历史信息分析"
     ),
-    dump: List[str] = typer.Option(
-        [], "--dump", "-D", rich_help_panel="调试工具", help="仅启动更新日志"
-    ),
+    dump: List[str] = typer.Option([], "--dump", "-D", rich_help_panel="调试工具", help="仅启动更新日志"),
     save: bool = typer.Option(
         False, "--save", "-S", rich_help_panel="调试参数", help="记录执行过程中的原始更新日志"
     ),
@@ -248,7 +246,9 @@ async def main(
         if emby:
             if debug_cron:
                 start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
-                pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0, debug=True))
+                pool.add(
+                    watcher_schedule(config, start_time=start_time, end_time=end_time, days=0, debug=True)
+                )
             else:
                 pool.add(watcher_schedule(config, days=emby))
             for a in config.get("emby", ()):

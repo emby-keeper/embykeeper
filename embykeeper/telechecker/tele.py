@@ -675,7 +675,9 @@ class ClientsSession:
                     break
                 except Unauthorized as e:
                     if config_session_string:
-                        logger.error(f'账号 "{account["phone"]}" 由于配置中提供的 session 已被注销, 将被跳过.')
+                        logger.error(
+                            f'账号 "{account["phone"]}" 由于配置中提供的 session 已被注销, 将被跳过.'
+                        )
                         show_exception(e)
                         break
                     elif file_session_string:
@@ -705,7 +707,9 @@ class ClientsSession:
         except asyncio.CancelledError:
             raise
         except binascii.Error:
-            logger.error(f'登录账号 "{account["phone"]}" 失败, 由于您在配置文件中提供的 session 无效, 将被跳过.')
+            logger.error(
+                f'登录账号 "{account["phone"]}" 失败, 由于您在配置文件中提供的 session 无效, 将被跳过.'
+            )
         except RPCError as e:
             logger.error(f'登录账号 "{account["phone"]}" 失败 ({e.MESSAGE.format(value=e.value)}), 将被跳过.')
             return None

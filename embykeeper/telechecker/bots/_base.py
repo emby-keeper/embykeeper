@@ -286,7 +286,7 @@ class BotCheckin(BaseBotCheckin):
             if not await self.init():
                 self.log.warning(f"初始化错误.")
                 return CheckinResult.FAIL
-            
+
             if self.additional_auth:
                 for a in self.additional_auth:
                     if not await Link(self.client).auth(a):

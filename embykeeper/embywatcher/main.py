@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 logger = logger.bind(scheme="embywatcher")
 
+
 class PlayError(Exception):
     pass
 
@@ -87,10 +88,10 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
     # 获取页面信息
     resp = await c.getJson(
         f"/Videos/{obj.id}/AdditionalParts",
-        Fields='PrimaryImageAspectRatio,UserData,CanDelete',
-        IncludeItemTypes='Playlist,BoxSet',
+        Fields="PrimaryImageAspectRatio,UserData,CanDelete",
+        IncludeItemTypes="Playlist,BoxSet",
         Recursive=True,
-        SortBy='SortName',
+        SortBy="SortName",
     )
 
     await asyncio.sleep(random.uniform(1, 3))
@@ -109,7 +110,7 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
         media_source_id = resp["MediaSources"][0]["Id"]
         direct_stream_id = resp["MediaSources"][0].get("DirectStreamUrl", None)
     else:
-        media_source_id = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+        media_source_id = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
         direct_stream_id = None
 
     await asyncio.sleep(random.uniform(1, 3))
@@ -366,7 +367,7 @@ async def watcher(config: dict, debug=False):
                 loggeruser.info(f"播放视频前随机等待 {wait:.0f} 秒.")
                 await asyncio.sleep(wait)
             else:
-                loggeruser.warning('处于调试模式, 播放前模拟挑选随机等待被跳过.')
+                loggeruser.warning("处于调试模式, 播放前模拟挑选随机等待被跳过.")
             if isinstance(time, Iterable):
                 tm = max(time) * 2
             else:
@@ -389,11 +390,7 @@ async def watcher(config: dict, debug=False):
 
 
 async def watcher_schedule(
-    config: dict,
-    start_time=time(11, 0),
-    end_time=time(23, 0),
-    days: int = 7,
-    debug: bool = False
+    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 7, debug: bool = False
 ):
     """计划任务 - 观看一个视频."""
     while True:
@@ -435,7 +432,9 @@ async def watcher_continuous_schedule(
     t = asyncio.create_task(watcher_continuous(config))
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)
-        logger.bind(scheme="embywatcher").info(f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始.")
+        logger.bind(scheme="embywatcher").info(
+            f"持续观看结束后, 将在 {dt.strftime('%m-%d %H:%M %p')} 再次开始."
+        )
         await asyncio.sleep((dt - datetime.now()).total_seconds())
         if not t.done():
             t.cancel()

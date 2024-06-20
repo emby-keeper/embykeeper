@@ -75,15 +75,15 @@ class Connector(_Connector):
         version = f"1.2.{random.randint(0, 18)}"
         ua = f"Fileball/{random.choice([200, 233])} {random.choice(ios_uas)}" if not self.ua else self.ua
         auth_headers = {
-            'UserId': uuid.uuid4(),
-            'Client': client,
-            'Device': device,
-            'DeviceId': uuid.uuid1(),
-            'Version': version,
+            "UserId": uuid.uuid4(),
+            "Client": client,
+            "Device": device,
+            "DeviceId": uuid.uuid1(),
+            "Version": version,
         }
-        auth_header = 'Emby '
+        auth_header = "Emby "
         for k, v in auth_headers.items():
-            auth_header += f'{k}={v},'
+            auth_header += f"{k}={v},"
         if self.token:
             headers["X-Emby-Token"] = self.token
         headers["User-Agent"] = ua
@@ -136,7 +136,7 @@ class Connector(_Connector):
 
     @async_func
     async def _req(self, method, path, params={}, **query):
-        query.pop('format', None)
+        query.pop("format", None)
         await self.login_if_needed()
         for i in range(self.tries):
             url = self.get_url(path, **query)
