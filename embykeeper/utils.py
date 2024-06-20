@@ -57,7 +57,7 @@ def format_exception(e, regular=True):
     proj_frame = get_path_frame(e, proj_path)
     if proj_frame:
         proj_frame_path = Path(proj_frame.filename).relative_to(proj_path)
-        prompt += f"\n  P {proj_frame_path}, L {proj_frame.lineno}, F {proj_frame.name}:"
+        prompt += f"\n  P {proj_frame_path}:{proj_frame.lineno}, F {proj_frame.name}:"
         prompt += f"\n    {proj_frame.line.strip()}"
     last_frame = get_last_frame(e)
     if last_frame:
@@ -66,7 +66,7 @@ def format_exception(e, regular=True):
             if Path(p) in Path(last_frame.filename).parents:
                 last_frame_path = "<SP>/" + str(Path(last_frame.filename).relative_to(p))
                 break
-        prompt += f"\n  S {last_frame_path}, L {last_frame.lineno}, F {last_frame.name}:"
+        prompt += f"\n  S {last_frame_path}:{last_frame.lineno}, F {last_frame.name}:"
         prompt += f"\n    {last_frame.line.strip()}"
     prompt += f"\n    E {get_cls_fullpath(type(e))}: {e}\n"
     return prompt
