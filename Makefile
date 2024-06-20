@@ -1,6 +1,6 @@
 .RECIPEPREFIX := >
 .DEFAULT_GOAL := help
-.PHONY: help help/simple help/all install develop venv venv/clean python/venv conda/venv conda/install run run/cli run/web systemd systemd/install systemd/uninstall lint test debugpy debugpy/cli debugpy/web version version/patch version/minor version/major push clean clean/build clean/pyc clean/test
+.PHONY: help help/simple help/all install develop venv venv/clean python/venv conda/venv conda/install run run/debug run/web systemd systemd/install systemd/uninstall lint test debugpy debugpy/cli debugpy/web version version/patch version/minor version/major push clean clean/build clean/pyc clean/test
 
 USE_MIRROR ?= True
 
@@ -47,6 +47,7 @@ help/all:
 >   @echo '  conda/venv - 使用 Conda 在 "<CWD>/venv" 中创建 Conda 虚拟环境'
 >   @echo '  conda/install - 在 "<CWD>/conda" 安装 Conda.
 >   @echo "  run - 运行 Embykeeper (使用默认配置文件 config.toml)"
+>   @echo "  run/debug - 运行 Embykeeper (使用默认配置文件 config.toml), 并启用调试日志输出"
 >   @echo "  run/web - 运行 Embykeeper 的在线网页服务器"
 >   @echo "  systemd - 启用 Embykeeper 自动启动 (当前用户登录时)"
 >   @echo "  systemd (当 sudo / root) - 启用 Embykeeper 自动启动 (系统启动时)"
@@ -117,10 +118,11 @@ conda/install:
 >       echo "Info: Conda 安装完成!"; \
 >   fi
 
-run: run/cli
-
-run/cli: venv/require
+run: venv/require
 >   @"$(VENV)/bin/python" -m embykeeper
+
+run/debug: venv/require
+>   @"$(VENV)/bin/python" -m embykeeper -dd
 
 run/web: venv/require
 >   @"$(VENV)/bin/python" -m embykeeperweb --public
