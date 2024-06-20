@@ -248,7 +248,7 @@ async def main(
         if emby:
             if debug_cron:
                 start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
-                pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0))
+                pool.add(watcher_schedule(config, start_time=start_time, end_time=end_time, days=0, debug=True))
             else:
                 pool.add(watcher_schedule(config, days=emby))
             for a in config.get("emby", ()):

@@ -15,13 +15,10 @@ with warnings.catch_warnings():
     from embypy.utils.asyncio import async_func
     from embypy.utils.connector import Connector as _Connector
 from loguru import logger
-from faker import Faker
 
 from .. import __version__
 
 logger = logger.bind(scheme="embywatcher")
-
-faker = Faker()
 
 
 class Connector(_Connector):
@@ -74,19 +71,24 @@ class Connector(_Connector):
             "CFNetwork/1333.0.4 Darwin/21.5.0",
         ]
         client = "Filebox"
-        device = f"{faker.first_name()}'s iPhone"
-        version = f"1.2.{random.randint(0, 32)}"
-        ua = f"Fileball/200 {random.choice(ios_uas)}" if not self.ua else self.ua
-        auth_header = (
-            f'MediaBrowser Client="{client}",'
-            + f'Device="{device}",'
-            + f'DeviceId="{self.device_id}",'
-            + f'Version="{version}"'
-        )
+        device = "iPhone"
+        version = f"1.2.{random.randint(0, 18)}"
+        ua = f"Fileball/{random.choice([200, 233])} {random.choice(ios_uas)}" if not self.ua else self.ua
+        auth_headers = {
+            'UserId': uuid.uuid4(),
+            'Client': client,
+            'Device': device,
+            'DeviceId': uuid.uuid1(),
+            'Version': version,
+        }
+        auth_header = 'Emby '
+        for k, v in auth_headers.items():
+            auth_header += f'{k}={v},'
         if self.token:
             headers["X-Emby-Token"] = self.token
         headers["User-Agent"] = ua
         headers["X-Emby-Authorization"] = auth_header
+        headers["Accept-Language"] = "zh-CN,zh-Hans;q=0.9"
         headers["Content-Type"] = "application/json"
         return headers
 
@@ -134,6 +136,7 @@ class Connector(_Connector):
 
     @async_func
     async def _req(self, method, path, params={}, **query):
+        query.pop('format', None)
         await self.login_if_needed()
         for i in range(self.tries):
             url = self.get_url(path, **query)
