@@ -172,6 +172,8 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
 
     if not is_ok(await c.post("/Sessions/Playing/Stopped", data=playing_info(time * 10000000))):
         raise PlayError("无法停止播放")
+    else:
+        loggeruser.info(f"播放完成, 共 {time} 秒.")
 
     task.cancel()
     try:
