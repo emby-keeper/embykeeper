@@ -211,7 +211,12 @@ async def login(config, continuous=False):
             loggeruser.info(
                 f'成功登录至服务器 "{a["url"]}" ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).'
             )
-            yield emby, loggeruser, a.get("time", None if continuous else [120, 240])
+            yield (
+                emby,
+                loggeruser,
+                a.get("time", None if continuous else [120, 240]),
+                True if continuous else a.get("allow_multiple", True),
+            )
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
             continue
@@ -232,9 +237,9 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
         try:
             async for obj in get_random_media(emby):
                 if isinstance(time, Iterable):
-                    t = random.uniform(*time)
+                    t = random.uniform(*time) + 10
                 else:
-                    t = time
+                    t = time + 10
                 loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({t:.0f} 秒).')
                 while True:
                     try:
@@ -244,10 +249,11 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
 
                         if obj.play_count < 1:
                             raise PlayError("尝试播放后播放数低于1")
-                        last_played = get_last_played(obj)
 
+                        last_played = get_last_played(obj)
                         if not last_played:
                             raise PlayError("尝试播放后无记录")
+
                         last_played = (
                             last_played.replace(tzinfo=timezone.utc)
                             .astimezone(tz=None)
@@ -257,7 +263,7 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
                         prompt = (
                             f"[yellow]成功播放视频[/], "
                             + f"当前该视频播放 {obj.play_count} 次, "
-                            + f"上次播放于 {last_played}."
+                            + f"上次播放于 {last_played} UTC."
                         )
                         loggeruser.bind(notify="成功保活.").info(prompt)
                         return True
@@ -302,7 +308,120 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
                 if isinstance(e, asyncio.IncompleteReadError):
                     await emby.connector._reset_session()
                 rt = random.uniform(30, 60)
-                loggeruser.info(f"连接失败, 等待 {rt:.0f} 秒后重试其他视频: {e}.")
+                loggeruser.info(f"连接失败, 等待 {rt:.0f} 秒后重试: {e}.")
+                await asyncio.sleep(rt)
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            loggeruser.warning(f"发生错误, 保活失败.")
+            show_exception(e, regular=False)
+            return False
+
+
+async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
+    if isinstance(time, Iterable):
+        req_time = random.uniform(*time) + 10
+    else:
+        req_time = time + 10
+    loggeruser.info(f"开始播放视频 (允许播放多个), 共需播放 {req_time:.0f} 秒.")
+    played_time = 0
+    played_videos = 0
+    retry = 0
+    while True:
+        try:
+            async for obj in get_random_media(emby):
+                totalticks = obj.object_dict.get("RunTimeTicks")
+                if not totalticks:
+                    rt = random.uniform(30, 60)
+                    loggeruser.info(
+                        f'无法获取视频 "{truncate_str(obj.name, 10)}" 长度, 等待 {rt:.0f} 秒后重试.'
+                    )
+                    await asyncio.sleep(rt)
+                    continue
+                totaltime = totalticks / 10000000
+                if req_time - played_time > totaltime:
+                    play_time = totaltime
+                else:
+                    play_time = min(req_time - played_time, 10)
+                loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({play_time:.0f} 秒).')
+                while True:
+                    try:
+                        await play(obj, loggeruser, time=play_time)
+
+                        obj = await obj.update("UserData")
+
+                        if obj.play_count < 1:
+                            raise PlayError("尝试播放后播放数低于1")
+
+                        last_played = get_last_played(obj)
+                        if not last_played:
+                            raise PlayError("尝试播放后无记录")
+
+                        last_played = (
+                            last_played.replace(tzinfo=timezone.utc)
+                            .astimezone(tz=None)
+                            .strftime("%m-%d %H:%M")
+                        )
+
+                        prompt = (
+                            f"[yellow]成功播放视频[/], "
+                            + f"当前该视频播放 {obj.play_count} 次, "
+                            + f"上次播放于 {last_played} UTC."
+                        )
+                        loggeruser.info(prompt)
+                        played_videos += 1
+                        played_time += play_time
+
+                        if played_time > req_time:
+                            loggeruser.bind(notify="成功保活.").info(
+                                f"保活成功, 共播放 {played_videos} 个视频."
+                            )
+                            return True
+                        else:
+                            loggeruser.info(f"还需播放 {req_time - played_time:.0f} 秒.")
+                            break
+                    except (ClientError, OSError, asyncio.IncompleteReadError) as e:
+                        retry += 1
+                        if retry > retries:
+                            loggeruser.warning(f"超过最大重试次数, 保活失败: {e}.")
+                            return False
+                        else:
+                            if isinstance(e, asyncio.IncompleteReadError):
+                                await emby.connector._reset_session()
+                            rt = random.uniform(30, 60)
+                            loggeruser.info(f"连接失败, 等待 {rt:.0f} 秒后重试: {e}.")
+                            await asyncio.sleep(rt)
+                    except PlayError as e:
+                        retry += 1
+                        if retry > retries:
+                            loggeruser.warning(f"超过最大重试次数, 保活失败: {e}.")
+                            return False
+                        else:
+                            rt = random.uniform(30, 60)
+                            loggeruser.info(f"发生错误, 等待 {rt:.0f} 秒后重试其他视频: {e}.")
+                            await asyncio.sleep(rt)
+                        break
+                    finally:
+                        try:
+                            if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 5)):
+                                loggeruser.debug(f"未能成功从最近播放中隐藏视频.")
+                        except asyncio.TimeoutError:
+                            loggeruser.debug(f"从最近播放中隐藏视频超时.")
+                        else:
+                            loggeruser.info(f"已从最近播放中隐藏该视频.")
+            else:
+                loggeruser.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
+                return False
+        except (ClientError, OSError, asyncio.IncompleteReadError) as e:
+            retry += 1
+            if retry > retries:
+                loggeruser.warning(f"超过最大重试次数, 保活失败: {e}.")
+                return False
+            else:
+                if isinstance(e, asyncio.IncompleteReadError):
+                    await emby.connector._reset_session()
+                rt = random.uniform(30, 60)
+                loggeruser.info(f"连接失败, 等待 {rt:.0f} 秒后重试: {e}.")
                 await asyncio.sleep(rt)
         except asyncio.CancelledError:
             raise
@@ -329,9 +448,8 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
                     loggeruser.info(f"无法获取视频长度, 等待 {rt:.0f} 秒后重试.")
                     await asyncio.sleep(rt)
                     continue
-                loggeruser.info(
-                    f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totalticks / 10000000:.0f} 秒).'
-                )
+                totaltime = totalticks / 10000000
+                loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totaltime:.0f} 秒).')
                 try:
                     await play(obj, loggeruser, time=0)
                 except PlayError as e:
@@ -345,7 +463,7 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
                             loggeruser.debug(f"未能成功从最近播放中隐藏视频.")
                     except asyncio.TimeoutError:
                         loggeruser.debug(f"从最近播放中隐藏视频超时.")
-        except (ClientError, OSError) as e:
+        except (ClientError, OSError, asyncio.IncompleteReadError) as e:
             if isinstance(e, asyncio.IncompleteReadError):
                 await emby.connector._reset_session()
             rt = random.uniform(30, 60)
@@ -362,7 +480,7 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
 async def watcher(config: dict, debug=False):
     """入口函数 - 观看一个视频."""
 
-    async def wrapper(emby: Emby, loggeruser: Logger, time: float):
+    async def wrapper(emby: Emby, loggeruser: Logger, time: float, multiple: bool):
         try:
             if not debug:
                 wait = random.uniform(180, 360)
@@ -374,17 +492,20 @@ async def watcher(config: dict, debug=False):
                 tm = max(time) * 2
             else:
                 tm = time * 2
-            return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 180))
+            if multiple:
+                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), max(tm, 180))
+            else:
+                return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 180))
         except asyncio.TimeoutError:
             loggeruser.warning(f"一定时间内未完成播放, 保活失败.")
             return False
 
     logger.info("开始执行 Emby 保活.")
     tasks = []
-    async for emby, loggeruser, time in login(config):
-        tasks.append(wrapper(emby, loggeruser, time))
+    async for emby, loggeruser, time, multiple in login(config):
+        tasks.append(wrapper(emby, loggeruser, time, multiple))
     if not tasks:
-        logger.info("没有指定有效的 Emby 服务器, 跳过保活.")
+        logger.info("没有指定相关的 Emby 服务器, 跳过保活.")
     results = await asyncio.gather(*tasks)
     fails = len(tasks) - sum(results)
     if fails:
@@ -420,9 +541,12 @@ async def watcher_continuous(config: dict):
         else:
             return False
 
+    logger.info("开始执行 Emby 持续观看.")
     tasks = []
-    async for emby, loggeruser, time in login(config, continuous=True):
+    async for emby, loggeruser, time, _ in login(config, continuous=True):
         tasks.append(wrapper(emby, loggeruser, time))
+    if not tasks:
+        logger.info("没有指定相关的 Emby 服务器, 跳过持续观看.")
     return await asyncio.gather(*tasks)
 
 

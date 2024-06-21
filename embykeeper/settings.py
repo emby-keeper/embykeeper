@@ -80,6 +80,7 @@ def check_config(config):
                         Optional("continuous"): bool,
                         Optional("jellyfin"): bool,
                         Optional("ua"): str,
+                        Optional("allow_multiple"): bool,
                     }
                 )
             ],
