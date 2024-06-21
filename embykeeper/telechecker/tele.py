@@ -418,6 +418,8 @@ class Client(pyrogram.Client):
                             )
                         except ChannelPrivate:
                             pass
+                        except ValueError:
+                            pass
                         except OSError:
                             logger.info("网络不稳定, 可能遗漏消息.")
                         else:
