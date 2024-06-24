@@ -372,7 +372,7 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
                         played_videos += 1
                         played_time += play_time
 
-                        if played_time > req_time:
+                        if played_time >= req_time - 1:
                             loggeruser.bind(notify="成功保活.").info(
                                 f"保活成功, 共播放 {played_videos} 个视频."
                             )
