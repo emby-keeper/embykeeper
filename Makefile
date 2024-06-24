@@ -113,7 +113,7 @@ conda/install:
 >           esac; \
 >       done; \
 >       echo "Info: 正在安装 Conda ..."; \
->       curl -o conda.sh "$(CONDA_URL)" && chmod +x conda.sh && bash conda.sh -b -f -p "$(CONDA_ROOT)" && \
+>       curl -L -o conda.sh "$(CONDA_URL)" && chmod +x conda.sh && bash conda.sh -b -f -p "$(CONDA_ROOT)" && \
 >       rm conda.sh 2>/dev/null && \
 >       echo "Info: Conda 安装完成!"; \
 >   fi
