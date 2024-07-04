@@ -17,4 +17,12 @@ if ($Update) {
 } else {
     & $PipPath install -i "https://pypi.tuna.tsinghua.edu.cn/simple" -U embykeeper --no-warn-script-location
 }
-Write-Host "Done installing dependencies"
+
+$exitCode = $LASTEXITCODE
+
+if ($exitCode -eq 0) {
+    Write-Host "Done installing dependencies"
+} else {
+    Write-Host "Failed to install dependencies, exit code: $exitCode"
+}
+exit $exitCode

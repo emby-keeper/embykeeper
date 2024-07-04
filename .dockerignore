@@ -9,10 +9,14 @@
 # Test files
 /test.py
 /test.ipynb
+/tests
 
 # Venvs
 /venv
 /conda
+
+# Utils
+/utils
 
 # Deploys
 /deploy

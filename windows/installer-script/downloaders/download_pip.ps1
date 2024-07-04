@@ -27,6 +27,12 @@ if ($ProxyBypassed){
 }
 
 Write-Host "Installing pip"
-& $TargetDirectory\python.exe $PipFile --no-warn-script-location
+& $TargetDirectory\python.exe $PipFile --no-warn-script-location -i "https://pypi.tuna.tsinghua.edu.cn/simple"
+$exitCode = $LASTEXITCODE
 
-Write-Host "Done installing pip"
+if ($exitCode -eq 0) {
+    Write-Host "Done installing pip"
+} else {
+    Write-Host "Failed to install pip, exit code: $exitCode"
+}
+exit $exitCode
