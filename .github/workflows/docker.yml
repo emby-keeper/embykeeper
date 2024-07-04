@@ -37,6 +37,10 @@ jobs:
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Docker Pull Anonymously
+        run: |
+          docker pull python:3.8
+          docker pull python:3.8-slim
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
