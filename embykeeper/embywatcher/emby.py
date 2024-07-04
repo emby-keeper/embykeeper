@@ -98,7 +98,6 @@ class Connector(_Connector):
         loop_id = hash(loop)
         async with await self._get_session_lock():
             session = self._sessions.get(loop_id)
-            self.ssl.verify_mode = ssl.CERT_OPTIONAL
             if not session:
                 if self.proxy:
                     connector = ProxyConnector(
@@ -107,10 +106,10 @@ class Connector(_Connector):
                         port=self.proxy["port"],
                         username=self.proxy.get("username", None),
                         password=self.proxy.get("password", None),
-                        ssl_context=self.ssl,
+                        verify_ssl=False,
                     )
                 else:
-                    connector = aiohttp.TCPConnector(ssl_context=self.ssl)
+                    connector = aiohttp.TCPConnector(verify_ssl=False)
                 session = aiohttp.ClientSession(headers=self.fake_headers, connector=connector)
                 self._sessions[loop_id] = session
                 self._session_uses[loop_id] = 1
