@@ -1,15 +1,17 @@
 FROM python:3.8
 
-WORKDIR /src
+WORKDIR /build
 COPY . .
 
 ENV TZ="Asia/Shanghai"
+ENV EK_IN_DOCKER="1"
+ENV EK_DEV_DOCKER="1"
 
 RUN python -m venv /opt/venv \
     && . /opt/venv/bin/activate \
     && pip install --no-cache-dir -U pip setuptools wheel \
     && pip install --no-cache-dir -e . \
-    && ln -s /src/scripts/docker-entrypoint.sh /entrypoint.sh \
+    && ln -s /src/scripts/docker-entrypoint-dev.sh /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
 WORKDIR /app

@@ -44,9 +44,12 @@ jobs:
             ${{ env.REGISTRY_IMAGE }}
             ghcr.io/${{ env.REGISTRY_IMAGE }}
           tags: |
-            type=ref,event=branch,suffix=-dev
-            type=ref,event=tag,suffix=-dev
-            type=ref,event=pr,suffix=-dev
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+          flavor: |
+            latest=false
+            suffix=-dev
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -105,9 +108,12 @@ jobs:
             ${{ env.REGISTRY_IMAGE }}
             ghcr.io/${{ env.REGISTRY_IMAGE }}
           tags: |
-            type=ref,event=branch,suffix=-dev
-            type=ref,event=tag,suffix=-dev
-            type=ref,event=pr,suffix=-dev
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+          flavor: |
+            latest=false
+            suffix=-dev
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
