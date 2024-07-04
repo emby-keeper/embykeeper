@@ -8,9 +8,6 @@
 *.updates.json
 *.txt
 
-# Data files
-/utils/data
-
 # Test files
 /test.py
 /test.ipynb

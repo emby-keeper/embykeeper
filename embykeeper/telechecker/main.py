@@ -52,7 +52,7 @@ def get_names(type: str, allow_ignore=False) -> List[str]:
             if not getattr(module, "__ignore__", False):
                 results.append(mn)
         else:
-            if (not mn == "_base") and (not mn == "test"):
+            if (not mn == "_base") and (not mn.startswith("test")):
                 results.append(mn)
     return results
 

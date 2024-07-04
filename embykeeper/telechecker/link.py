@@ -192,6 +192,15 @@ class Link:
         else:
             return None, None
 
+    async def ocr(self, photo):
+        """向机器人发送 OCR 解答请求."""
+        cmd = f"/ocr {self.instance}"
+        results = await self.post(cmd, photo=photo, timeout=20, name="请求验证码解答")
+        if results:
+            return results.get("answer", None)
+        else:
+            return None
+
     async def send_log(self, message):
         """向机器人发送日志记录请求."""
         results = await self.post(f"/log {self.instance} {message}", name="发送日志到 Telegram")

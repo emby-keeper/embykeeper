@@ -149,7 +149,7 @@ class BotCheckin(BaseBotCheckin):
     bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息, 置空不限制
     ocr: Optional[str] = None # OCR 模型, None = 默认模型, str = 自定义模型
     bot_captcha_char_range: Optional[Union[CharRange, str]] = None # OCR 字符范围, 仅当默认模型可用, None = 默认范围, OCRRanges = 预定义范围, str = 自定义范围
-    bot_captcha_len: Union[int, Iterable[int]] = []  # 验证码的可能范围, 例如 [1, 2, 3], 置空不限制
+    bot_captcha_len: Union[int, Iterable[int]] = []  # 验证码长度的可能范围, 例如 [1, 2, 3], 置空不限制
     bot_success_pat: str = r"(\d+)[^\d]*(\d+)"  # 当接收到成功消息后, 从消息中提取数字的模式
     bot_retry_wait: int = 2  # 失败时等待的秒数
     bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条, 置空禁用

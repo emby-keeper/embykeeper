@@ -63,7 +63,7 @@ async def label(config: Path, inp: Path = "captchas.txt"):
                     continue
                 else:
                     tasks.append(
-                        asyncio.create_task(tg.download_media(photo, f"data/{labelmsg.text.lower()}.png"))
+                        asyncio.create_task(tg.download_media(photo, f"output/{labelmsg.text.lower()}.png"))
                     )
         await asyncio.gather(*tasks)
 
