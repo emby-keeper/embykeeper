@@ -1,4 +1,4 @@
-name: Docker Hub Publish (editable image)
+name: Docker Image Publish (editable)
 
 on:
   workflow_dispatch:
@@ -40,7 +40,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY_IMAGE }}
+          images: |
+            ${{ env.REGISTRY_IMAGE }}
+            ghcr.io/${{ env.REGISTRY_IMAGE }}
           tags: |
             type=ref,event=branch,suffix=-dev
             type=ref,event=tag,suffix=-dev
@@ -54,6 +56,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v5
@@ -93,7 +101,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY_IMAGE }}
+          images: |
+            ${{ env.REGISTRY_IMAGE }}
+            ghcr.io/${{ env.REGISTRY_IMAGE }}
           tags: |
             type=ref,event=branch,suffix=-dev
             type=ref,event=tag,suffix=-dev
@@ -103,6 +113,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
