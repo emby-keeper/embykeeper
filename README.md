@@ -127,7 +127,3 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
 
 ![Kitty](https://github.com/embykeeper/embykeeper/raw/main/images/kitty.gif)
-
-## 趋势
-
-[![Star History Chart](https://api.star-history.com/svg?repos=embykeeper/embykeeper&type=Date)](https://star-history.com/#embykeeper/embykeeper&Date)
