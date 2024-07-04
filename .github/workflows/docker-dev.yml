@@ -39,8 +39,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Docker Pull Anonymously
         run: |
-          docker pull python:3.8
-          docker pull python:3.8-slim
+          docker pull --platform ${{ matrix.platform }} python:3.8
+          docker pull --platform ${{ matrix.platform }} python:3.8-slim
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
