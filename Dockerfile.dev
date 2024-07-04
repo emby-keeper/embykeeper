@@ -3,17 +3,18 @@ FROM python:3.8
 WORKDIR /src
 COPY . .
 
+ENV TZ="Asia/Shanghai"
+
 RUN python -m venv /opt/venv \
     && . /opt/venv/bin/activate \
     && pip install --no-cache-dir -U pip setuptools wheel \
-    && pip install -e --no-cache-dir .
+    && pip install -e --no-cache-dir . \
+    && ln -s /src/scripts/docker-entrypoint.sh /entrypoint.sh \
+    && chmod +x /entrypoint.sh
 
-COPY /src/scripts/docker-entrypoint.sh /entrypoint.sh
-
-ENV TZ="Asia/Shanghai"
 WORKDIR /app
-RUN chmod +x /entrypoint.sh \
-    && touch config.toml
+
+RUN touch config.toml
 ENV PATH="/opt/venv/bin:$PATH"
 
 ENTRYPOINT ["/entrypoint.sh"]
