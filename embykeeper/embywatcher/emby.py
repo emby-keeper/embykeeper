@@ -1,6 +1,7 @@
 import asyncio
 import random
 import re
+import ssl
 from urllib.parse import urlencode, urlunparse
 import uuid
 import warnings
@@ -97,6 +98,7 @@ class Connector(_Connector):
         loop_id = hash(loop)
         async with await self._get_session_lock():
             session = self._sessions.get(loop_id)
+            self.ssl.verify_mode = ssl.CERT_OPTIONAL
             if not session:
                 if self.proxy:
                     connector = ProxyConnector(

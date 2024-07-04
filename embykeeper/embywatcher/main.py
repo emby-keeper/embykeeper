@@ -342,7 +342,7 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
                 if req_time - played_time > totaltime:
                     play_time = totaltime
                 else:
-                    play_time = min(req_time - played_time, 10)
+                    play_time = max(req_time - played_time, 10)
                 loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({play_time:.0f} 秒).')
                 while True:
                     try:
@@ -379,6 +379,9 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
                             return True
                         else:
                             loggeruser.info(f"还需播放 {req_time - played_time:.0f} 秒.")
+                            rt = random.uniform(30, 60)
+                            loggeruser.info(f"等待 {rt:.0f} 秒后播放下一个.")
+                            await asyncio.sleep(rt)
                             break
                     except (ClientError, OSError, asyncio.IncompleteReadError) as e:
                         retry += 1
