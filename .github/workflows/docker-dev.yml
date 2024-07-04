@@ -1,4 +1,4 @@
-name: Docker Hub Publish
+name: Docker Hub Publish (editable image)
 
 on:
   workflow_dispatch:
@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.editable
+          file: ./Dockerfile.dev
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
