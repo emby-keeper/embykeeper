@@ -378,9 +378,6 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
     docker = bool(os.environ.get('EK_IN_DOCKER', False))
     if docker:
         logger.info('当前在 Docker 容器中运行, 请确认该目录已挂载, 否则文件将在容器重建后丢失.')
-    docker_dev = bool(os.environ.get('EK_DEV_DOCKER', False))
-    if docker_dev:
-        logger.info('当前 Docker 容器可编辑源码, 请挂载.')
     env_config = os.environ.get(f"EK_CONFIG", None)
     if env_config:
         config = load_env_config(env_config)
