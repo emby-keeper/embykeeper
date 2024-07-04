@@ -25,10 +25,12 @@ logger = logger.bind(scheme="embywatcher")
 class Connector(_Connector):
     """重写的 Emby 连接器, 以支持代理."""
 
-    def __init__(self, url, proxy=None, ua=None, **kargs):
+    def __init__(self, url, proxy=None, ua=None, device=None, client=None, **kargs):
         super().__init__(url, **kargs)
         self.proxy = proxy
         self.ua = ua
+        self.device = device
+        self.client = client
         self.fake_headers = self.get_fake_headers()
         self.watch = asyncio.create_task(self.watchdog())
 
@@ -71,8 +73,8 @@ class Connector(_Connector):
             "CFNetwork/1406.0.4 Darwin/22.4.0",
             "CFNetwork/1333.0.4 Darwin/21.5.0",
         ]
-        client = "Filebox"
-        device = "iPhone"
+        client = "Fileball" if not self.client else self.client
+        device = "iPhone" if not self.device else self.device
         version = f"1.2.{random.randint(0, 18)}"
         ua = f"Fileball/{random.choice([200, 233])} {random.choice(ios_uas)}" if not self.ua else self.ua
         auth_headers = {

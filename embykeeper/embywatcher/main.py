@@ -199,6 +199,8 @@ async def login(config, continuous=False):
             jellyfin=a.get("jellyfin", False),
             proxy=config.get("proxy", None),
             ua=a.get("ua", None),
+            device=a.get("device", None),
+            client=a.get("client", None),
             device_id=str(uuid.uuid4()).upper(),
         )
         try:
