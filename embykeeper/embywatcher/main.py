@@ -498,9 +498,9 @@ async def watcher(config: dict, debug=False):
             else:
                 tm = time * 2
             if multiple:
-                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), max(tm, 180))
+                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), min(tm, 180))
             else:
-                return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 180))
+                return await asyncio.wait_for(watch(emby, loggeruser, time), min(tm, 180))
         except asyncio.TimeoutError:
             loggeruser.warning(f"一定时间内未完成播放, 保活失败.")
             return False
