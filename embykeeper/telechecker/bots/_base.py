@@ -288,7 +288,7 @@ class BotCheckin(BaseBotCheckin):
                     if not await Link(self.client).auth(a):
                         self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
                         return CheckinResult.IGNORE
-            
+
             if not await self.init():
                 self.log.warning(f"初始化错误.")
                 return CheckinResult.FAIL
