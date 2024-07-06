@@ -157,13 +157,21 @@ class Link:
         results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.upper()} 认证")
         return bool(results)
 
-    async def captcha(self):
-        """向机器人发送 Cloudflare 验证码解析请求."""
-        results = await self.post(f"/captcha {self.instance}", timeout=240, name="请求跳过验证码")
+    async def captcha(self, site: str):
+        """向机器人发送 Cloudflare / HCaptcha / ReCaptcha 验证码解析请求."""
+        results = await self.post(f"/captcha {self.instance} {site}", timeout=240, name="请求跳过验证码")
         if results:
-            return [results.get(p, None) for p in ("token", "proxy", "useragent")]
+            return results.get("token", None)
         else:
-            return None, None, None
+            return None
+        
+    async def captcha_url(self, site: str, url: str):
+        """向机器人发送带验证码的远程网页解析请求."""
+        results = await self.post(f"/captcha_url {self.instance} {site} {url}", timeout=240, name="请求跳过验证码")
+        if results:
+            return results.get("result", None)
+        else:
+            return None
 
     async def answer(self, question: str):
         """向机器人发送问题回答请求."""
