@@ -31,11 +31,11 @@ class CharonCheckin(BotCheckin):
 
     async def message_handler(self, client: Client, message: Message):
         if message.text:
-            match = re.search(r'请打开并复制网页的内容, 粘贴回复:\s*(.*)', message.text)
+            match = re.search(r"请打开并复制网页的内容, 粘贴回复:\s*(.*)", message.text)
             if match:
                 return await self.handle_url(match.group(1))
         return await super().message_handler(client, message)
-    
+
     async def handle_url(self, url: str):
         self.log.debug(f"即将解析网页中的验证码: {url}.")
         result = await Link(self.client).captcha_url("charon", url)

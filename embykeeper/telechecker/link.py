@@ -164,10 +164,12 @@ class Link:
             return results.get("token", None)
         else:
             return None
-        
+
     async def captcha_url(self, site: str, url: str):
         """向机器人发送带验证码的远程网页解析请求."""
-        results = await self.post(f"/captcha_url {self.instance} {site} {url}", timeout=240, name="请求跳过验证码")
+        results = await self.post(
+            f"/captcha_url {self.instance} {site} {url}", timeout=240, name="请求跳过验证码"
+        )
         if results:
             return results.get("result", None)
         else:

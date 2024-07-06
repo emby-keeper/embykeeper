@@ -15,18 +15,20 @@ from embykeeper.telechecker.tele import Client, API_KEY
 app = AsyncTyper()
 app_config = {}
 
+
 async def dump(client: Client, message: Message):
     if message.text:
         logger.debug(f"<- {message.text}")
 
 
 async def checkin(client: Client, message: Message):
-    url = app_config['url']
+    url = app_config["url"]
     await client.send_message(
         message.chat.id,
         f"请打开并复制网页的内容, 粘贴回复: [{url}]({url})",
         parse_mode=ParseMode.MARKDOWN,
     )
+
 
 @app.async_command()
 async def main(config: Path, url: str):
