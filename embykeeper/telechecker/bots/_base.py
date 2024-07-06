@@ -283,15 +283,15 @@ class BotCheckin(BaseBotCheckin):
                     return CheckinResult.IGNORE
 
         while True:
-            if not await self.init():
-                self.log.warning(f"初始化错误.")
-                return CheckinResult.FAIL
-
             if self.additional_auth:
                 for a in self.additional_auth:
                     if not await Link(self.client).auth(a):
                         self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
                         return CheckinResult.IGNORE
+            
+            if not await self.init():
+                self.log.warning(f"初始化错误.")
+                return CheckinResult.FAIL
 
             bot = await self.client.get_users(self.bot_username)
             msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"

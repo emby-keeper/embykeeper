@@ -214,14 +214,14 @@ class Monitor:
         except UserNotParticipant:
             self.log.info(f'跳过监控: 尚未加入群组 "{chat.title}".')
             return False
-        if not await self.init():
-            self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
-            return False
         if self.additional_auth:
             for a in self.additional_auth:
                 if not await Link(self.client).auth(a):
                     self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
                     return False
+        if not await self.init():
+            self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")
+            return False
         if self.notify_create_name:
             self.unique_name = self.get_unique_name()
         spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"
