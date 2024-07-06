@@ -67,7 +67,7 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
         try:
             module = import_module(f"{__product__}.{sub}.{name.lower()}")
             for cn, cls in inspect.getmembers(module, inspect.isclass):
-                if (name.lower().replace("_", "") + suffix).lower() == cn.lower():
+                if (name.replace("_", "").replace("_old", "") + suffix).lower() == cn.lower():
                     results.append(cls)
         except ImportError:
             all_names = get_names(type)

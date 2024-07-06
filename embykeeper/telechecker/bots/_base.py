@@ -144,7 +144,7 @@ class BotCheckin(BaseBotCheckin):
     name: str = None  # 签到器的名称
     bot_username: Union[int, str] = None  # Bot 的 UserID 或 用户名 (不带 @ 或 https://t.me/)
     bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
-    bot_send_interval: int = 1  # 签到命令间等待的秒数
+    bot_send_interval: int = 3  # 签到命令间等待的秒数
     bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码, 置空不限制
     bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息, 置空不限制
     ocr: Optional[str] = None # OCR 模型, None = 默认模型, str = 自定义模型

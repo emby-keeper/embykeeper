@@ -1,8 +1,8 @@
 import asyncio
 from urllib.parse import parse_qs, urlencode, urlparse
 
-from aiohttp import ClientSession
-from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError
+from aiohttp import ClientSession, TCPConnector
+from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError, ProxyType
 from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram.raw.functions.users import GetFullUser
 from faker import Faker
@@ -57,15 +57,23 @@ class NebulaCheckin(BaseBotCheckin):
         scheme = urlparse(url_base)
         query = parse_qs(scheme.query, keep_blank_values=True)
         query = {k: v for k, v in query.items() if not k.startswith("tgWebApp")}
-        token, proxy, useragent = await Link(self.client).captcha()
-        if (not token) or (not proxy):
+        token = await Link(self.client).captcha("nebula")
+        if not token:
             self.log.warning("签到失败: 无法获得验证码.")
             return await self.fail()
-        if not useragent:
-            useragent = Faker().safari()
+        useragent = Faker().safari()
         query["token"] = token
         url_checkin = scheme._replace(query=urlencode(query, True)).geturl()
-        connector = ProxyConnector.from_url(proxy)
+        if self.proxy:
+            connector = ProxyConnector(
+                proxy_type=ProxyType[self.proxy["scheme"].upper()],
+                host=self.proxy["hostname"],
+                port=self.proxy["port"],
+                username=self.proxy.get("username", None),
+                password=self.proxy.get("password", None),
+            )
+        else:
+            connector = TCPConnector()
         try:
             async with ClientSession(connector=connector) as session:
                 async with session.get(url_checkin, headers={"User-Agent": useragent}) as resp:
