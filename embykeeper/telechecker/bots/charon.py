@@ -1,5 +1,12 @@
 import asyncio
+import re
 
+from aiohttp import ClientSession
+from pyrogram import Client
+from pyrogram.types import Message
+from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError
+
+from ..link import Link
 from ._base import BotCheckin
 
 __ignore__ = True
@@ -7,11 +14,7 @@ __ignore__ = True
 
 class CharonCheckin(BotCheckin):
     name = "卡戎"
-    ocr = "words6@v1"
     bot_username = "charontv_bot"
-    bot_checkin_cmd = ["/checkin", "/cancel"]
-    bot_send_interval = 3
-    bot_captcha_len = 6
     bot_success_pat = r".*(\d+)"
     bot_text_ignore = ["已结束当前对话"]
 
@@ -21,6 +24,23 @@ class CharonCheckin(BotCheckin):
         while True:
             await self.send("/checkin")
             if await self.wait_until("已结束当前对话", 3):
+                await asyncio.sleep(self.bot_send_interval)
                 continue
             else:
                 break
+
+    async def message_handler(self, client: Client, message: Message):
+        if message.text:
+            match = re.search(r'请打开并复制网页的内容, 粘贴回复:\s*(.*)', message.text)
+            if match:
+                return await self.handle_url(match.group(1))
+        return await super().message_handler(client, message)
+    
+    async def handle_url(self, url: str):
+        self.log.debug(f"即将解析网页中的验证码: {url}.")
+        result = await Link(self.client).captcha_url("charon", url)
+        if result:
+            await self.client.send_message(self.bot, result)
+        else:
+            self.log.warning("签到失败: 无法获得验证码.")
+            return await self.fail()
