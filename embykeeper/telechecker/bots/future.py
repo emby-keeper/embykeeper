@@ -1,11 +1,9 @@
 import asyncio
 import random
-from urllib.parse import parse_qs, urlencode, urlparse, urljoin
+from urllib.parse import parse_qs, urlparse
 
-from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.raw.functions.messages import RequestWebView
-from pyrogram.raw.types.messages import BotCallbackAnswer
 from aiohttp import ClientSession, TCPConnector
 from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError, ProxyType
 from faker import Faker
@@ -96,5 +94,5 @@ class FutureCheckin(BotCheckin):
                         result = await resp.text()
                         if "完成" in result:
                             return True
-            except:
+            except (ProxyTimeoutError, ProxyError, OSError):
                 return False
