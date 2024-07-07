@@ -30,42 +30,42 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 3.3.17 生成的.
+# 该部分内容是根据 Embykeeper 3.3.18 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["apop", "dvfilm", "feiyue", "happy", "heisi", "jms", "lyrebird", "magic", "micu", "misty", "pandatv", "peach", "pornemby", "shufu", "skysink", "terminus", "theend", "tiannan"]
-# monitor = ["bgk", "embyhub", "infinity_fly", "misty", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
+# checkiner = ["apop", "dvfilm", "feiyue", "happy", "heisi", "jms", "lyrebird", "magic", "micu", "pandatv", "peach", "pornemby", "shufu", "skysink", "terminus", "theend", "tiannan"]
+# monitor = ["bgk", "embyhub", "infinity_fly", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
 # [service]
-# checkiner = ["aisgk", "akuai", "apop", "bluesea", "cc", "charon", "charon_old", "data007sgk", "dogsgk", "dvfilm", "embyhub", "feiyue", "happy", "heisi", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "micu", "misty", "nebula", "pandatv", "peach", "pornemby", "shufu", "singularity", "skysink", "sssq", "temby", "terminus", "terminus_old", "theend", "tiannan", "zhipian"]
-# monitor = ["bgk", "embyhub", "follow", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
+# checkiner = ["aisgk", "akuai", "apop", "bluesea", "cc", "charon", "charon_old", "data007sgk", "dogsgk", "dvfilm", "embyhub", "feiyue", "future", "happy", "heisi", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "micu", "misty", "nebula", "pandatv", "peach", "pornemby", "shufu", "singularity", "skysink", "sssq", "temby", "terminus", "terminus_old", "theend", "tiannan", "zhipian"]
+# monitor = ["bgk", "embyhub", "follow", "future", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8619136776482"
+phone = "+8619803469940"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8611667166876"
+phone = "+8616029980807"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://pearson.biz/"
-username = "michael19"
-password = "*#hG85Q3+l"
+url = "https://www.tran.info/"
+username = "cthomas"
+password = "mKN9OU9w@*"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.hernandez.com/"
-username = "knightmonica"
-password = "Al87XzOp%i"
+url = "https://www.nelson.org/"
+username = "mendezkimberly"
+password = "F8s_Ueid%A"
 time = [120, 240] # 模拟观看的时长范围 (秒)
