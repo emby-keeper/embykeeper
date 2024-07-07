@@ -32,7 +32,7 @@ from pyrogram.errors import (
     PhoneCodeInvalid,
     BadMsgNotification,
 )
-from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler
+from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler, EditedMessageHandler
 from pyrogram.handlers.handler import Handler
 from aiocache import Cache
 import aiohttp
@@ -337,15 +337,45 @@ class Client(pyrogram.Client):
                         return
 
     @asynccontextmanager
-    async def catch_reply(self, chat_id: Union[int, str], outgoing=False):
+    async def catch_reply(self, chat_id: Union[int, str], outgoing=False, filter=None):
         async def handler_func(client, message, future: asyncio.Future):
-            future.set_result(message)
+            try:
+                future.set_result(message)
+            except asyncio.InvalidStateError:
+                pass
 
         future = asyncio.Future()
-        filter = filters.chat(chat_id)
+        f = filters.chat(chat_id)
         if not outgoing:
-            filter = filter & (~filters.outgoing)
-        handler = MessageHandler(async_partial(handler_func, future=future), filter)
+            f = f & (~filters.outgoing)
+        if filter:
+            f = f & filter
+        handler = MessageHandler(async_partial(handler_func, future=future), f)
+        await self.add_handler(handler, group=0)
+        try:
+            yield future
+        finally:
+            await self.remove_handler(handler, group=0)
+
+    @asynccontextmanager
+    async def catch_edit(self, message: types.Message, filter=None):
+        def filter_message(id: int):
+            async def func(flt, _, message: types.Message):
+                return message.id == id
+
+            return filters.create(func, "MessageFilter")
+
+        async def handler_func(client, message, future: asyncio.Future):
+            try:
+                future.set_result(message)
+            except asyncio.InvalidStateError:
+                pass
+
+        future = asyncio.Future()
+        f = filter_message(message.id)
+        if filter:
+            f = f & filter
+        handler = EditedMessageHandler(async_partial(handler_func, future=future), f)
         await self.add_handler(handler, group=0)
         try:
             yield future
@@ -353,11 +383,31 @@ class Client(pyrogram.Client):
             await self.remove_handler(handler, group=0)
 
     async def wait_reply(
-        self, chat_id: Union[int, str], send: str = None, timeout: float = 10, outgoing=False
+        self, chat_id: Union[int, str], send: str = None, timeout: float = 10, outgoing=False, filter=None
     ):
-        async with self.catch_reply(chat_id=chat_id, outgoing=outgoing) as f:
+        async with self.catch_reply(chat_id=chat_id, filter=filter) as f:
             if send:
                 await self.send_message(chat_id, send)
+            msg: types.Message = await asyncio.wait_for(f, timeout)
+            return msg
+
+    async def wait_edit(
+        self,
+        message: types.Message,
+        click: Union[str, int] = None,
+        timeout: float = 10,
+        noanswer=True,
+        filter=None,
+    ):
+        async with self.catch_edit(message, filter=filter) as f:
+            if click:
+                try:
+                    await message.click(click)
+                except TimeoutError:
+                    if noanswer:
+                        pass
+                    else:
+                        raise
             msg: types.Message = await asyncio.wait_for(f, timeout)
             return msg
 

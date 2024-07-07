@@ -116,6 +116,7 @@ class Monitor:
     ] = None  # 回复的内容, 可以为恒定字符串或函数或异步函数
     notify_create_name: bool = False  # 启动时生成 unique name 并提示, 用于抢注
     allow_edit: bool = False  # 编辑消息内容后也触发
+    trigger_interval: float = 2  # 每次触发的最低时间间隔
     additional_auth: List[str] = []  # 额外认证要求
     debug_no_log = False  # 调试模式不显示冗余日志
 
@@ -137,6 +138,7 @@ class Monitor:
         self.log = logger.bind(scheme="telemonitor", name=self.name, username=client.me.name)
         self.session = None
         self.failed = asyncio.Event()
+        self.lock = asyncio.Lock()
 
     def get_filter(self):
         """设定要监控的目标."""
@@ -300,7 +302,7 @@ class Monitor:
         for key in self.keys(message):
             spec = self.get_spec(key)
             if not self.debug_no_log:
-                self.log.debug(f"监听到关键信息: {spec}.")
+                self.log.info(f"监听到关键信息: {truncate_str(spec, 30)}.")
             if random.random() >= self.chat_probability:
                 self.log.info(f"由于概率设置, 不予回应: {spec}.")
                 return False
@@ -312,7 +314,9 @@ class Monitor:
             self.session = Session(reply, follows=self.chat_follow_user, delays=self.chat_delay)
             if await self.session.wait():
                 self.session = None
-                await self.on_trigger(message, key, reply)
+                async with self.lock:
+                    await self.on_trigger(message, key, reply)
+                    await asyncio.sleep(self.trigger_interval)
         else:
             if self.session and not self.session.followed.is_set():
                 text = message.text or message.caption
@@ -340,6 +344,8 @@ class Monitor:
         unique_name = self.config.get("unique_name", None)
         if unique_name:
             self.log.info(f'根据您的设置, 当监控到开注时, 该站点将以用户名 "{unique_name}" 注册.')
+            if not re.search("^\w+$"):
+                self.log.warning(f"用户名含有除 a-z, A-Z, 0-9, 以及下划线之外的字符, 可能导致注册失败.")
             return unique_name
         else:
             return Monitor.unique_cache[self.client.me]

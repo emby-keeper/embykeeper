@@ -11,6 +11,8 @@ from ...data import get_datas
 from ..lock import misty_locks
 from ._base import Monitor
 
+__ignore__ = True
+
 misty_monitor_pool = {}
 
 

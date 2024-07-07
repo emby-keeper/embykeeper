@@ -10,6 +10,7 @@ from .misty import MistyMonitor
 from .bgk import BGKMonitor
 from .polo import PoloMonitor
 from .viper import ViperMonitor
+from .future import FutureMonitor
 
 __ignore__ = True
 
@@ -93,6 +94,12 @@ class TestMonitor:
 
     class TestPoloMonitor(PoloMonitor):
         name = "Polo 测试"
+        chat_name = "api_group"
+        chat_allow_outgoing = True
+        chat_user = []
+
+    class TestFutureMonitor(FutureMonitor):
+        name = "未响 测试"
         chat_name = "api_group"
         chat_allow_outgoing = True
         chat_user = []

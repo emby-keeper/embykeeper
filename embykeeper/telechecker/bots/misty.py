@@ -8,6 +8,8 @@ from ..lock import misty_monitors, misty_locks
 
 from ._base import BotCheckin
 
+__ignore__ = True
+
 
 class MistyCheckin(BotCheckin):
     ocr = "digit5-large@v1"
