@@ -1,11 +1,8 @@
 import asyncio
 import re
 
-from aiohttp import ClientSession
 from pyrogram import Client
 from pyrogram.types import Message
-from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError
-
 from ..link import Link
 from ._base import BotCheckin
 
@@ -40,7 +37,7 @@ class CharonCheckin(BotCheckin):
         self.log.debug(f"即将解析网页中的验证码: {url}.")
         result = await Link(self.client).captcha_url("charon", url)
         if result:
-            await self.client.send_message(self.bot, result)
+            await self.client.send_message(self.bot_username, result)
         else:
             self.log.warning("签到失败: 无法获得验证码.")
             return await self.fail()
