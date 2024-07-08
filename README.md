@@ -27,7 +27,7 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
 
 ## 功能
 
-- Telegram 机器人签到
+- **Telegram 机器人签到**
   - 卷毛鼠 (`jms`): [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
   - 终点站 (`terminus`): [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
   - Pornemby (`pornemby`): [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
@@ -66,14 +66,14 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
     - 狗狗社工库 (`dogsgk`): [频道](https://t.me/DogeSGK) [机器人](https://t.me/DogeSGK_bot)
     - Data 007 社工库 (`data007sgk`): [频道](https://t.me/DATA007_dev) [机器人](https://t.me/DATA_007bot)
     - 花花社工库 (`huasgk`): [频道](https://t.me/sgkhua) [机器人](https://t.me/sgkvipbot)
-- Emby 保活
+- **Emby 保活**
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
-- Telegram 自动水群 (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
+- **Telegram 自动水群** (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
   - Pornemby (`pornemby`): [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/embykeeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
   - 关服或无响应 (默认禁用, 请参考[Wiki](https://github.com/embykeeper/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
     - NakoNako 自动水群 (`nakonako`): ~~[群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
-- Telegram 自动监控信息
+- **Telegram 自动监控信息**
   - Pornemby:
     - 科举考试 (`pornemby_answer`): [活动频道](https://t.me/PornembyFun)
     - 自动抢注 (`pornemby_register`): [群组](https://t.me/Pornemby)
