@@ -24,7 +24,10 @@ class CCCheckin(BotCheckin):
             keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
             for k in keys:
                 if "签到" in k:
-                    await message.click(k)
+                    try:
+                        await message.click(k)
+                    except TimeoutError:
+                        pass
                     return
             else:
                 self.log.warning(f"签到失败: 账户错误.")
@@ -52,4 +55,7 @@ class CCCheckin(BotCheckin):
             self.log.warning(f"远端答案难以与可用选项相匹配 (分数: {score}/100).")
         self.log.debug(f"[gray50]接收验证码: {captcha}.[/]")
         await asyncio.sleep(random.uniform(2, 4))
-        await message.click(captcha)
+        try:
+            await message.click(captcha)
+        except TimeoutError:
+            pass

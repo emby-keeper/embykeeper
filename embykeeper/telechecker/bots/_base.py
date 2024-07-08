@@ -154,11 +154,11 @@ class BotCheckin(BaseBotCheckin):
     bot_retry_wait: int = 2  # 失败时等待的秒数
     bot_use_history: int = None  # 首先尝试识别历史记录中最后一个验证码图片, 最多识别 N 条, 置空禁用
     bot_allow_from_scratch: bool = False  # 允许从未聊天情况下启动
-    bot_success_keywords: Union[str, List[str]] = ([])  # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_success_keywords: Union[str, List[str]] = []  # 成功时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     bot_checked_keywords: Union[str, List[str]] = []  # 今日已签到时检测的关键词, 置空使用内置关键词表
-    bot_account_fail_keywords: Union[str, List[str]] = ([])  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_too_many_tries_fail_keywords: Union[str, List[str]] = ([])  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
-    bot_fail_keywords: Union[str, List[str]] = ([])  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_account_fail_keywords: Union[str, List[str]] = []  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_too_many_tries_fail_keywords: Union[str, List[str]] = []  # 账户错误将退出时检测的关键词 (暂不支持regex), 置空使用内置关键词表
+    bot_fail_keywords: Union[str, List[str]] = []  # 签到错误将重试时检测的关键词 (暂不支持regex), 置空使用内置关键词表
     chat_name: str = None  # 在群聊中向机器人签到
     additional_auth: List[str] = []  # 额外认证要求
     max_retries = None  # 验证码错误或网络错误时最高重试次数 (默认无限)
@@ -494,25 +494,30 @@ class BotCheckin(BaseBotCheckin):
 
     async def on_text(self, message: Message, text: str):
         """接收非验证码消息时, 检测关键词并确认签到成功或失败, 发送用户提示."""
+        if not text:
+            return
         if any(s in text for s in to_iterable(self.bot_text_ignore)):
             pass
-        elif any(s in text for s in self.bot_account_fail_keywords or default_keywords["account_fail"]):
+        elif any(
+            s in text for s in to_iterable(self.bot_account_fail_keywords) or default_keywords["account_fail"]
+        ):
             self.log.warning(f"签到失败: 账户错误.")
             await self.fail()
         elif any(
             s in text
-            for s in self.bot_too_many_tries_fail_keywords or default_keywords["too_many_tries_fail"]
+            for s in to_iterable(self.bot_too_many_tries_fail_keywords)
+            or default_keywords["too_many_tries_fail"]
         ):
             self.log.warning(f"签到失败: 尝试次数过多.")
             await self.fail()
-        elif any(s in text for s in self.bot_checked_keywords or default_keywords["checked"]):
+        elif any(s in text for s in to_iterable(self.bot_checked_keywords) or default_keywords["checked"]):
             self.log.info(f"今日已经签到过了.")
             self._checked = True
             self.finished.set()
-        elif any(s in text for s in self.bot_fail_keywords or default_keywords["fail"]):
+        elif any(s in text for s in to_iterable(self.bot_fail_keywords) or default_keywords["fail"]):
             self.log.info(f"签到失败: 验证码错误, 正在重试.")
             await self.retry()
-        elif any(s in text for s in self.bot_success_keywords or default_keywords["success"]):
+        elif any(s in text for s in to_iterable(self.bot_success_keywords) or default_keywords["success"]):
             if await self.before_success():
                 matches = re.search(self.bot_success_pat, text)
                 if matches:
@@ -714,4 +719,7 @@ class AnswerBotCheckin(BotCheckin):
                 self.log.info(f'未能找到对应 "{captcha}" 的按键, 正在重试.')
                 await self.retry()
             else:
-                await self.message.click(max_k)
+                try:
+                    await self.message.click(max_k)
+                except TimeoutError:
+                    pass
