@@ -45,7 +45,7 @@ class TembyCheckin(BotCheckin):
         return await super().message_handler(client, message)
 
     async def get_app_url(self, url: str):
-        match = re.search(r't\.me/(\w+)/(\w+)\?startapp=(\w+)', url)
+        match = re.search(r"t\.me/(\w+)/(\w+)\?startapp=(\w+)", url)
         if not match:
             return None
         bot_username, app_short_name, star_param = match.groups()
