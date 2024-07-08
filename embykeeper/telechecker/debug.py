@@ -7,7 +7,12 @@ from dateutil import parser
 from loguru import logger
 from pyrogram import filters
 from pyrogram.enums import ChatType
-from pyrogram.handlers import CallbackQueryHandler, EditedMessageHandler, MessageHandler, RawUpdateHandler
+from pyrogram.handlers import (
+    CallbackQueryHandler,
+    EditedMessageHandler,
+    MessageHandler,
+    RawUpdateHandler,
+)
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineQuery, Message, ReplyKeyboardMarkup
 from rich import box
 from rich.live import Live
@@ -117,7 +122,11 @@ async def _dumper_raw(client, update, users, chats):
 
 
 async def _dumper_update(client, update):
-    await client.queue.put(update)
+    if isinstance(update, list):
+        for u in update:
+            await client.queue.put(u)
+    else:
+        await client.queue.put(update)
 
 
 async def dumper(config: dict, specs=["message"]):
@@ -125,7 +134,6 @@ async def dumper(config: dict, specs=["message"]):
         "message": MessageHandler(_dumper_update),
         "edited_message": EditedMessageHandler(_dumper_update),
         "callback": CallbackQueryHandler(_dumper_update),
-        "inline": InlineKeyboardMarkup(_dumper_update),
         "raw": RawUpdateHandler(_dumper_raw),
     }
     queue = asyncio.Queue()
@@ -139,13 +147,20 @@ async def dumper(config: dict, specs=["message"]):
                 except ValueError:
                     t = s
                     c = []
-                try:
-                    handler = type_handler[t]
-                    handler.filters = filters.chat(c) if c else None
-                    await tg.add_handler(handler)
-                except KeyError:
-                    log.warning(f'更新类型 {t} 不可用, 请选择: {", ".join(list(type_handler.keys()))}')
-                    continue
+                if t == "all":
+                    handlers = [type_handler[t] for t in ["message", "edited_message", "callback"]]
+                    for h in handlers:
+                        h.filters = filters.chat(c) if c else None
+                        await tg.add_handler(h)
+                    break
+                else:
+                    try:
+                        handler = type_handler[t]
+                    except KeyError:
+                        log.warning(f'更新类型 {t} 不可用, 请选择: {", ".join(list(type_handler.keys()))}')
+                        continue
+                handler.filters = filters.chat(c) if c else None
+                await tg.add_handler(handler)
             log.info(f'开始监控账号: "{tg.me.name}" 中的更新.')
         while True:
             update = await queue.get()
