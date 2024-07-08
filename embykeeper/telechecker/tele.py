@@ -131,9 +131,12 @@ class Dispatcher(dispatcher.Dispatcher):
                 update, users, chats = packet
                 parser = self.update_parsers.get(type(update), None)
 
-                parsed_update, handler_type = (
-                    await parser(update, users, chats) if parser is not None else (None, type(None))
-                )
+                try:
+                    parsed_update, handler_type = (
+                        await parser(update, users, chats) if parser is not None else (None, type(None))
+                    )
+                except ValueError:
+                    continue
 
                 async with self.mutex:
                     groups = {i: g[:] for i, g in self.groups.items()}
