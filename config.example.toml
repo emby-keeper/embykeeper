@@ -40,32 +40,32 @@ random = 15
 
 # 全部可用站点:
 # [service]
-# checkiner = ["aisgk", "akuai", "apop", "bluesea", "cc", "charon", "charon_old", "data007sgk", "dogsgk", "dvfilm", "embyhub", "feiyue", "future", "happy", "heisi", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "micu", "misty", "nebula", "pandatv", "peach", "pornemby", "shufu", "singularity", "skysink", "sssq", "temby", "terminus", "terminus_old", "theend", "tiannan", "zhipian"]
+# checkiner = ["aisgk", "akuai", "apop", "bluesea", "cc", "charon", "charon_old", "data007sgk", "dogsgk", "dvfilm", "embyhub", "feiyue", "future", "happy", "heisi", "huasgk", "infsgk", "jms", "jms_iptv", "jms_old", "judog", "ljyy", "ljyy_old", "lyrebird", "magic", "micu", "misty", "nebula", "pandatv", "peach", "pilipili", "pornemby", "shufu", "singularity", "skysink", "sssq", "temby", "temby_old", "terminus", "terminus_old", "theend", "tiannan", "zhipian"]
 # monitor = ["bgk", "embyhub", "follow", "future", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8619803469940"
+phone = "+8610854425927"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8616029980807"
+phone = "+8616196054430"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://www.tran.info/"
-username = "cthomas"
-password = "mKN9OU9w@*"
+url = "https://www.mccoy.org/"
+username = "townsenddavid"
+password = "(Cg0Sf8$O0"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.nelson.org/"
-username = "mendezkimberly"
-password = "F8s_Ueid%A"
+url = "https://gill.com/"
+username = "lisalopez"
+password = "u00ZK$aa!P"
 time = [120, 240] # 模拟观看的时长范围 (秒)

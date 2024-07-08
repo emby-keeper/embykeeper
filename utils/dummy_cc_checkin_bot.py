@@ -91,11 +91,11 @@ async def callback_yzm(client: Client, callback: CallbackQuery):
         if signed.get(callback.from_user.id, None):
             content = dedent(
                 """
-            您今天已经签到过了
-            ⚖️ 累计签到：1
-            💰 当前积分:1
-            🪙 当前Cc币:1
-            """.strip()
+                您今天已经签到过了
+                ⚖️ 累计签到：1
+                💰 当前积分:1
+                🪙 当前Cc币:1
+                """.strip()
             )
             await client.send_photo(
                 callback.message.chat.id,
@@ -108,9 +108,9 @@ async def callback_yzm(client: Client, callback: CallbackQuery):
             signed[callback.from_user.id] = True
             content = dedent(
                 """
-            🎉 签到成功，获得了 1积分
-            💰总积分：1
-            """.strip()
+                🎉 签到成功，获得了 1积分
+                💰总积分：1
+                """.strip()
             )
             await client.send_photo(
                 callback.message.chat.id,

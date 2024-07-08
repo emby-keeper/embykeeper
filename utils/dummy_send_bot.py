@@ -52,7 +52,13 @@ async def parse(client: Client, message: Message, updates: List[Dict]):
                 for row in keyboard:
                     _row = []
                     for key in row:
-                        _row.append(InlineKeyboardButton(key["text"], key["callback_data"]))
+                        _row.append(
+                            InlineKeyboardButton(
+                                key["text"],
+                                callback_data=key.get("callback_data", None),
+                                url=key.get("url", None),
+                            )
+                        )
                     _reply_markup.append(_row)
                 _reply_markup = InlineKeyboardMarkup(_reply_markup)
         else:
