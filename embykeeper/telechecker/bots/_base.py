@@ -515,7 +515,7 @@ class BotCheckin(BaseBotCheckin):
             self._checked = True
             self.finished.set()
         elif any(s in text for s in to_iterable(self.bot_fail_keywords) or default_keywords["fail"]):
-            self.log.info(f"签到失败: 验证码错误, 正在重试.")
+            self.log.info(f"签到失败: 验证码错误或网络错误, 正在重试.")
             await self.retry()
         elif any(s in text for s in to_iterable(self.bot_success_keywords) or default_keywords["success"]):
             if await self.before_success():
