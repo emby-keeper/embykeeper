@@ -14,6 +14,7 @@ class CharonCheckin(BotCheckin):
     bot_username = "charontv_bot"
     bot_success_pat = r".*(\d+)"
     bot_text_ignore = ["已结束当前对话"]
+    additional_auth = ["captcha"]
 
     async def send_checkin(self, retry=False):
         if retry:

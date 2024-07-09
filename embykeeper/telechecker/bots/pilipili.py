@@ -14,6 +14,7 @@ class PilipiliCheckin(BotCheckin):
     bot_username = "PiliPiliUltraTv_bot"
     bot_checkin_caption_pat = "<disabled>"
     bot_checkin_cmd = "/start"
+    additional_auth = ["prime"]
 
     async def message_handler(self, client, message: Message):
         if message.caption and "请选择功能" in message.caption and message.reply_markup:

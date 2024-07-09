@@ -22,6 +22,7 @@ class FutureMonitor(Monitor):
     chat_name = "FutureEcho_Chat"
     notify_create_name = True
     allow_edit = False
+    additional_auth = ["captcha"]
 
     async def solve_captcha(self, url: str):
         token = await Link(self.client).captcha("future_echo")

@@ -14,6 +14,7 @@ class JudogMonitor(Monitor):
     chat_keyword = r"剩余可注册人数：\d+"
     bot_username = "mulgorebot"
     notify_create_name = True
+    additional_auth = ["prime"]
 
     async def init(self):
         channel = await self.client.get_chat("Mulgoreemby")

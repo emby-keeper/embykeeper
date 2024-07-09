@@ -26,6 +26,7 @@ class MistyMonitor(Monitor):
     chat_keyword = r"空余名额数: (?!0$)"
     bot_username = "EmbyMistyBot"
     notify_create_name = True
+    additional_auth = ["prime"]
 
     async def init(self, initial=True):
         async with self.lock:

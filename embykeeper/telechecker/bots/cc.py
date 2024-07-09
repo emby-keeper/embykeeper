@@ -18,6 +18,7 @@ class CCCheckin(BotCheckin):
     bot_checked_keywords = ["已经签到过了"]
     bot_checkin_caption_pat = "请选择正确验证码"
     max_retries = 1
+    additional_auth = ["ocr"]
 
     async def message_handler(self, client, message: Message):
         if message.caption and "欢迎使用" in message.caption and message.reply_markup:

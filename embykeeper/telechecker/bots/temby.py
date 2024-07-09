@@ -23,6 +23,7 @@ class TembyCheckin(BotCheckin):
     bot_checkin_cmd = "/hi"
     bot_success_pat = r".*(\d+)"
     max_retries = 1
+    additional_auth = ["captcha"]
 
     async def message_handler(self, client: Client, message: Message):
         if message.text and message.text == "请在一分钟内点击下方按钮完成签到":

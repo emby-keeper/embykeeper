@@ -10,6 +10,7 @@ class EmbyhubMonitor(Monitor):
     chat_keyword = r"注册已开放"
     bot_username = "EdHubot"
     notify_create_name = True
+    additional_auth = ["prime"]
 
     async def on_trigger(self, message: Message, key, reply):
         await self.client.send_message(self.bot_username, f"/create {self.unique_name}")

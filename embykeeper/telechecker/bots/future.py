@@ -18,6 +18,7 @@ class FutureCheckin(BotCheckin):
     name = "未响"
     bot_username = "lotayu_bot"
     bot_checkin_cmd = "/start"
+    additional_auth = ["captcha"]
 
     async def message_handler(self, client, message: Message):
         if message.text and "验证您的身份" in message.text and message.reply_markup:
