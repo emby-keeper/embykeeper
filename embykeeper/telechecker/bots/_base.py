@@ -139,6 +139,7 @@ class BotCheckin(BaseBotCheckin):
     """签到类, 用于回复模式签到."""
 
     group_pool = AsyncCountPool(base=2000)
+    interval_pool = {}
 
     # fmt: off
     name: str = None  # 签到器的名称
@@ -183,7 +184,9 @@ class BotCheckin(BaseBotCheckin):
 
     def get_filter(self):
         """设定要签到的目标."""
-        filter = filters.user(self.bot_username)
+        filter = filters.all
+        if self.bot_username:
+            filter = filter & filters.user(self.bot_username)
         if self.chat_name:
             filter = filter & filters.chat(self.chat_name)
         else:
@@ -246,6 +249,20 @@ class BotCheckin(BaseBotCheckin):
 
     async def start(self):
         """签到器的入口函数."""
+        skip = self.config.get("skip", None)
+        if skip:
+            current_count = self.interval_pool.get(self.client.me.id, None)
+            if current_count is None:
+                self.interval_pool[self.client.me.id] = 0
+            else:
+                if current_count < skip:
+                    self.interval_pool[self.client.me.id] += 1
+                    self.log.info(f"跳过签到: 根据配置跳过 (还需跳过 {skip - current_count} 次).")
+                    return CheckinResult.IGNORE
+                else:
+                    self.interval_pool[self.client.me.id] = 0
+        if (not self.chat_name) and (not self.bot_username):
+            raise ValueError("未指定 chat_name 或 bot_username")
         ident = self.chat_name or self.bot_username
         while True:
             try:
@@ -268,6 +285,7 @@ class BotCheckin(BaseBotCheckin):
                     return CheckinResult.FAIL
             else:
                 break
+
         _is_archived = False
         async for d in self.client.get_dialogs(folder_id=1):
             if d.chat.id == chat.id:
@@ -293,11 +311,13 @@ class BotCheckin(BaseBotCheckin):
                 self.log.warning(f"初始化错误.")
                 return CheckinResult.FAIL
 
-            bot = await self.client.get_users(self.bot_username)
-            msg = f"开始执行签到: [green]{bot.name}[/] [gray50](@{bot.username})[/]"
+            specs = []
+            if self.bot_username:
+                bot = await self.client.get_users(self.bot_username)
+                specs.append(f"[green]{bot.name}[/] [gray50](@{bot.username})[/]")
             if chat.title:
-                msg += f" @ [green]{chat.title}[/] [gray50](@{chat.username})[/]"
-            self.log.info(msg + ".")
+                specs.append(f"[green]{chat.title}[/] [gray50](@{chat.username})[/]")
+            self.log.info(f"开始执行签到: {' @ '.join(specs)}.")
 
             if not self.chat_name:
                 self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
@@ -389,8 +409,7 @@ class BotCheckin(BaseBotCheckin):
     async def send(self, cmd):
         """向机器人发送命令."""
         if self.chat_name:
-            bot = await self.client.get_users(self.bot_username)
-            await self.client.send_message(self.chat_name, f"{cmd}@{bot.username}")
+            await self.client.send_message(self.chat_name, cmd)
         else:
             await self.client.send_message(self.bot_username, cmd)
 
