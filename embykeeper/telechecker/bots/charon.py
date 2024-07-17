@@ -6,8 +6,6 @@ from pyrogram.types import Message
 from ..link import Link
 from ._base import BotCheckin
 
-__ignore__ = True
-
 
 class CharonCheckin(BotCheckin):
     name = "卡戎"

@@ -6,8 +6,6 @@ from pyrogram.raw.types.messages import BotCallbackAnswer
 
 from ._base import BotCheckin
 
-__ignore__ = True
-
 
 class PilipiliCheckin(BotCheckin):
     name = "Pilipili"

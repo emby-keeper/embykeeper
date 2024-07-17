@@ -14,8 +14,6 @@ from faker import Faker
 from ..link import Link
 from ._base import BotCheckin
 
-__ignore__ = True
-
 
 class TembyCheckin(BotCheckin):
     name = "Temby"

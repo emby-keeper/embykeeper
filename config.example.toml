@@ -30,11 +30,11 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 3.3.20 生成的.
+# 该部分内容是根据 Embykeeper 3.3.22 生成的.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["apop", "dvfilm", "feiyue", "happy", "heisi", "jms", "lyrebird", "magic", "micu", "mjj", "pandatv", "peach", "pornemby", "shufu", "skysink", "terminus", "theend", "tiannan"]
+# checkiner = ["apop", "cc", "charon", "dvfilm", "feiyue", "future", "happy", "heisi", "jms", "lyrebird", "magic", "micu", "mjj", "pandatv", "peach", "pilipili", "pornemby", "shufu", "skysink", "temby", "terminus", "theend", "tiannan"]
 # monitor = ["bgk", "embyhub", "infinity_fly", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
@@ -47,25 +47,25 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8614175780686"
+phone = "+8616251042763"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8614990199553"
+phone = "+8611098172023"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://molina-roberts.com/"
-username = "krussell"
-password = "#ze6AOenG7"
+url = "https://www.burke.com/"
+username = "susanmaldonado"
+password = "ymz&2Hn5d9"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.bauer.com/"
-username = "qkerr"
-password = "9C#XmqiM@0"
+url = "https://www.webb.net/"
+username = "matthew22"
+password = "(cPeJ+GCd8"
 time = [120, 240] # 模拟观看的时长范围 (秒)
