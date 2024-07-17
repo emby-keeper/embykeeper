@@ -139,10 +139,10 @@ jobs:
       - name: Sync huggingface docker image version
         run: |
           cd deploy
-          git init
           git config --global init.defaultBranch main
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git init
           git remote add origin https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/${{ env.REGISTRY_IMAGE }}
           git add .
           git commit -m "Update Dockerfile"
