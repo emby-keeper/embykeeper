@@ -134,6 +134,8 @@ jobs:
     needs:
       - merge
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Sync huggingface docker image version
         run: |
           cd deploy
