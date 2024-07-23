@@ -102,9 +102,9 @@ Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 
 
 若您没有服务器, 您可以通过免费托管平台进行部署, 点击下方按钮开始部署:
 
-[![Deploy to Huggingface Space](https://github.com/embykeeper/embykeeper/raw/main/images/deploy-to-hf.svg)](https://huggingface.co/spaces/embykeeper/embykeeper?duplicate=true)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/hf-tutorial.svg)](https://zetx.tech/2024/05/19/embykeeper-hf-tutorial/)
+[![Deploy to Huggingface Space](https://github.com/embykeeper/embykeeper/raw/main/images/deploy-to-hf.svg)](https://huggingface.co/spaces/embykeeper/embykeeper?duplicate=true)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/hf-tutorial.svg)](https://blog.zetx.tech/2024/05/19/embykeeper-hf-tutorial/)
 
-[![Deploy to Render](https://github.com/embykeeper/embykeeper/raw/main/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/embykeeper/embykeeper/tree/stable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/render-tutorial.svg)](https://zetx.tech/2023/06/26/embykeeper-render-tutorial)
+[![Deploy to Render](https://github.com/embykeeper/embykeeper/raw/main/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/embykeeper/embykeeper/tree/stable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/render-tutorial.svg)](https://blog.zetx.tech/2023/06/26/embykeeper-render-tutorial)
 
 若您有服务器, 我们推荐使用 [Docker 部署](https://github.com/embykeeper/embykeeper/wiki/Linux-Docker-%E9%83%A8%E7%BD%B2):
 
