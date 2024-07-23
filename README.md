@@ -130,6 +130,6 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 - [jackzzs](https://github.com/jackzzs)
 
-##### 通过[爱发电](https://afdian.net/a/jackzzs)赞助
+##### 通过[爱发电](https://afdian.com/a/jackzzs)赞助
 
 ![Kitty](https://github.com/embykeeper/embykeeper/raw/main/images/kitty.gif)
