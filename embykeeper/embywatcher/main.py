@@ -201,7 +201,8 @@ async def login(config, continuous=False):
             ua=a.get("ua", None),
             device=a.get("device", None),
             client=a.get("client", None),
-            device_id=str(uuid.uuid4()).upper(),
+            user_id=a.get("user_id", None),
+            device_id=a.get("device_id", None),
         )
         try:
             info = await emby.info()

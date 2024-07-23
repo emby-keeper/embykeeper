@@ -197,8 +197,7 @@ class Messager:
             async with ClientsSession([self.account], proxy=self.proxy, basedir=self.basedir) as clients:
                 async for tg in clients:
                     for a in self.additional_auth:
-                        if not await Link(tg).auth(a):
-                            self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                        if not await Link(tg).auth(a, log_func=self.log.info):
                             return False
 
         if self.max_interval and self.min_interval > self.max_interval:

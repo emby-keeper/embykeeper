@@ -13,7 +13,12 @@ from pyrogram.raw.functions.messages import DeleteHistory
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
 from ..utils import async_partial, truncate_str
+from .lock import account_status, account_status_lock
 from .tele import Client
+
+
+class LinkError(Exception):
+    pass
 
 
 class Link:
@@ -47,7 +52,14 @@ class Link:
         return await asyncio.gather(*[delete(m) for m in messages])
 
     async def post(
-        self, cmd, photo=None, condition: Callable = None, timeout: int = 20, retries=3, name: str = None
+        self,
+        cmd,
+        photo=None,
+        condition: Callable = None,
+        timeout: int = 20,
+        retries=3,
+        name: str = None,
+        fail: bool = False,
     ) -> Tuple[Optional[str], Optional[str]]:
         """
         向机器人发送请求.
@@ -57,6 +69,7 @@ class Link:
             timeout: 超时 (s)
             retries: 最大重试次数
             name: 请求名称, 用于用户提示
+            fail: 当出现错误时抛出错误, 而非发送日志
         """
         for r in range(retries):
             self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
@@ -91,24 +104,36 @@ class Link:
                     await asyncio.sleep(3)
                     continue
                 else:
-                    self.log.warning(f"{name}超时 ({r + 1}/{retries}).")
-                    return None
+                    msg = f"{name}超时 ({r + 1}/{retries})."
+                    if fail:
+                        raise LinkError(msg)
+                    else:
+                        self.log.warning(msg)
+                        return None
             except YouBlockedUser:
-                self.log.error(
-                    f"您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用."
-                )
-                return None
+                msg = "您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用."
+                if fail:
+                    raise LinkError(msg)
+                else:
+                    self.log.error(msg)
+                    return None
             else:
                 await self.delete_messages(messages)
                 status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
                 if status == "error":
-                    self.log.warning(f"{name}错误: {errmsg}.")
-                    return False
+                    if fail:
+                        raise LinkError(f"{errmsg}.")
+                    else:
+                        self.log.warning(f"{name}错误: {errmsg}.")
+                        return False
                 elif status == "ok":
                     return results
                 else:
-                    self.log.warning(f"{name}出现未知错误.")
-                    return False
+                    if fail:
+                        raise LinkError("出现未知错误.")
+                    else:
+                        self.log.warning(f"{name}出现未知错误.")
+                        return False
             finally:
                 await self.client.remove_handler(handler, group=1)
 
@@ -152,10 +177,36 @@ class Link:
         self.log.debug("清空机器人日志记录.")
         await self.client.invoke(DeleteHistory(max_id=0, peer=await self.client.resolve_peer(self.bot)))
 
-    async def auth(self, service: str):
+    async def auth(self, service: str, log_func=None):
         """向机器人发送授权请求."""
-        results = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.upper()} 认证")
-        return bool(results)
+        if not log_func:
+            result = await self.post(f"/auth {service} {self.instance}", name=f"服务 {service.upper()} 认证")
+            return bool(result)
+        else:
+            try:
+                await self.post(
+                    f"/auth {service} {self.instance}", name=f"服务 {service.upper()} 认证", fail=True
+                )
+            except LinkError as e:
+                log_func(f"初始化错误: 使用 {service.upper()} 服务, 但{e}")
+                if "权限不足" in str(e):
+                    await self._show_super_ad()
+                return False
+            else:
+                return True
+
+    async def _show_super_ad(self):
+        async with account_status_lock:
+            super_ad_shown = account_status.get(self.client.me.id, {}).get("super_ad_shown", False)
+            if not super_ad_shown:
+                self.log.info("请访问 https://bit.ly/eksuper 赞助项目以升级为高级用户, 尊享更多功能.")
+                if self.client.me.id in account_status:
+                    account_status[self.client.me.id]["super_ad_shown"] = True
+                else:
+                    account_status[self.client.me.id] = {"super_ad_shown": True}
+                return True
+            else:
+                return False
 
     async def captcha(self, site: str):
         """向机器人发送验证码解析请求."""

@@ -25,12 +25,16 @@ logger = logger.bind(scheme="embywatcher")
 class Connector(_Connector):
     """重写的 Emby 连接器, 以支持代理."""
 
-    def __init__(self, url, proxy=None, ua=None, device=None, client=None, **kargs):
+    def __init__(
+        self, url, proxy=None, ua=None, device=None, client=None, client_id=None, user_id=None, **kargs
+    ):
         super().__init__(url, **kargs)
         self.proxy = proxy
         self.ua = ua
         self.device = device
         self.client = client
+        self.client_id = client_id
+        self.user_id = user_id
         self.fake_headers = self.get_fake_headers()
         self.watch = asyncio.create_task(self.watchdog())
 
@@ -66,6 +70,11 @@ class Connector(_Connector):
                     except asyncio.TimeoutError:
                         pass
 
+    def get_device_uuid(self):
+        rd = random.Random()
+        rd.seed(uuid.getnode())
+        return uuid.UUID(int=rd.getrandbits(128))
+
     def get_fake_headers(self):
         headers = {}
         ios_uas = [
@@ -75,13 +84,15 @@ class Connector(_Connector):
         ]
         client = "Fileball" if not self.client else self.client
         device = "iPhone" if not self.device else self.device
+        user_id = str(uuid.uuid4()).upper() if not self.user_id else self.user_id
+        device_id = str(self.get_device_uuid()).upper() if not self.device_id else self.device_id
         version = f"1.2.{random.randint(0, 18)}"
         ua = f"Fileball/{random.choice([200, 233])} {random.choice(ios_uas)}" if not self.ua else self.ua
         auth_headers = {
-            "UserId": uuid.uuid4(),
+            "UserId": user_id,
             "Client": client,
             "Device": device,
-            "DeviceId": uuid.uuid1(),
+            "DeviceId": device_id,
             "Version": version,
         }
         auth_header = "Emby "

@@ -109,8 +109,7 @@ async def checkiner(config: dict, instant=False):
         async for tg in clients:
             log = logger.bind(scheme="telechecker", username=tg.me.name)
             logger.info("已连接到 Telegram, 签到器正在初始化.")
-            if not await Link(tg).auth("checkiner"):
-                log.error(f"功能初始化失败: 权限校验不通过.")
+            if not await Link(tg).auth("checkiner", log_func=log.error):
                 continue
             sem = asyncio.Semaphore(int(config.get("concurrent", 1)))
             clses = extract(get_cls("checkiner", names=config.get("service", {}).get("checkiner", None)))
@@ -118,7 +117,7 @@ async def checkiner(config: dict, instant=False):
                 cls(
                     tg,
                     retries=config.get("retries", 4),
-                    timeout=config.get("timeout", 120),
+                    timeout=config.get("timeout", 240),
                     nofail=config.get("nofail", True),
                     basedir=config.get("basedir", None),
                     proxy=config.get("proxy", None),
@@ -194,8 +193,7 @@ async def monitorer(config: dict):
         async for tg in clients:
             log = logger.bind(scheme="telemonitor", username=tg.me.name)
             logger.info("已连接到 Telegram, 监控器正在初始化.")
-            if not await Link(tg).auth("monitorer"):
-                log.error(f"功能初始化失败: 权限校验不通过.")
+            if not await Link(tg).auth("monitorer", log_func=log.error):
                 continue
             clses = extract(get_cls("monitor", names=config.get("service", {}).get("monitor", None)))
             names = []
@@ -226,8 +224,7 @@ async def messager(config: dict):
         async for tg in clients:
             log = logger.bind(scheme="telemessager", username=tg.me.name)
             logger.info("已连接到 Telegram, 自动水群正在初始化.")
-            if not await Link(tg).auth("messager"):
-                log.error(f"功能初始化失败: 权限校验不通过.")
+            if not await Link(tg).auth("messager", log_func=log.error):
                 continue
             clses = extract(get_cls("messager", names=config.get("service", {}).get("messager", None)))
             for cls in clses:

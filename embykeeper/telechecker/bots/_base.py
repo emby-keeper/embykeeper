@@ -10,7 +10,6 @@ import string
 import time
 from typing import Iterable, List, Optional, Union
 
-from ddddocr import DdddOcr
 from appdirs import user_data_dir
 from loguru import logger
 from PIL import Image
@@ -89,7 +88,7 @@ class BaseBotCheckin(ABC):
         self,
         client: Client,
         retries=4,
-        timeout=120,
+        timeout=240,
         nofail=True,
         basedir=None,
         proxy=None,
@@ -218,6 +217,8 @@ class BotCheckin(BaseBotCheckin):
 
     async def get_ocr(self, ocr: str = None, range: Optional[Union[CharRange, str]] = None):
         """加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型."""
+        from ddddocr import DdddOcr
+
         while True:
             async with ocrs_lock:
                 if ocr in ocrs:
@@ -305,8 +306,7 @@ class BotCheckin(BaseBotCheckin):
         while True:
             if self.additional_auth:
                 for a in self.additional_auth:
-                    if not await Link(self.client).auth(a):
-                        self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                    if not await Link(self.client).auth(a, log_func=self.log.info):
                         return CheckinResult.IGNORE
 
             if not await self.init():

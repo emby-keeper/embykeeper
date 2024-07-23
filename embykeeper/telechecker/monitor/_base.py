@@ -218,8 +218,7 @@ class Monitor:
             return False
         if self.additional_auth:
             for a in self.additional_auth:
-                if not await Link(self.client).auth(a):
-                    self.log.info(f"初始化错误: 权限校验不通过, 需要: {a}.")
+                if not await Link(self.client).auth(a, log_func=self.log.info):
                     return False
         if not await self.init():
             self.log.bind(notify=True).warning(f"机器人状态初始化失败, 监控将停止.")

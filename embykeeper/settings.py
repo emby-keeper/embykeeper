@@ -82,6 +82,8 @@ def check_config(config):
                         Optional("ua"): str,
                         Optional("client"): str,
                         Optional("device"): str,
+                        Optional("user_id"): str,
+                        Optional("device_id"): str,
                         Optional("allow_multiple"): bool,
                     }
                 )
@@ -132,7 +134,7 @@ def write_faked_config(path, quiet=False):
     doc["notifier"] = True
     doc.add(nl())
     doc.add(comment("每个 Telegram Bot 签到的最大尝试时间 (秒)."))
-    doc["timeout"] = 120
+    doc["timeout"] = 240
     doc.add(nl())
     doc.add(comment("每个 Telegram Bot 签到的最大尝试次数."))
     doc["retries"] = 4
@@ -300,7 +302,7 @@ async def interactive_config(config: dict = {}, basedir=None):
     config = {"telegram": telegrams, "emby": embies}
     advanced = Confirm.ask(pad + "是否配置高级设置", default=False, console=console)
     config.setdefault("notifier", True)
-    config.setdefault("timeout", 120)
+    config.setdefault("timeout", 240)
     config.setdefault("retries", 4)
     config.setdefault("concurrent", 1)
     config.setdefault("random", 15)

@@ -4,7 +4,6 @@ import string
 
 from pyrogram.types import Message
 from PIL import Image
-from ddddocr import DdddOcr
 
 from ...utils import async_partial
 from ...data import get_datas
@@ -29,6 +28,8 @@ class MistyMonitor(Monitor):
     additional_auth = ["prime"]
 
     async def init(self, initial=True):
+        from ddddocr import DdddOcr
+
         async with self.lock:
             if isinstance(self.ocr, str):
                 data = []

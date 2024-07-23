@@ -14,3 +14,6 @@ pornemby_nohp = {}  # uid: date
 pornemby_messager_enabled = {}  # uid: bool
 pornemby_alert = {}  # uid: bool
 pornemby_messager_mids = {}  # uid: list(mid)
+
+account_status = {}  # uid: dict
+account_status_lock = asyncio.Lock()

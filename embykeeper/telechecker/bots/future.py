@@ -24,7 +24,7 @@ class FutureCheckin(BotCheckin):
 
     async def message_handler(self, client, message: Message):
         if message.text and "驗證您的身份" in message.text and message.reply_markup:
-            keys = [b for r in message.reply_markup.inline_keyboard for k in r]
+            keys = [b for r in message.reply_markup.inline_keyboard for b in r]
             for b in keys:
                 if "Verify" in b.text and b.web_app:
                     url = b.web_app.url
