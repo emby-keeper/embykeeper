@@ -31,6 +31,7 @@ from pyrogram.errors import (
     CodeInvalid,
     PhoneCodeInvalid,
     BadMsgNotification,
+    FloodWait,
 )
 from pyrogram.handlers import MessageHandler, RawUpdateHandler, DisconnectHandler, EditedMessageHandler
 from pyrogram.handlers.handler import Handler
@@ -232,6 +233,8 @@ class Client(pyrogram.Client):
                     except BadRequest:
                         self.password = None
                         retry = True
+            except FloodWait:
+                raise BadRequest(f'登录 "{self.phone_number}" 时出现异常: 登录过于频繁.')
             except Exception as e:
                 logger.error(f"登录时出现异常错误!")
                 show_exception(e, regular=False)
