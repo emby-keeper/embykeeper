@@ -164,15 +164,6 @@ async def dumper(config: dict, specs=["message"]):
             log.info(f'开始监控账号: "{tg.me.name}" 中的更新.')
         while True:
             update = await queue.get()
-            if isinstance(update, Message):
-                title = "Message"
-            elif isinstance(update, CallbackQuery):
-                title = "CallbackQuery"
-            elif isinstance(update, InlineQuery):
-                title = "InlineQuery"
-            else:
-                title = None
-            console.rule(title)
             print(update, flush=True)
 
 

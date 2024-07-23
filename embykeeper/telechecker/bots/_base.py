@@ -55,6 +55,7 @@ default_keywords = {
 
 
 class MessageType(Flag):
+    IGNORE = auto()
     TEXT = auto()
     CAPTION = auto()
     CAPTCHA = auto()
@@ -146,6 +147,7 @@ class BotCheckin(BaseBotCheckin):
     bot_username: Union[int, str] = None  # Bot 的 UserID 或 用户名 (不带 @ 或 https://t.me/)
     bot_checkin_cmd: Union[str, List[str]] = ["/checkin"]  # Bot 依次执行的签到命令
     bot_send_interval: int = 3  # 签到命令间等待的秒数
+    bot_use_captcha = True # 当 Bot 返回图片时, 识别验证码并调用 on_captcha
     bot_checkin_caption_pat: str = None  # 当 Bot 返回图片时, 仅当符合该 regex 才识别为验证码, 置空不限制
     bot_text_ignore: Union[str, List[str]] = []  # 当含有列表中的关键词, 即忽略该消息, 置空不限制
     ocr: Optional[str] = None # OCR 模型, None = 默认模型, str = 自定义模型
@@ -466,15 +468,21 @@ class BotCheckin(BaseBotCheckin):
         """分析传入消息的类型为验证码或文字."""
         if message.photo:
             if message.caption:
-                if self.bot_checkin_caption_pat:
-                    if re.search(self.bot_checkin_caption_pat, message.caption):
-                        return MessageType.CAPTCHA
+                if self.bot_use_captcha:
+                    if self.bot_checkin_caption_pat:
+                        if re.search(self.bot_checkin_caption_pat, message.caption):
+                            return MessageType.CAPTCHA
+                        else:
+                            return MessageType.CAPTION
                     else:
-                        return MessageType.CAPTION
+                        return MessageType.CAPTCHA
                 else:
-                    return MessageType.CAPTCHA
+                    return MessageType.CAPTION
             else:
-                return MessageType.CAPTCHA
+                if self.bot_use_captcha:
+                    return MessageType.CAPTCHA
+                else:
+                    return MessageType.IGNORE
         elif message.text:
             return MessageType.TEXT
 
@@ -572,7 +580,7 @@ class BotCheckin(BaseBotCheckin):
                 f"{content}\n\n"
                 f"你可选: {', '.join(button_specs)} 中的一个作为回答.\n"
                 "如果您认为不应该进行任何操作, 请输出 'NO_RESP'.\n"
-                "如果这是一个指令, 请输出您需要发送或点击的内容, 不要说明这是一个指令, 不要说明需要发送文本消息, 仅仅输出发送或点击的内容. "
+                "如果这是一个指令, 请输出您需要发送或点击的内容, 不要说明这是一个指令, 不要说明需要发送文本消息, 仅仅输出发送或点击的内容.\n"
                 "如果这是一个状态, 请输出 'IS_STATUS', 禁止输出其他内容."
             )
             for _ in range(3):

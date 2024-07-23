@@ -158,7 +158,7 @@ class Link:
         return bool(results)
 
     async def captcha(self, site: str):
-        """向机器人发送 Cloudflare / HCaptcha / ReCaptcha 验证码解析请求."""
+        """向机器人发送验证码解析请求."""
         results = await self.post(f"/captcha {self.instance} {site}", timeout=240, name="请求跳过验证码")
         if results:
             return results.get("token", None)
