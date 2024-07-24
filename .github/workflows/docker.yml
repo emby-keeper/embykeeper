@@ -138,6 +138,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Sync huggingface docker image version
         run: |
+          sleep 30
           cd deploy
           git config --global init.defaultBranch main
           git config --global user.name "github-actions"
