@@ -3,6 +3,8 @@ from pyrogram.raw.types.messages import BotCallbackAnswer
 
 from ._base import BotCheckin
 
+__ignore__ = True
+
 
 class HappyCheckin(BotCheckin):
     name = "开心服"

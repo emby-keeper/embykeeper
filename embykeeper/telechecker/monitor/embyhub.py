@@ -2,6 +2,8 @@ from pyrogram.types import Message
 
 from ._base import Monitor
 
+__ignore__ = True
+
 
 class EmbyhubMonitor(Monitor):
     name = "EmbyHub"

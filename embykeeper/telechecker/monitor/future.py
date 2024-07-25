@@ -12,8 +12,6 @@ from faker import Faker
 from ..link import Link
 from ._base import Monitor
 
-__ignore__ = True
-
 
 class FutureMonitor(Monitor):
     name = "未响"

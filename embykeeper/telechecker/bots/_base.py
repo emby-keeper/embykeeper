@@ -14,7 +14,7 @@ from appdirs import user_data_dir
 from loguru import logger
 from PIL import Image
 from pyrogram import filters
-from pyrogram.errors import UsernameNotOccupied, FloodWait
+from pyrogram.errors import UsernameNotOccupied, FloodWait, UsernameInvalid
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
@@ -270,8 +270,8 @@ class BotCheckin(BaseBotCheckin):
         while True:
             try:
                 chat = await self.client.get_chat(ident)
-            except UsernameNotOccupied:
-                self.log.warning(f'初始化错误: 会话 "{ident}" 不存在.')
+            except (UsernameNotOccupied, UsernameInvalid) as e:
+                self.log.warning(f'初始化错误: 会话 "{ident}" 已不存在.')
                 return CheckinResult.FAIL
             except KeyError as e:
                 self.log.info(f"初始化错误: 无法访问, 您可能已被封禁: {e}.")
