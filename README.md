@@ -15,7 +15,7 @@ Embykeeper 是一个用于 Emby 影视服务器的签到和保号的自动执行
 
 ## 存储库迁移
 
-由于作者 (jackzzs) 账号莫名被封, embykeeper/embykeeper 存储库已迁移到这里. 之后的更新在这里进行.
+由于作者 (jackzzs) 账号莫名被封, embykeeper/embykeeper 存储库已迁移到[这里](https://github.com/zetxtech/embykeeper). 之后的更新在这里进行.
 
 ## 声明
 
