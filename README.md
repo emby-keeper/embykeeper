@@ -1,4 +1,4 @@
-[![build status](https://img.shields.io/github/actions/workflow/status/embykeeper/embykeeper/ci.yml?branch=main)](https://github.com/zetxtech/embykeeper/commits/main) [![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![docker](https://img.shields.io/docker/v/embykeeper/embykeeper?label=docker)](https://hub.docker.com/r/embykeeper/embykeeper) [![docker pulls](https://img.shields.io/docker/pulls/embykeeper/embykeeper?label=pulls)](https://hub.docker.com/r/embykeeper/embykeeper) [![license badge](https://img.shields.io/github/license/embykeeper/embykeeper)](https://github.com/zetxtech/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper) [![telegram badge](https://img.shields.io/badge/telegram-group-violet)](https://t.me/embykeeperchat)
+[![build status](https://img.shields.io/github/actions/workflow/status/zetxtech/embykeeper/ci.yml?branch=main)](https://github.com/zetxtech/embykeeper/commits/main) [![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![docker](https://img.shields.io/docker/v/embykeeper/embykeeper?label=docker)](https://hub.docker.com/r/embykeeper/embykeeper) [![docker pulls](https://img.shields.io/docker/pulls/embykeeper/embykeeper?label=pulls)](https://hub.docker.com/r/embykeeper/embykeeper) [![license badge](https://img.shields.io/github/license/zetxtech/embykeeper)](https://github.com/zetxtech/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper) [![telegram badge](https://img.shields.io/badge/telegram-group-violet)](https://t.me/embykeeperchat)
 
 <p align="center">
   <a href='https://github.com/zetxtech/embykeeper'>
@@ -15,7 +15,7 @@ Embykeeper 是一个用于 Emby 影视服务器的签到和保号的自动执行
 
 ## 存储库迁移
 
-由于作者 (jackzzs) 账号莫名被封, embykeeper/embykeeper 存储库已迁移到[这里](https://github.com/zetxtech/embykeeper). 之后的更新在这里进行.
+由于作者 (jackzzs) 账号莫名被封, 原 embykeeper/embykeeper 存储库已迁移到[这里](https://github.com/zetxtech/embykeeper). 之后的更新在这里进行.
 
 ## 声明
 
