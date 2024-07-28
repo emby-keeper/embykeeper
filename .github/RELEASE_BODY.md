@@ -2,4 +2,4 @@
 
 1.
 
-**Full Changelog**: https://github.com/zetxtech/embykeeper/compare/v0.0.0...v3.3.39
+**Full Changelog**: https://github.com/zetxtech/embykeeper/compare/v0.0.0...v4.0.0
