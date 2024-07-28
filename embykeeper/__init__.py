@@ -1,5 +1,5 @@
 __author__ = {
     "jackzzs": "jackzzs@outlook.com",
 }
-__version__ = "3.3.38"
+__version__ = "3.3.39"
 __url__ = "https://github.com/zetxtech/embykeeper"
