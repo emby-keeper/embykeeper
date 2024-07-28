@@ -132,7 +132,8 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 ##### 开发者团队
 
-- [jackzzs](https://github.com/jackzzs)
+- ~~[jackzzs](https://github.com/jackzzs)~~
+- [zetxtech](https://github.com/zetxtech)
 
 ##### 通过[爱发电](https://afdian.com/a/jackzzs)赞助
 
