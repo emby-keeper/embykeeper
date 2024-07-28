@@ -13,6 +13,10 @@
 
 Embykeeper 是一个用于 Emby 影视服务器的签到和保号的自动执行工具, 可以实现机器人自动签到和 Emby 服务器登陆模拟播放的功能.
 
+## 存储库迁移
+
+由于作者 (jackzzs) 账号莫名被封, embykeeper/embykeeper 存储库已迁移到这里. 之后的更新在这里进行.
+
 ## 声明
 
 本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关. 为了您的账号安全, 推荐使用小号.
