@@ -108,7 +108,7 @@ conda/install:
 >           read -p "请注意: 您当前的 Python 环境不符合要求 (python >=3.8, <3.11), 是否在当前目录安装一个新的 Conda Python 环境? [y/N]:" yn; \
 >           case $$yn in \
 >               [Yy]* ) break;; \
->               [Nn]* ) exit;; \
+>               [Nn]* ) exit 1;; \
 >               * ) echo "Info: 请回答 Y (确定) 或 N (取消).";; \
 >           esac; \
 >       done; \
