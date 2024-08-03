@@ -155,7 +155,7 @@ async def main(
 
     msg = " 您可以通过 Ctrl+C 以结束运行." if not public else ""
     logger.info(f"欢迎使用 [orange3]{__name__.capitalize()}[/]! 正在启动, 请稍等.{msg}")
-    logger.info(f'当前版本 ({__version__}) 活跃贡献者: {", ".join(__author__)}.')
+    logger.info(f"当前版本 ({__version__}) 项目页: {__url__}.")
     logger.debug(f'命令行参数: "{" ".join(sys.argv[1:])}".')
 
     if verbosity:
@@ -267,7 +267,7 @@ async def main(
             pool.add(
                 checkiner_schedule(
                     config,
-                    instant=debug_cron,
+                    instant=False,
                     start_time=start_time,
                     end_time=end_time,
                     days=0 if debug_cron else 1,

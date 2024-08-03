@@ -26,7 +26,7 @@ class PornembyCheckin(AnswerBotCheckin):
             except TimeoutError:
                 pass
             except BadRequest:
-                self.log.warning(f"签到失败: 账号错误.")
+                self.log.warning(f"签到失败: 账户错误.")
                 await self.fail()
             try:
                 m = await asyncio.wait_for(f, 10)

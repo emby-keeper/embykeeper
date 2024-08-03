@@ -375,13 +375,11 @@ class BotCheckin(BaseBotCheckin):
                         if sleep > max_sleep:
                             return CheckinResult.CHECKED
                         else:
-                            self.log.info(f"今日已签到, 即将在 {format_timedelta_human(sleep)} 后重试.")
-                            await asyncio.sleep(sleep.total_seconds())
-                            self._checked = False
-                            self._retries = 0
-                            self._waiting = {}
-                    else:
-                        return CheckinResult.CHECKED
+                            self.log.info(
+                                f"今日已签到, 即将在 {format_timedelta_human(sleep)} 后重试, 重试不发送日志."
+                            )
+                            asyncio.create_task(self._start())
+                    return CheckinResult.CHECKED
                 else:
                     return CheckinResult.SUCCESS
             else:

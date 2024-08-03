@@ -91,7 +91,7 @@ def extract(clss: List[Type]) -> List[Type]:
 async def _checkin_task(checkiner: BaseBotCheckin, sem, wait=0):
     """签到器壳, 用于随机等待开始."""
     if wait > 0:
-        checkiner.log.debug(f"随机启动等待: 将等待 {wait} 分钟以启动.")
+        checkiner.log.debug(f"随机启动等待: 将等待 {wait:.2f} 分钟以启动.")
     await asyncio.sleep(wait * 60)
     async with sem:
         return await checkiner._start()

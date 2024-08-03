@@ -22,4 +22,9 @@ class HappyCheckin(BotCheckin):
             else:
                 self.log.warning(f"签到失败: 账户错误.")
                 return await self.fail()
+
+        if message.text and "请先点击下面加入我们的群组后" in message.text:
+            self.log.warning(f"签到失败: 账户错误.")
+            return await self.fail()
+
         await super().message_handler(client, message)

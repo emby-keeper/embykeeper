@@ -69,7 +69,7 @@ class FutureMonitor(Monitor):
             msg = await self.client.wait_reply(self.bot_username, f"/start")
             text = msg.text or msg.caption
             if "你还未加入" in text:
-                self.log.error("账号错误, 无法注册.")
+                self.log.error("账户错误, 无法注册.")
                 return
             async with self.client.catch_reply(self.bot_username) as f1:
                 async with self.client.catch_edit(msg, ~filters.regex("请先完成验证")) as f2:

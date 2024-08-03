@@ -16,11 +16,16 @@ class MICUCheckin(BotCheckin):
                 if "签到" in k:
                     try:
                         answer: BotCallbackAnswer = await message.click(k)
+                        await self.on_text(Message(id=0), answer.message)
                     except TimeoutError:
                         pass
-                    await self.on_text(Message(id=0), answer.message)
                     return
             else:
                 self.log.warning(f"签到失败: 账户错误.")
                 return await self.fail()
+
+        if message.text and "请先点击下面加入我们的群组后" in message.text:
+            self.log.warning(f"签到失败: 账户错误.")
+            return await self.fail()
+
         await super().message_handler(client, message)
