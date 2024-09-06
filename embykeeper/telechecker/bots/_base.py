@@ -82,7 +82,7 @@ class CharRange(IntEnum):
 class BaseBotCheckin(ABC):
     """基础签到类."""
 
-    name = None
+    name: str = None
 
     def __init__(
         self,
@@ -165,6 +165,7 @@ class BotCheckin(BaseBotCheckin):
     additional_auth: List[str] = []  # 额外认证要求
     max_retries = None  # 验证码错误或网络错误时最高重试次数 (默认无限)
     checked_retries = None # 今日已签到时最高重试次数 (默认不重试)
+    skip = None # 跳过签到次数 (默认不跳过)
     # fmt: on
 
     @property
@@ -253,6 +254,11 @@ class BotCheckin(BaseBotCheckin):
     async def start(self):
         """签到器的入口函数."""
         skip = self.config.get("skip", None)
+        quiet = False
+        if not skip:
+            if self.skip:
+                quiet = True
+                skip = self.skip
         if skip:
             current_count = self.interval_pool.get(self.client.me.id, None)
             if current_count is None:
@@ -260,7 +266,8 @@ class BotCheckin(BaseBotCheckin):
             else:
                 if current_count < skip:
                     self.interval_pool[self.client.me.id] += 1
-                    self.log.info(f"跳过签到: 根据配置跳过 (还需跳过 {skip - current_count} 次).")
+                    if not quiet:
+                        self.log.info(f"跳过签到: 根据配置跳过 (还需跳过 {skip - current_count} 次).")
                     return CheckinResult.IGNORE
                 else:
                     self.interval_pool[self.client.me.id] = 0
