@@ -5,7 +5,6 @@ __ignore__ = True
 
 class TestGroupCheckin(BotCheckin):
     name = "群组签到测试"
-    bot_username = "embykeeper_test_bot"
     chat_name = "api_group"
     bot_checkin_cmd = "签到"
 
