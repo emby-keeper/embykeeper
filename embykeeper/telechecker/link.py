@@ -9,7 +9,8 @@ from loguru import logger
 from pyrogram import filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
-from pyrogram.raw.functions.messages import DeleteHistory
+from pyrogram.raw.functions.account import GetNotifySettings
+from pyrogram.raw.types import PeerNotifySettings, InputNotifyPeer
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
 
 from ..utils import async_partial, truncate_str
@@ -73,69 +74,80 @@ class Link:
         """
         for r in range(retries):
             self.log.debug(f"[gray50]禁用提醒 {timeout} 秒: {self.bot}[/]")
+            peer = InputNotifyPeer(peer=await self.client.resolve_peer(self.bot))
+            settings: PeerNotifySettings = await self.client.invoke(GetNotifySettings(peer=peer))
+            old_mute_until = settings.mute_until
             await self.client.mute_chat(self.bot, time.time() + timeout + 5)
-            future = asyncio.Future()
-            handler = MessageHandler(
-                async_partial(self._handler, cmd=cmd, future=future, condition=condition),
-                filters.text & filters.bot & filters.user(self.bot),
-            )
-            await self.client.add_handler(handler, group=1)
             try:
-                messages = []
-                messages.append(await self.client.send_message(self.bot, f"/start quiet"))
-                await asyncio.sleep(0.5)
-                if photo:
-                    messages.append(await self.client.send_photo(self.bot, photo, cmd))
-                else:
-                    messages.append(await self.client.send_message(self.bot, cmd))
-                self.log.debug(f"[gray50]-> {cmd}[/]")
-                results = await asyncio.wait_for(future, timeout=timeout)
-            except asyncio.CancelledError:
+                future = asyncio.Future()
+                handler = MessageHandler(
+                    async_partial(self._handler, cmd=cmd, future=future, condition=condition),
+                    filters.text & filters.bot & filters.user(self.bot),
+                )
+                await self.client.add_handler(handler, group=1)
                 try:
-                    await asyncio.wait_for(self.delete_messages(messages), 1.0)
+                    messages = []
+                    messages.append(await self.client.send_message(self.bot, f"/start quiet"))
+                    await asyncio.sleep(0.5)
+                    if photo:
+                        messages.append(await self.client.send_photo(self.bot, photo, cmd))
+                    else:
+                        messages.append(await self.client.send_message(self.bot, cmd))
+                    self.log.debug(f"[gray50]-> {cmd}[/]")
+                    results = await asyncio.wait_for(future, timeout=timeout)
+                except asyncio.CancelledError:
+                    try:
+                        await asyncio.wait_for(self.delete_messages(messages), 1.0)
+                    except asyncio.TimeoutError:
+                        pass
+                    finally:
+                        raise
                 except asyncio.TimeoutError:
-                    pass
-                finally:
-                    raise
-            except asyncio.TimeoutError:
-                await self.delete_messages(messages)
-                if r + 1 < retries:
-                    self.log.info(f"{name}超时 ({r + 1}/{retries}), 将在 3 秒后重试.")
-                    await asyncio.sleep(3)
-                    continue
-                else:
-                    msg = f"{name}超时 ({r + 1}/{retries})."
+                    await self.delete_messages(messages)
+                    if r + 1 < retries:
+                        self.log.info(f"{name}超时 ({r + 1}/{retries}), 将在 3 秒后重试.")
+                        await asyncio.sleep(3)
+                        continue
+                    else:
+                        msg = f"{name}超时 ({r + 1}/{retries})."
+                        if fail:
+                            raise LinkError(msg)
+                        else:
+                            self.log.warning(msg)
+                            return None
+                except YouBlockedUser:
+                    msg = "您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用."
                     if fail:
                         raise LinkError(msg)
                     else:
-                        self.log.warning(msg)
+                        self.log.error(msg)
                         return None
-            except YouBlockedUser:
-                msg = "您在账户中禁用了用于 API 信息传递的 Bot: @embykeeper_auth_bot, 这将导致 embykeeper 无法运行, 请尝试取消禁用."
-                if fail:
-                    raise LinkError(msg)
                 else:
-                    self.log.error(msg)
-                    return None
-            else:
-                await self.delete_messages(messages)
-                status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
-                if status == "error":
-                    if fail:
-                        raise LinkError(f"{errmsg}.")
+                    await self.delete_messages(messages)
+                    status, errmsg = [results.get(p, None) for p in ("status", "errmsg")]
+                    if status == "error":
+                        if fail:
+                            raise LinkError(f"{errmsg}.")
+                        else:
+                            self.log.warning(f"{name}错误: {errmsg}.")
+                            return False
+                    elif status == "ok":
+                        return results
                     else:
-                        self.log.warning(f"{name}错误: {errmsg}.")
-                        return False
-                elif status == "ok":
-                    return results
-                else:
-                    if fail:
-                        raise LinkError("出现未知错误.")
-                    else:
-                        self.log.warning(f"{name}出现未知错误.")
-                        return False
+                        if fail:
+                            raise LinkError("出现未知错误.")
+                        else:
+                            self.log.warning(f"{name}出现未知错误.")
+                            return False
+                finally:
+                    await self.client.remove_handler(handler, group=1)
             finally:
-                await self.client.remove_handler(handler, group=1)
+                try:
+                    await self.client.mute_chat(self.bot, until=old_mute_until)
+                except asyncio.TimeoutError:
+                    self.log.debug(f"[gray50]重新设置通知设置失败: {self.bot}[/]")
+                else:
+                    self.log.debug(f"[gray50]重新设置通知设置成功: {self.bot}[/]")
 
     async def _handler(
         self,
@@ -172,10 +184,6 @@ class Link:
                     future.set_exception(e)
             finally:
                 message.continue_propagation()
-
-    async def delete_history(self):
-        self.log.debug("清空机器人日志记录.")
-        await self.client.invoke(DeleteHistory(max_id=0, peer=await self.client.resolve_peer(self.bot)))
 
     async def auth(self, service: str, log_func=None):
         """向机器人发送授权请求."""

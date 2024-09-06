@@ -17,6 +17,8 @@ from pyrogram import filters
 from pyrogram.errors import UsernameNotOccupied, FloodWait, UsernameInvalid
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
+from pyrogram.raw.functions.account import GetNotifySettings
+from pyrogram.raw.types import PeerNotifySettings, InputNotifyPeer
 from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
 from thefuzz import fuzz, process
 
@@ -330,8 +332,10 @@ class BotCheckin(BaseBotCheckin):
 
             if not self.chat_name:
                 self.log.debug(f"[gray50]禁用提醒 {self.timeout} 秒: {bot.username}[/]")
+                peer = InputNotifyPeer(peer=await self.client.resolve_peer(ident))
+                settings: PeerNotifySettings = await self.client.invoke(GetNotifySettings(peer=peer))
+                old_mute_until = settings.mute_until
                 await self.client.mute_chat(ident, time.time() + self.timeout + 10)
-
             try:
                 async with self.listener():
                     cancelled = False
@@ -368,6 +372,14 @@ class BotCheckin(BaseBotCheckin):
                 return CheckinResult.FAIL
             except asyncio.TimeoutError:
                 pass
+            finally:
+                if not self.chat_name:
+                    try:
+                        await self.client.mute_chat(ident, until=old_mute_until)
+                    except asyncio.TimeoutError:
+                        self.log.debug(f"[gray50]重新设置通知设置失败: {ident}[/]")
+                    else:
+                        self.log.debug(f"[gray50]重新设置通知设置成功: {ident}[/]")
             if not self.finished.is_set():
                 self.log.warning("无法在时限内完成签到.")
                 return CheckinResult.FAIL
