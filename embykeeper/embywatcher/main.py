@@ -382,7 +382,7 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
                             return True
                         else:
                             loggeruser.info(f"还需播放 {req_time - played_time:.0f} 秒.")
-                            rt = random.uniform(30, 60)
+                            rt = random.uniform(5, 15)
                             loggeruser.info(f"等待 {rt:.0f} 秒后播放下一个.")
                             await asyncio.sleep(rt)
                             break
@@ -483,12 +483,12 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
             return False
 
 
-async def watcher(config: dict, debug=False):
+async def watcher(config: dict, instant: bool = False):
     """入口函数 - 观看一个视频."""
 
     async def wrapper(emby: Emby, loggeruser: Logger, time: float, multiple: bool):
         try:
-            if not debug:
+            if not instant:
                 wait = random.uniform(180, 360)
                 loggeruser.info(f"播放视频前随机等待 {wait:.0f} 秒.")
                 await asyncio.sleep(wait)
@@ -519,14 +519,14 @@ async def watcher(config: dict, debug=False):
 
 
 async def watcher_schedule(
-    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 7, debug: bool = False
+    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 7, instant: bool = False
 ):
     """计划任务 - 观看一个视频."""
     while True:
         dt = next_random_datetime(start_time, end_time, interval_days=days)
         logger.bind(scheme="embywatcher").info(f"下一次保活将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
         await asyncio.sleep((dt - datetime.now()).total_seconds())
-        await watcher(config, debug=debug)
+        await watcher(config, instant=instant)
 
 
 async def watcher_continuous(config: dict):

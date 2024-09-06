@@ -235,7 +235,7 @@ async def main(
 
     if instant and not debug_cron:
         if emby:
-            pool.add(watcher(config))
+            pool.add(watcher(config, instant=True))
         if checkin:
             pool.add(checkiner(config, instant=True))
         await pool.wait()
@@ -247,7 +247,7 @@ async def main(
             if debug_cron:
                 start_time = end_time = (datetime.now() + timedelta(seconds=10)).time()
                 pool.add(
-                    watcher_schedule(config, start_time=start_time, end_time=end_time, days=0, debug=True)
+                    watcher_schedule(config, start_time=start_time, end_time=end_time, days=0, instant=True)
                 )
             else:
                 pool.add(watcher_schedule(config, days=emby))
