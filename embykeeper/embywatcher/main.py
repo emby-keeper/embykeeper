@@ -5,7 +5,6 @@ import random
 import string
 from typing import TYPE_CHECKING, Iterable, Union
 from datetime import datetime, time, timezone
-import uuid
 import warnings
 
 from aiohttp import ClientError, ClientConnectionError
@@ -212,7 +211,7 @@ async def login(config, continuous=False):
         if info:
             loggeruser = logger.bind(server=info["ServerName"], username=a["username"])
             loggeruser.info(
-                f'成功登录至服务器 "{a["url"]}" ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).'
+                f'成功连接至服务器 "{a["url"]}" ({"Jellyfin" if a.get("jellyfin", False) else "Emby"} {info["Version"]}).'
             )
             yield (
                 emby,
