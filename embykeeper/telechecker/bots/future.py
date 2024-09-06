@@ -23,6 +23,10 @@ class FutureCheckin(BotCheckin):
     click_button = ["签到", "簽到"]
 
     async def message_handler(self, client, message: Message):
+        if message.text and "未加入" in message.text:
+            self.log.warning(f"签到失败: 账户错误.")
+            return await self.fail()
+        
         if message.text and "驗證您的身份" in message.text and message.reply_markup:
             keys = [b for r in message.reply_markup.inline_keyboard for b in r]
             for b in keys:
