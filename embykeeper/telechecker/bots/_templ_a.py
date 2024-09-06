@@ -10,7 +10,11 @@ class TemplateACheckin(BotCheckin):
     bot_checkin_cmd = "/start"
 
     async def message_handler(self, client, message: Message):
-        if message.caption and ("请选择功能" in message.caption or "用户面板" in message.caption) and message.reply_markup:
+        if (
+            message.caption
+            and ("请选择功能" in message.caption or "用户面板" in message.caption)
+            and message.reply_markup
+        ):
             keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
             for k in keys:
                 if "签到" in k:
@@ -27,5 +31,6 @@ class TemplateACheckin(BotCheckin):
 
         await super().message_handler(client, message)
 
+
 def use(**kw):
-    return type('TemplatedClass', (TemplateACheckin,), kw)
+    return type("TemplatedClass", (TemplateACheckin,), kw)

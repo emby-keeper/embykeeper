@@ -65,15 +65,15 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
         names = get_names(type)
     results = []
     for name in names:
-        match = re.match(r'templ_(\w+)<(\w+)>', name)
+        match = re.match(r"templ_(\w+)<(\w+)>", name)
         if match:
             try:
                 module = import_module(f"{__product__}.{sub}._templ_{match.group(1).lower()}")
-                func = getattr(module, 'use', None)
+                func = getattr(module, "use", None)
                 if not func:
                     logger.warning(f'您配置的 "{type}" 不支持模板 "{match.group(1)}".')
                     continue
-                results.append(func(bot_username = match.group(2), name=f'@{match.group(2)}'))
+                results.append(func(bot_username=match.group(2), name=f"@{match.group(2)}"))
             except ImportError:
                 all_names = get_names(type)
                 logger.warning(f'您配置的 "{type}" 不支持站点 "{name}", 请从以下站点中选择:')
@@ -126,7 +126,7 @@ async def checkiner(config: dict, instant=False):
             logger.info("已连接到 Telegram, 签到器正在初始化.")
             clses = extract(get_cls("checkiner", names=config.get("service", {}).get("checkiner", None)))
             if not clses:
-                log.warning('没有任何有效签到站点, 签到将跳过.')
+                log.warning("没有任何有效签到站点, 签到将跳过.")
                 continue
             if not await Link(tg).auth("checkiner", log_func=log.error):
                 continue
@@ -213,7 +213,7 @@ async def monitorer(config: dict):
             logger.info("已连接到 Telegram, 监控器正在初始化.")
             clses = extract(get_cls("monitor", names=config.get("service", {}).get("monitor", None)))
             if not clses:
-                log.warning('没有任何有效监控站点, 监控将跳过.')
+                log.warning("没有任何有效监控站点, 监控将跳过.")
             if not await Link(tg).auth("monitorer", log_func=log.error):
                 continue
             names = []
@@ -246,7 +246,7 @@ async def messager(config: dict):
             logger.info("已连接到 Telegram, 自动水群正在初始化.")
             clses = extract(get_cls("messager", names=config.get("service", {}).get("messager", None)))
             if not clses:
-                log.warning('没有任何有效自动水群站点, 自动水群将跳过.')
+                log.warning("没有任何有效自动水群站点, 自动水群将跳过.")
             if not await Link(tg).auth("messager", log_func=log.error):
                 continue
             for cls in clses:
