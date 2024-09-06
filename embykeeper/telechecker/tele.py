@@ -311,15 +311,20 @@ class Client(pyrogram.Client):
                         continue
 
                     chat_id = utils.get_peer_id(message.peer_id)
-                    messages[chat_id] = await types.Message._parse(self, message, users, chats)
+                    try:
+                        messages[chat_id] = await types.Message._parse(self, message, users, chats)
+                    except BadRequest:
+                        continue
 
                 dialogs = []
 
                 for dialog in r.dialogs:
                     if not isinstance(dialog, raw.types.Dialog):
                         continue
-
-                    dialogs.append(types.Dialog._parse(self, dialog, messages, users, chats))
+                    try:
+                        dialogs.append(types.Dialog._parse(self, dialog, messages, users, chats))
+                    except BadRequest:
+                        continue
 
                 if not dialogs:
                     return
