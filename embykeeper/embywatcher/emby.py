@@ -1,7 +1,5 @@
 import asyncio
 import random
-import re
-import ssl
 from urllib.parse import urlencode, urlunparse
 import uuid
 import warnings
@@ -95,9 +93,7 @@ class Connector(_Connector):
             "DeviceId": device_id,
             "Version": version,
         }
-        auth_header = "Emby "
-        for k, v in auth_headers.items():
-            auth_header += f"{k}={v},"
+        auth_header = f"Emby {','.join([f'{k}={v}' for k, v in auth_headers.items()])}"
         if self.token:
             headers["X-Emby-Token"] = self.token
         headers["User-Agent"] = ua
@@ -147,6 +143,11 @@ class Connector(_Connector):
             loop_id = hash(loop)
             self._sessions[loop_id] = None
             self._session_uses[loop_id] = 0
+
+    @async_func
+    async def login_if_needed(self):
+        if not self.token:
+            return await self.login()
 
     @async_func
     async def _req(self, method, path, params={}, **query):
