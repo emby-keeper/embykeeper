@@ -142,12 +142,13 @@ class Link:
                 finally:
                     await self.client.remove_handler(handler, group=1)
             finally:
-                try:
-                    await self.client.mute_chat(self.bot, until=old_mute_until)
-                except asyncio.TimeoutError:
-                    self.log.debug(f"[gray50]重新设置通知设置失败: {self.bot}[/]")
-                else:
-                    self.log.debug(f"[gray50]重新设置通知设置成功: {self.bot}[/]")
+                if old_mute_until:
+                    try:
+                        await self.client.mute_chat(self.bot, until=old_mute_until)
+                    except asyncio.TimeoutError:
+                        self.log.debug(f"[gray50]重新设置通知设置失败: {self.bot}[/]")
+                    else:
+                        self.log.debug(f"[gray50]重新设置通知设置成功: {self.bot}[/]")
 
     async def _handler(
         self,

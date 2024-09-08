@@ -373,7 +373,7 @@ class BotCheckin(BaseBotCheckin):
             except asyncio.TimeoutError:
                 pass
             finally:
-                if not self.chat_name:
+                if old_mute_until and (not self.chat_name):
                     try:
                         await self.client.mute_chat(ident, until=old_mute_until)
                     except asyncio.TimeoutError:
