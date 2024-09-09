@@ -6,6 +6,7 @@ from pyrogram.types import Message
 from ..link import Link
 from ._base import BotCheckin
 
+__ignore__ = True
 
 class CharonCheckin(BotCheckin):
     name = "卡戎"
@@ -34,10 +35,10 @@ class CharonCheckin(BotCheckin):
 
     async def handle_url(self, url: str):
         self.log.debug(f"即将解析网页中的验证码: {url}.")
-        for i in range(10):
+        for i in range(3):
             result = await Link(self.client).captcha_url("charon", url)
             if result:
                 await self.client.send_message(self.bot_username, result)
                 break
             else:
-                self.log.warning(f"正在重试解析验证码 ({i+1} / 10).")
+                self.log.warning(f"正在重试解析验证码 ({i+1} / 3).")
