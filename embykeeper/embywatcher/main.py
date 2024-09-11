@@ -172,7 +172,7 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
     if not is_ok(await c.post("/Sessions/Playing/Stopped", data=playing_info(time * 10000000))):
         raise PlayError("无法停止播放")
     else:
-        loggeruser.info(f"播放完成, 共 {time} 秒.")
+        loggeruser.info(f"播放完成, 共 {time:.0f} 秒.")
 
     task.cancel()
     try:
@@ -491,8 +491,6 @@ async def watcher(config: dict, instant: bool = False):
                 wait = random.uniform(180, 360)
                 loggeruser.info(f"播放视频前随机等待 {wait:.0f} 秒.")
                 await asyncio.sleep(wait)
-            else:
-                loggeruser.warning("处于调试模式, 播放前模拟挑选随机等待被跳过.")
             if isinstance(time, Iterable):
                 tm = max(time) * 2
             else:
