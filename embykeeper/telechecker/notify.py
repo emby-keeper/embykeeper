@@ -7,6 +7,7 @@ from .log import TelegramStream
 
 logger = logger.bind(scheme="telegram")
 
+
 async def start_notifier(config: dict):
     """消息通知初始化函数."""
 

@@ -3,10 +3,9 @@ from ._base import BotCheckin
 __ignore__ = True
 
 
-class DogSGKCheckin(BotCheckin):
-    name = "狗狗社工库"
-    bot_username = "DogeSGK_bot"
+class RednoseSGKCheckin(BotCheckin):
+    name = "红鼻子社工库"
+    bot_username = "freesgk123_bot"
     bot_checkin_cmd = "/sign"
     additional_auth = ["prime"]
-    bot_success_pat = r".*\+(\d+)"
     bot_checked_keywords = "请勿重复签到"

@@ -44,7 +44,8 @@ default_keywords = {
         "加入群聊",
         "请先关注",
         "请先加入",
-        "注册",
+        "未注册",
+        "先注册",
         "不存在",
     ),
     "too_many_tries_fail": ("已尝试", "过多"),
@@ -335,7 +336,10 @@ class BotCheckin(BaseBotCheckin):
                 peer = InputNotifyPeer(peer=await self.client.resolve_peer(ident))
                 settings: PeerNotifySettings = await self.client.invoke(GetNotifySettings(peer=peer))
                 old_mute_until = settings.mute_until
-                await self.client.mute_chat(ident, time.time() + self.timeout + 10)
+                try:
+                    await self.client.mute_chat(ident, time.time() + self.timeout + 10)
+                except FloodWait:     
+                    self.log.debug(f"[gray50]设置禁用提醒因访问超限而失败: {bot.username}[/]")
             try:
                 async with self.listener():
                     cancelled = False
@@ -378,6 +382,8 @@ class BotCheckin(BaseBotCheckin):
                         await self.client.mute_chat(ident, until=old_mute_until)
                     except asyncio.TimeoutError:
                         self.log.debug(f"[gray50]重新设置通知设置失败: {ident}[/]")
+                    except FloodWait:
+                        self.log.debug(f"[gray50]重新设置通知设置因访问超限而失败: {ident}[/]")
                     else:
                         self.log.debug(f"[gray50]重新设置通知设置成功: {ident}[/]")
             if not self.finished.is_set():
@@ -605,10 +611,12 @@ class BotCheckin(BaseBotCheckin):
                 if answer:
                     self.log.debug(f"智能回答 ({by}): {answer}")
                     if "NO_RESP" in answer:
-                        self.log.info(f"智能回答认为无需进行操作.")
+                        self.log.info(f"智能回答认为无需进行操作, 为了避免风险签到器将停止.")
+                        await self.fail()
                         return
                     if "IS_STATUS" in answer:
-                        self.log.info(f"智能回答认为这是一条状态信息.")
+                        self.log.info(f"智能回答认为这是一条状态信息, 无需进行操作, 为了避免风险签到器将停止.")
+                        await self.fail()
                         return
                     if buttons:
                         self.log.debug(f"当前按钮: {', '.join(button_specs)}")

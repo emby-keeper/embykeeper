@@ -12,6 +12,7 @@ from pyrogram.types import Message
 from pyrogram.raw.functions.account import GetNotifySettings
 from pyrogram.raw.types import PeerNotifySettings, InputNotifyPeer
 from pyrogram.errors.exceptions.bad_request_400 import YouBlockedUser
+from pyrogram.errors import FloodWait
 
 from ..utils import async_partial, truncate_str
 from .lock import account_status, account_status_lock
@@ -77,7 +78,10 @@ class Link:
             peer = InputNotifyPeer(peer=await self.client.resolve_peer(self.bot))
             settings: PeerNotifySettings = await self.client.invoke(GetNotifySettings(peer=peer))
             old_mute_until = settings.mute_until
-            await self.client.mute_chat(self.bot, time.time() + timeout + 5)
+            try:
+                await self.client.mute_chat(self.bot, time.time() + timeout + 5)
+            except FloodWait:     
+                self.log.debug(f"[gray50]设置禁用提醒因访问超限而失败: {self.bot}[/]")
             try:
                 future = asyncio.Future()
                 handler = MessageHandler(
@@ -147,6 +151,8 @@ class Link:
                         await self.client.mute_chat(self.bot, until=old_mute_until)
                     except asyncio.TimeoutError:
                         self.log.debug(f"[gray50]重新设置通知设置失败: {self.bot}[/]")
+                    except FloodWait:
+                        self.log.debug(f"[gray50]重新设置通知设置因访问超限而失败: {self.bot}[/]")
                     else:
                         self.log.debug(f"[gray50]重新设置通知设置成功: {self.bot}[/]")
 

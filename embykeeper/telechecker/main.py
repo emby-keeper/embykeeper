@@ -61,6 +61,12 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
     if names == None:
         names = get_names(type)
     results = []
+    if type == "checkiner" and "sgk" in names:
+        sgk_names = [n for n in get_names(type, allow_ignore=True) if n.endswith('sgk')]
+        names = list(set(sgk_names))
+    if "all" in names:
+        all_names = get_names(type, allow_ignore=True)
+        names = list(set(all_names))
     for name in names:
         match = re.match(r"templ_(\w+)<(\w+)>", name)
         if match:
