@@ -338,7 +338,7 @@ class BotCheckin(BaseBotCheckin):
                 old_mute_until = settings.mute_until
                 try:
                     await self.client.mute_chat(ident, time.time() + self.timeout + 10)
-                except FloodWait:     
+                except FloodWait:
                     self.log.debug(f"[gray50]设置禁用提醒因访问超限而失败: {bot.username}[/]")
             try:
                 async with self.listener():
@@ -615,7 +615,9 @@ class BotCheckin(BaseBotCheckin):
                         await self.fail()
                         return
                     if "IS_STATUS" in answer:
-                        self.log.info(f"智能回答认为这是一条状态信息, 无需进行操作, 为了避免风险签到器将停止.")
+                        self.log.info(
+                            f"智能回答认为这是一条状态信息, 无需进行操作, 为了避免风险签到器将停止."
+                        )
                         await self.fail()
                         return
                     if buttons:

@@ -62,7 +62,7 @@ def get_cls(type: str, names: List[str] = None) -> List[Type]:
         names = get_names(type)
     results = []
     if type == "checkiner" and "sgk" in names:
-        sgk_names = [n for n in get_names(type, allow_ignore=True) if n.endswith('sgk')]
+        sgk_names = [n for n in get_names(type, allow_ignore=True) if n.endswith("sgk")]
         names = list(set(sgk_names))
     if "all" in names:
         all_names = get_names(type, allow_ignore=True)

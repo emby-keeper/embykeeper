@@ -80,7 +80,7 @@ class Link:
             old_mute_until = settings.mute_until
             try:
                 await self.client.mute_chat(self.bot, time.time() + timeout + 5)
-            except FloodWait:     
+            except FloodWait:
                 self.log.debug(f"[gray50]设置禁用提醒因访问超限而失败: {self.bot}[/]")
             try:
                 future = asyncio.Future()
