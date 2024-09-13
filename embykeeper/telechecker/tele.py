@@ -476,7 +476,7 @@ class Client(pyrogram.Client):
                                     limit=pts,
                                 )
                             )
-                        except ChannelPrivate:
+                        except RPCError:
                             pass
                         except ValueError:
                             pass
