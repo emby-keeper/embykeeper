@@ -3,7 +3,6 @@ from pathlib import Path
 import re
 import sys
 import base64
-import hashlib
 
 from loguru import logger
 import tomli as tomllib
@@ -12,10 +11,10 @@ from appdirs import user_data_dir
 
 from . import __name__ as __product__
 from .var import console
-from .telechecker.tele import ClientsSession
-
 
 async def convert_session(accounts, basedir=None):
+    from .telechecker.tele import ClientsSession
+    
     results = []
     for a in accounts:
         async with ClientsSession.from_config({"telegram": [a], "basedir": basedir}) as clients:

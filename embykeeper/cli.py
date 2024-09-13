@@ -213,18 +213,21 @@ async def main(
 
         return await dumper(config, dump)
 
-    from .embywatcher.main import (
-        watcher,
-        watcher_schedule,
-        watcher_continuous_schedule,
-    )
-    from .telechecker.main import (
-        checkiner,
-        checkiner_schedule,
-        messager,
-        monitorer,
-        start_notifier,
-    )
+    from .telechecker.notify import start_notifier
+
+    if emby:
+        from .embywatcher.main import (
+            watcher,
+            watcher_schedule,
+            watcher_continuous_schedule,
+        )
+    if checkin or monitor or send:
+        from .telechecker.main import (
+            checkiner,
+            checkiner_schedule,
+            messager,
+            monitorer,
+        )
 
     pool = AsyncTaskPool()
 

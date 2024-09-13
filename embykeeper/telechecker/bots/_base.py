@@ -19,7 +19,6 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from pyrogram.raw.functions.account import GetNotifySettings
 from pyrogram.raw.types import PeerNotifySettings, InputNotifyPeer
-from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
 from thefuzz import fuzz, process
 
 from embykeeper import __name__ as __product__
@@ -221,6 +220,7 @@ class BotCheckin(BaseBotCheckin):
     async def get_ocr(self, ocr: str = None, range: Optional[Union[CharRange, str]] = None):
         """加载特定标签的 OCR 模型, 默认加载 ddddocr 默认模型."""
         from ddddocr import DdddOcr
+        from onnxruntime.capi.onnxruntime_pybind11_state import InvalidProtobuf
 
         while True:
             async with ocrs_lock:
