@@ -12,9 +12,10 @@ from appdirs import user_data_dir
 from . import __name__ as __product__
 from .var import console
 
+
 async def convert_session(accounts, basedir=None):
     from .telechecker.tele import ClientsSession
-    
+
     results = []
     for a in accounts:
         async with ClientsSession.from_config({"telegram": [a], "basedir": basedir}) as clients:
@@ -160,6 +161,7 @@ def write_faked_config(path, quiet=False):
     doc.add(nl())
     doc.add(comment(f"服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改."))
     doc.add(comment(f"该部分内容是根据 {__product__.capitalize()} {__version__} 生成的."))
+    doc.add(comment(f'使用 checkiner = ["all"] 以启用所有签到器, 使用 checkiner = ["sgk"] 以启用所有社工库签到器.'))
     doc.add(nl())
     service = item(
         {
