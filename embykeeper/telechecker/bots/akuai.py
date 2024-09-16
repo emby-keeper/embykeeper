@@ -6,4 +6,3 @@ __ignore__ = True
 class AkuaiCheckin(TemplateACheckin):
     name = "Akuai"
     bot_username = "joulilibot"
-    bot_checkin_cmd = "/start"

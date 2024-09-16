@@ -6,4 +6,3 @@ __ignore__ = True
 class TheEndCheckin(TemplateACheckin):
     name = "阿甘正传"
     bot_username = "theendemby_bot"
-    bot_checkin_cmd = "/start"
