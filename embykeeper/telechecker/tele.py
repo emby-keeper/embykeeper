@@ -213,7 +213,12 @@ class Client(pyrogram.Client):
                         msg = f'验证码错误, 请重新输入 "{self.phone_number}" 的登录验证码 (按回车确认)'
                     else:
                         msg = f'请从{code_target[sent_code.type]}接收 "{self.phone_number}" 的登录验证码 (按回车确认)'
-                    self.phone_code = Prompt.ask(" " * 23 + msg, console=var.console)
+                    try:
+                        self.phone_code = Prompt.ask(" " * 23 + msg, console=var.console)
+                    except EOFError:
+                        raise BadRequest(
+                            f'登录 "{self.phone_number}" 时出现异常: 您正在使用非交互式终端, 无法输入验证码.'
+                        )
                 signed_in = await self.sign_in(self.phone_number, sent_code.phone_code_hash, self.phone_code)
             except (CodeInvalid, PhoneCodeInvalid):
                 self.phone_code = None
