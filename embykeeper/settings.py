@@ -36,7 +36,7 @@ def check_config(config):
             Optional("retries"): PositiveInt(),
             Optional("concurrent"): PositiveInt(),
             Optional("random"): PositiveInt(),
-            Optional("notifier"): Or(str, bool),
+            Optional("notifier"): Or(str, bool, int),
             Optional("nofail"): bool,
             Optional("proxy"): Schema(
                 {
