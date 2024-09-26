@@ -1,8 +1,14 @@
+<script setup>
+
+import Logo from '../components/Logo.vue';
+
+</script>
+
 # 什么是 Embykeeper?
 
 <p align="center">
   <a href='https://github.com/emby-keeper/embykeeper'>
-    <img src="https://github.com/emby-keeper/embykeeper/raw/main/images/logo.svg" alt="Embykeeper" />
+    <Logo />
   </a>
 </p>
 
