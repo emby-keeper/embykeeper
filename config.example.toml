@@ -48,25 +48,26 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8618323433500"
+phone = "+8613841281929"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8615635499568"
+phone = "+8614770237375"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://jensen.biz/"
-username = "nbernard"
-password = "*%NO1K^tr#"
+url = "https://cole.info/"
+username = "mcain"
+password = "@5OhZA)5CN"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://barnett.org/"
-username = "danielmartin"
-password = "2!8Mn9tpRT"
+url = "https://peterson-jacobs.com/"
+username = "allison63"
+password = "*4CeKgj@2D"
 time = [120, 240] # 模拟观看的时长范围 (秒)
+
