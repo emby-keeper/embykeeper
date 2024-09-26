@@ -1,6 +1,6 @@
 .RECIPEPREFIX := >
 .DEFAULT_GOAL := help
-.PHONY: help help/simple help/all install develop venv venv/clean python/venv conda/venv conda/install run run/debug run/web systemd systemd/install systemd/uninstall lint test debugpy debugpy/cli debugpy/web version version/patch version/minor version/major push clean clean/build clean/pyc clean/test
+.PHONY: help help/simple help/all install develop venv venv/require venv/clean python/venv conda/venv conda/install run run/debug run/web systemd systemd/install systemd/uninstall lint lint/node lint/python test debugpy debugpy/cli debugpy/web version version/patch version/minor version/major config/generate push clean clean/build clean/pyc clean/test node/require docs/dev docs/build docs/preview
 
 USE_MIRROR ?= True
 
@@ -28,6 +28,8 @@ help/simple:
 >   @echo "  install - 创建一个 Python 环境并在其中安装 Embykeeper"
 >   @echo "  develop - 创建一个 Python 环境并在其中安装 Embykeeper, 同时安装开发相关工具"
 >   @echo "  run - 运行 Embykeeper (使用默认配置文件 config.toml)"
+>   @echo "  run/debug - 运行 Embykeeper (使用默认配置文件 config.toml), 并启用调试日志输出"
+>   @echo "  run/web - 运行 Embykeeper 的在线网页服务器"
 >   @echo "  systemd - 启用 Embykeeper 自动启动"
 >   @echo "  lint - 使用 black 和 pre-commit 检查代码风格"
 >   @echo "  test - 使用 pytest 运行代码测试"
@@ -45,7 +47,7 @@ help/all:
 >   @echo "  venv/clean - 删除所有创建的 Python 环境"
 >   @echo '  python/venv - 使用可用 Python 在 "<CWD>/venv" 创建 Virtualvenv 虚拟环境'
 >   @echo '  conda/venv - 使用 Conda 在 "<CWD>/venv" 中创建 Conda 虚拟环境'
->   @echo '  conda/install - 在 "<CWD>/conda" 安装 Conda.
+>   @echo '  conda/install - 在 "<CWD>/conda" 安装 Conda.'
 >   @echo "  run - 运行 Embykeeper (使用默认配置文件 config.toml)"
 >   @echo "  run/debug - 运行 Embykeeper (使用默认配置文件 config.toml), 并启用调试日志输出"
 >   @echo "  run/web - 运行 Embykeeper 的在线网页服务器"
@@ -61,11 +63,16 @@ help/all:
 >   @echo "  version/patch - 运行 bump2version 版本更新 (patch, 例如 1.0.0 -> 1.0.1)"
 >   @echo "  version/minor - 运行 bump2version 版本更新 (minor, 例如 1.0.0 -> 1.1.0)"
 >   @echo "  version/major - 运行 bump2version 版本更新 (major, 例如 1.0.0 -> 2.0.0)"
+>   @echo "  config/generate - 生成示例配置文件"
 >   @echo "  push - 推送提交和标签"
 >   @echo "  clean - 删除所有 Python 缓存, 构建缓存和测试缓存 (不包括 Python 虚拟环境)"
 >   @echo "  clean/build - 删除构建缓存"
 >   @echo "  clean/pyc - 删除 Python 缓存"
 >   @echo "  clean/test - 删除测试缓存"
+>   @echo "  node/require - 安装 NPM 依赖"
+>   @echo "  docs/dev - 在本地启动文档服务器"
+>   @echo "  docs/build - 构建文档"
+>   @echo "  docs/preview - 预览文档"
 
 install: venv
 >   @"$(VENV)/bin/python" -m pip install -i "$(PYPI_URL)" -U pip && \
@@ -194,7 +201,12 @@ systemd/uninstall:
 >       echo 'Info: 已移除 systemd 配置. Embykeeper 不再自动启动.'; \
 >   fi
 
-lint: venv/require
+lint: lint/python lint/node
+
+lint/node: node/require
+>   npm run lint
+
+lint/python: venv/require
 >   "$(VENV)/bin/python" -m black .
 >   "$(VENV)/bin/python" -m pre_commit run -a
 
@@ -213,15 +225,23 @@ version: version/patch
 
 version/patch: venv/require
 >   "$(VENV)/bin/python" -m bumpversion patch
->   git push && git push --tags
+>   $(MAKE) config/generate
+>   $(MAKE) push
 
 version/minor: venv/require
 >   "$(VENV)/bin/python" -m bumpversion minor
->   git push && git push --tags
+>   $(MAKE) config/generate
+>   $(MAKE) push
 
 version/major: venv/require
 >   "$(VENV)/bin/python" -m bumpversion major
->   git push && git push --tags
+>   $(MAKE) config/generate
+>   $(MAKE) push
+
+config/generate: venv/require
+>   "$(VENV)/bin/python" -m embykeeper -E > config.example.toml
+>   git add config.example.toml
+>   git commit -m "Generate example config file for $$(git describe --tags --abbrev=0)"
 
 push:
 >   git push && git push --tags
@@ -246,3 +266,18 @@ clean/test:
 >   rm -fr .tox/
 >   rm -f .coverage
 >   rm -fr htmlcov/
+
+node/require:
+>   @if [ ! -d "node_modules" ]; then \
+>       echo "正在安装 NPM 依赖..."; \
+>       npm install; \
+>   fi
+
+docs/dev: node/require
+>   npm run docs:dev
+
+docs/build: node/require
+>   npm run docs:build
+
+docs/preview: node/require
+>   npm run docs:preview

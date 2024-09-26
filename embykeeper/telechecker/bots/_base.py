@@ -377,15 +377,16 @@ class BotCheckin(BaseBotCheckin):
             except asyncio.TimeoutError:
                 pass
             finally:
-                if old_mute_until and (not self.chat_name):
-                    try:
-                        await self.client.mute_chat(ident, until=old_mute_until)
-                    except asyncio.TimeoutError:
-                        self.log.debug(f"[gray50]重新设置通知设置失败: {ident}[/]")
-                    except FloodWait:
-                        self.log.debug(f"[gray50]重新设置通知设置因访问超限而失败: {ident}[/]")
-                    else:
-                        self.log.debug(f"[gray50]重新设置通知设置成功: {ident}[/]")
+                if not self.chat_name:
+                    if old_mute_until:
+                        try:
+                            await self.client.mute_chat(ident, until=old_mute_until)
+                        except asyncio.TimeoutError:
+                            self.log.debug(f"[gray50]重新设置通知设置失败: {ident}[/]")
+                        except FloodWait:
+                            self.log.debug(f"[gray50]重新设置通知设置因访问超限而失败: {ident}[/]")
+                        else:
+                            self.log.debug(f"[gray50]重新设置通知设置成功: {ident}[/]")
             if not self.finished.is_set():
                 self.log.warning("无法在时限内完成签到.")
                 return CheckinResult.FAIL

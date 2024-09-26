@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "cli": "make run",
+    "cli:dev": "make run/dev",
+    "cli:install": "make install",
+    "cli:develop": "make develop",
+    "web": "make run/web",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "lint": "prettier -w docs"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "vitepress": "^1.3.4"
+  },
+  "dependencies": {
+    "@lehoczky/vue-termynal": "^1.3.0",
+    "vue-lazyload": "^3.0.0"
+  }
+}

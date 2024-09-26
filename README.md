@@ -1,8 +1,8 @@
-[![build status](https://img.shields.io/github/actions/workflow/status/zetxtech/embykeeper/ci.yml?branch=main)](https://github.com/zetxtech/embykeeper/commits/main) [![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![docker](https://img.shields.io/docker/v/embykeeper/embykeeper?label=docker)](https://hub.docker.com/r/embykeeper/embykeeper) [![docker pulls](https://img.shields.io/docker/pulls/embykeeper/embykeeper?label=pulls)](https://hub.docker.com/r/embykeeper/embykeeper) [![license badge](https://img.shields.io/github/license/zetxtech/embykeeper)](https://github.com/zetxtech/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper) [![telegram badge](https://img.shields.io/badge/telegram-group-violet)](https://t.me/embykeeperchat)
+[![build status](https://img.shields.io/github/actions/workflow/status/emby-keeper/embykeeper/ci.yml?branch=main)](https://github.com/emby-keeper/embykeeper/commits/main) [![pypi badge](https://img.shields.io/pypi/v/embykeeper)](https://pypi.org/project/embykeeper/) [![docker](https://img.shields.io/docker/v/embykeeper/embykeeper?label=docker)](https://hub.docker.com/r/embykeeper/embykeeper) [![docker pulls](https://img.shields.io/docker/pulls/embykeeper/embykeeper?label=pulls)](https://hub.docker.com/r/embykeeper/embykeeper) [![license badge](https://img.shields.io/github/license/emby-keeper/embykeeper)](https://github.com/emby-keeper/embykeeper/blob/main/LICENSE) [![telegram badge](https://img.shields.io/badge/telegram-bot-blue)](https://t.me/embykeeper_bot) [![telegram badge](https://img.shields.io/badge/telegram-channel-green)](https://t.me/embykeeper) [![telegram badge](https://img.shields.io/badge/telegram-group-violet)](https://t.me/embykeeperchat)
 
 <p align="center">
-  <a href='https://github.com/zetxtech/embykeeper'>
-    <img src="https://github.com/zetxtech/embykeeper/raw/main/images/logo.svg" alt="Embykeeper" />
+  <a href='https://github.com/emby-keeper/embykeeper'>
+    <img src="https://github.com/emby-keeper/embykeeper/raw/main/images/logo.svg" alt="Embykeeper" />
   </a>
 </p>
 <p align="center">
@@ -11,30 +11,74 @@
 
 ---
 
-Embykeeper 是一个用于 Emby 影视服务器的签到和保号的自动执行工具, 可以实现机器人自动签到和 Emby 服务器登陆模拟播放的功能.
+## 功能
+
+Embykeeper 是一个 Emby 影视服务器签到保号的自动执行工具, 它主要提供两大核心功能:
+
+1. **TG 机器人签到** - 可以自动完成 50+ 站点的 Telegram 机器人每日签到, 以获取积分.
+
+2. **Emby 保号** - 通过模拟登录和播放视频, 定期保持 Emby 账号的活跃状态, 支持任何 Emby 站点.
+
+除此之外,Embykeeper 还提供了一些额外功能：
+
+1. **自动抢注** - 监听邀请码发码信息和开放注册信息, 并自动抢注.
+
+2. **群组游戏** - 自动完成群组内的抢红包和答题等游戏, 以获取积分.
+
+3. **便捷的二次开发** - 基于 Pyrogram 开发, 提供了一套便捷的框架来实现新的签到器.
+
+项目支持 Python 运行、Docker 部署或云部署, 且完全开源, 不存储任何密钥或隐私信息, 经两年的开发已经在稳定和安全性方面有一定保证.
 
 ## 存储库迁移
 
-由于作者 (jackzzs) 账号莫名被封, 原 embykeeper/embykeeper 存储库已迁移到[这里](https://github.com/zetxtech/embykeeper). 之后的更新在这里进行.
+由于作者 (jackzzs) 账号莫名被封, 原 embykeeper/embykeeper 存储库已迁移到 [emby-keeper/embykeeper](https://github.com/emby-keeper/embykeeper). 之后的更新在这里进行.
 
 ## 声明
 
-本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关. 为了您的账号安全, 推荐使用小号.
+本项目涉及的一切 Emby 服务器与 Embykeeper 开发团队无关, 在使用 Embykeeper 时造成的一切损失 (包括但不限于 Emby 或 Telegram 账号被封禁或被群封禁) 与开发团队无关. 为了您的账号安全, 推荐使用小号. 运行该工具的 Telegram 账号若通过接码注册, 请使用一段时间再接入本工具.
 
 本项目设计初衷是在中文 Emby 社群规则下, 保号要求逐渐苛刻 (部分要求每月登录或每日签到), 这使得休闲时间紧张的人士难以安心使用. 本项目仅旨在帮助该类人群保号, 不鼓励持有大量 Emby 账号而不使用, 导致真正需要的人、为中文影视资源分享和翻译有贡献的人难以获得账号的行为, 开发团队也呼吁仅保留 1-2 个较全面质量较高的 Emby 服务器. 本项目仅提供工具, 具体使用形式及造成的影响和后果与开发团队无关.
 
-本项目欢迎友善讨论与建议, 您可以通过 [Github Issue](https://github.com/zetxtech/embykeeper) 途径反馈, 并认可开发团队可以关闭与项目开发不直接相关的不友善讨论. 您也可以通过 [Telegram 讨论群](https://t.me/embykeeper_chat_bot) 获得社区帮助.
-
-Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)" 发送信息, 用于用户验证, 在线验证码解析, 以及日志记录, 以供定时从 "[Embykeeper Bot](https://t.me/embykeeper_bot)" 向您推送日志, 日志内容不含任何密码或密钥信息, 您认可该命令不会给您带来隐私与安全问题.
+Embykeeper 将自动向 Embykeeper Auth Bot ([@embykeeper_auth_bot](https://t.me/embykeeper_auth_bot))" 发送信息, 用于在线验证码解析、日志记录、用户验证等, 内容不含任何密码或密钥信息, 或其他敏感隐私信息.
 
 当您安装并使用该工具, 默认您已经阅读并同意上述声明, 并确认自己并非出于"集邮"目的而安装.
 
-## 功能
+## 安装与使用
+
+Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 请点击下方按钮开始部署:
+
+[![Setup Tutorial](https://github.com/emby-keeper/embykeeper/raw/main/images/setup-button.svg)](https://emby-keeper.github.io/guide/安装指南)
+
+若您没有服务器, 您可以通过免费托管平台进行部署, 点击下方按钮开始部署:
+
+[![Deploy to Huggingface Space](https://github.com/emby-keeper/embykeeper/raw/main/images/deploy-to-hf.svg)](https://huggingface.co/spaces/embykeeper/embykeeper?duplicate=true)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/emby-keeper/embykeeper/raw/main/images/hf-tutorial.svg)](https://blog.zetx.tech/2024/05/19/embykeeper-hf-tutorial/)
+
+[![Deploy to Render](https://github.com/emby-keeper/embykeeper/raw/main/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/emby-keeper/embykeeper/tree/stable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/emby-keeper/embykeeper/raw/main/images/render-tutorial.svg)](https://blog.zetx.tech/2023/06/26/embykeeper-render-tutorial)
+
+若您有服务器, 我们推荐使用 [Docker 部署](https://emby-keeper.github.io/guide/Linux-Docker-部署):
+
+```bash
+docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
+```
+
+您也可以使用 [Docker Compose 部署](https://emby-keeper.github.io/guide/Linux-Docker-Compose-部署).
+
+更多安装和配置方面的帮助请参考 [Wiki](https://github.com/emby-keeper/embykeeper/wiki).
+
+本项目欢迎友善讨论与建议, 您可以通过 [Github Issue](https://github.com/emby-keeper/embykeeper) 途径反馈, 并认可开发团队可以关闭与项目开发不直接相关的不友善讨论. 您也可以通过 [Telegram 讨论群](https://t.me/embykeeper_chat_bot) 获得社区帮助.
+
+## 运行截图
+
+![Screenshot](https://github.com/emby-keeper/embykeeper/raw/main/images/screenshot.png)
+
+## 完整功能支持列表
 
 - **Emby 保活**
   - 定时模拟账号登录视频播放
   - 播放时间与进度模拟
 - **Telegram 机器人签到**
+  <!-- #region checkiner-sites -->
+
   - 卷毛鼠 (`jms`): [频道](https://t.me/CurlyMouse) [群组](https://t.me/Curly_Mouse) [机器人](https://t.me/jmsembybot)
   - 终点站 (`terminus`): [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
   - Pornemby (`pornemby`): [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot)
@@ -65,7 +109,19 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
   - Lyrebird (`lyrebird`): [频道](https://t.me/lyrebirdchannel) [群组](https://t.me/lyrebirdchat) [机器人](https://t.me/Lyrebird_bot)
   - 非越助手 (`sfcju`): [频道](https://t.me/sfcj_org) [群组](https://t.me/sfcj_chat) [机器人](https://t.me/sfcju_Bot)
   - Yomo (`yomo`): [频道](https://t.me/yomoemby_notice) [群组](https://t.me/yomoemby) [机器人](https://t.me/yomoemby_bot)
-  - 关服, 无响应, 或已停用签到功能 (默认禁用, 请参考[Wiki](https://github.com/zetxtech/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
+  - Raismusic (`raismusic`): [频道](https://t.me/raisemby_channel) [群组1](https://t.me/raismusic_group) [群组2](https://t.me/Raisembyg) [机器人](https://t.me/raismusicbot)
+
+  <!-- #endregion checkiner-sites -->
+  - 测试中新签到器 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region checkiner-beta-sites -->
+
+    - Marmot: [频道](https://t.me/Marmot_Emby_Channel) [机器人](https://t.me/Marmot_Emby_Account_BOT)
+      - 每 14 天自动群里发送签到 (`marmot_group`): [群组](https://t.me/Marmot_Emby)(非公开)
+
+    <!-- #endregion checkiner-beta-sites -->
+  - 关服, 无响应, 或已停用签到功能 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region checkiner-ignored-sites -->
+
     - Misty (`misty`): ~~[频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
     - Akuai (`akuai`): ~~[频道](https://t.me/Akuaitzpibgdao) [群组](https://t.me/ikuaiemby) [机器人](https://t.me/joulilibot)~~
     - 垃圾影音 (`ljyy`): ~~[群组](https://t.me/+3sP2A-fgeXg0ZmY1) [机器人](https://t.me/zckllflbot)~~
@@ -77,9 +133,13 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
     - 剧狗 (`judog`): ~~[频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
     - Heisi (`heisi`): ~~[频道](https://t.me/HeisiEm) [群组](https://t.me/HeisiYi) [机器人](https://t.me/HeisiheiBot)~~
     - 阿甘正传 (`theend`): ~~[群组](https://t.me/+5vRfDeGmOKNiMzU1) [机器人](https://t.me/theendemby_bot)~~
-  - 其他非 Emby 相关 (默认禁用, 请参考[Wiki](https://github.com/zetxtech/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
+
+    <!-- #endregion checkiner-ignored-sites -->
+  - 其他非 Emby 相关 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region checkiner-other-sites -->
+
     - AVIBI (`avibi`): [频道](https://t.me/plus_emby) [群组](https://t.me/plusemby) [机器人](https://t.me/AIVBIbot)
-    - 搜书神器 (`sssq`) ([@chneez](https://github.com/zetxtech/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot?start=fromid_6489896414)
+    - 搜书神器 (`sssq`) ([@chneez](https://github.com/emby-keeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot?start=fromid_6489896414)
     - 纸片 DDoS (`zhipian`): [频道](https://t.me/PaperBotnet) [机器人](https://t.me/zhipianbot?start=2zbx04e)
     - 情报局社工库 (`infsgk`) ([@GrandDuke1106](https://github.com/GrandDuke1106) 增加): [机器人](https://t.me/qbjSGKzhuquebot?start=NjQ4OTg5NjQxNA==)
     - AI 社工库 (`aisgk`): [频道](https://t.me/AISGKChannel) [机器人](https://t.me/aishegongkubot?start=AISGK_BZ5728VM)
@@ -116,7 +176,11 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
     - Shzi (`shzi`): [机器人](https://t.me/aishuazibot?start=QvSBSqCG)
     - 飞机工具箱 (`feiji`): [机器人](https://t.me/fjtool_bot?start=6489896414C44)
     - 鸟哥轰炸 (`niaoge`): [机器人](https://t.me/nb3344bot?start=6489896414)
+
+    <!-- #endregion checkiner-other-sites -->
 - **Telegram 自动监控信息**
+  <!-- #region monitor-sites -->
+
   - Pornemby:
     - 科举考试 (`pornemby_answer`): [活动频道](https://t.me/PornembyFun)
     - 自动抢注 (`pornemby_register`): [群组](https://t.me/Pornemby)
@@ -125,51 +189,40 @@ Embykeeper 将自动向 "[Embykeeper Auth Bot](https://t.me/embykeeper_auth_bot)
     - 无 HP 自动停止自动水群 (`pornemby_double`): [群组](https://t.me/Pornemby)
     - 风险时期自动停止 (`pornemby_alert`): [群组](https://t.me/Pornemby)
   - 不给看 抢邀请码 (`bgk`): [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
-  - 测试中的站点 (默认禁用, 请参考[Wiki](https://github.com/zetxtech/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
+
+  <!-- #endregion monitor-sites -->
+  - 测试中的站点 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region monitor-beta-sites -->
+
     - 未响 抢邀请码 (`future`): [频道](https://t.me/FutureEcho_Notice) [群组](https://t.me/FutureEcho_Chat) [机器人](https://t.me/lotayu_bot)
-  - 关服或无响应 (默认禁用, 请参考[Wiki](https://github.com/zetxtech/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
+
+    <!-- #endregion monitor-beta-sites -->
+  - 关服或无响应 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region monitor-ignored-sites -->
+
     - 全局自动从众 (`follow`): 当在任何群组中发现 5 分钟内 5 条一样内容的消息, 会自动跟一句 (影响范围大默认禁用)
     - Misty 开注自动注册 (`misty`): ~~[频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
     - Polo 抢邀请码 (`polo`): ~~[频道](https://t.me/poloembyc) [群组](https://t.me/poloemby) [机器人](https://t.me/polo_emby_bot)~~
     - 剧狗 开注自动注册 (`judog`): ~~[频道](https://t.me/Mulgoreemby) [机器人](https://t.me/mulgorebot)~~
     - Embyhub 开注自动注册 (`embyhub`): ~~[频道](https://t.me/embyhub) [群组](https://t.me/emby_hub) [机器人](https://t.me/EdHubot)~~
     - Viper 抢邀请码 (`viper`): ~~[频道](https://t.me/viper_emby_channel) [群组](https://t.me/Viper_Emby_Chat) [机器人](https://t.me/viper_emby_bot)~~
-- **Telegram 自动水群** (默认使用内建话术列表, 易被辨别和封禁, 请谨慎使用)
-  - Pornemby (`pornemby`): [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/zetxtech/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
-  - 关服或无响应 (默认禁用, 请参考[Wiki](https://github.com/zetxtech/embykeeper/wiki/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6#service-%E5%AD%90%E9%A1%B9)启用):
+
+    <!-- #endregion monitor-ignored-sites -->
+
+- **Telegram 自动水群**
+  <!-- #region messager-sites -->
+
+  - Pornemby (`pornemby`): [频道](https://t.me/pornembyservice) [群组](https://t.me/Pornemby) [机器人](https://t.me/PronembyTGBot2_bot) [内建话术列表](https://github.com/emby-keeper/embykeeper-data/blob/main/data/pornemby-common-wl%40v1.yaml)
+
+  <!-- #endregion messager-sites -->
+  - 关服或无响应 (默认禁用, 请参考[Wiki](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
+    <!-- #region messager-ignored-sites -->
+
     - NakoNako 自动水群 (`nakonako`): ~~[群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
 
-**注意**: 部分功能由于涉及竞争条件 / 付费验证码解析服务等，部分功能需要[高级用户](https://github.com/zetxtech/embykeeper/wiki/%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E-%E2%80%90-%E9%AB%98%E7%BA%A7%E7%94%A8%E6%88%B7) (永久可用).
+    <!-- #endregion messager-ignored-sites -->
 
-## 安装与使用
-
-Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 请点击下方按钮开始安装:
-
-[![Setup Tutorial](https://github.com/zetxtech/embykeeper/raw/main/images/setup-button.svg)](https://github.com/zetxtech/embykeeper/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)
-
-若您没有服务器, 您可以通过免费托管平台进行部署, 点击下方按钮开始部署:
-
-[![Deploy to Huggingface Space](https://github.com/zetxtech/embykeeper/raw/main/images/deploy-to-hf.svg)](https://huggingface.co/spaces/embykeeper/embykeeper?duplicate=true)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/zetxtech/embykeeper/raw/main/images/hf-tutorial.svg)](https://blog.zetx.tech/2024/05/19/embykeeper-hf-tutorial/)
-
-[![Deploy to Render](https://github.com/zetxtech/embykeeper/raw/main/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/zetxtech/embykeeper/tree/stable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/zetxtech/embykeeper/raw/main/images/render-tutorial.svg)](https://blog.zetx.tech/2023/06/26/embykeeper-render-tutorial)
-
-若您有服务器, 我们推荐使用 [Docker 部署](https://github.com/zetxtech/embykeeper/wiki/Linux-Docker-%E9%83%A8%E7%BD%B2):
-
-```bash
-docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
-```
-
-您也可以使用 [Docker Compose 部署](https://github.com/zetxtech/embykeeper/wiki/Linux-Docker-Compose-%E9%83%A8%E7%BD%B2).
-
-除此之外, 您还可以通过 [PyPI 安装](https://github.com/zetxtech/embykeeper/wiki/Linux-%E4%BB%8E-PyPI-%E5%AE%89%E8%A3%85) 或 [源码构建](https://github.com/zetxtech/embykeeper/wiki/Linux-%E4%BB%8E%E6%BA%90%E7%A0%81%E6%9E%84%E5%BB%BA).
-
-更多安装和配置方面的帮助请参考 [Wiki](https://github.com/zetxtech/embykeeper/wiki).
-
-**注意**: 请尽可能使用小号运行本工具, 运行该工具的 Telegram 账号若通过接码注册, 请使用一段时间再接入本工具.
-
-## 运行截图
-
-![Screenshot](https://github.com/zetxtech/embykeeper/raw/main/images/screenshot.png)
+**注意**: 部分功能由于涉及竞争条件和付费验证码解析服务等, 仅有[高级用户](https://emby-keeper.github.io/guide/高级用户)才能使用, 您需要共享邀请码或[赞助项目](https://afdian.com/a/jackzzs)以成为永久有效期的高级用户.
 
 ## 支持 Embykeeper
 
@@ -180,4 +233,4 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
 ##### 通过[爱发电](https://afdian.com/a/jackzzs)赞助
 
-![Kitty](https://github.com/zetxtech/embykeeper/raw/main/images/kitty.gif)
+![Kitty](https://github.com/emby-keeper/embykeeper/raw/main/images/kitty.gif)
