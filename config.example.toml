@@ -30,7 +30,7 @@ random = 15
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 5.0.0 生成的.
+# 该部分内容是根据 Embykeeper 5.0.1 生成的.
 # 使用 checkiner = ["all"] 以启用所有签到器, 使用 checkiner = ["sgk"] 以启用所有社工库签到器.
 
 # 默认启用站点:
@@ -48,26 +48,26 @@ random = 15
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8616871736077"
+phone = "+8617267956331"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8614892989866"
+phone = "+8616712696896"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://reynolds.com/"
-username = "robinsondylan"
-password = "4%FkCUxD!N"
+url = "https://www.rose-boone.com/"
+username = "kari59"
+password = "^%ptPU+n18"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://rice.com/"
-username = "leonard71"
-password = "t#&%6xUx$h"
+url = "https://www.sanchez-gray.com/"
+username = "ochoadesiree"
+password = "*#Pw(EgpF5"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
