@@ -1,1 +1,1 @@
-embykeeper==4.0.12
+embykeeper==5.0.0
