@@ -6,7 +6,7 @@ from ._base import BotCheckin
 class MarmotGroupCheckin(BotCheckin):
     name = "Marmot 群组发言"
     chat_name = "Marmot_Emby"
-    bot_checkin_cmd = ["卡", "打卡", "保号", "冒泡"]
+    bot_checkin_cmd = ["签到", "打劫", "没币了", "低保", "打卡", "冒泡"]
     skip = 14
 
     async def send_checkin(self):
