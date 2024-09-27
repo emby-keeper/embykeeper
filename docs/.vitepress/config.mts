@@ -1,14 +1,30 @@
 import { defineConfig } from 'vitepress';
+import {
+  pagefindPlugin,
+  chineseSearchOptimize,
+} from 'vitepress-plugin-pagefind';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  lang: 'zh-CN',
+  lang: 'zh-cn',
   title: 'Embykeeper',
   description: 'Emby 签到保号的自动执行工具',
   cleanUrls: true,
   head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
   sitemap: {
     hostname: 'https://emby-keeper.github.io',
+  },
+  vite: {
+    plugins: [
+      pagefindPlugin({
+        customSearchQuery: chineseSearchOptimize,
+        btnPlaceholder: '搜索',
+        placeholder: '搜索文档',
+        emptyText: '空空如也',
+        heading: '共: {{searchResult}} 条结果',
+        excludeSelector: ['img', 'a.header-anchor'],
+      }),
+    ],
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -88,15 +104,6 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/emby-keeper/embykeeper' },
     ],
-
-    search: {
-      provider: 'algolia',
-      options: {
-        appId: 'RLTLHXWTR2',
-        apiKey: '292d52721a1226e128a6b6411efcdd03',
-        indexName: 'embykeeper-docs',
-      },
-    },
 
     editLink: {
       pattern: 'https://github.com/emby-keeper/embykeeper/edit/main/docs/:path',

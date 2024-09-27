@@ -1,3 +1,13 @@
+<script>
+import TerminalExample from './TerminalExample.vue';
+
+export default {
+  components: {
+    TerminalExample,
+  },
+};
+</script>
+
 <template>
   <div class="terminal-example-section">
     <div class="content-wrapper">
@@ -11,16 +21,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import TerminalExample from './TerminalExample.vue';
-
-export default {
-  components: {
-    TerminalExample,
-  },
-};
-</script>
 
 <style scoped>
 .terminal-example-section {

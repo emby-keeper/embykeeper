@@ -1,3 +1,7 @@
+<script setup>
+import { withBase } from 'vitepress';
+</script>
+
 <template>
   <div class="web-example-section">
     <div class="content-wrapper">
@@ -6,7 +10,7 @@
         <h3 class="subtitle">支持云部署</h3>
       </div>
       <div class="web-wrapper">
-        <img class="web-box" src="/public/web_example.png" />
+        <img class="web-box" :src="withBase('/web_example.png')" />
       </div>
     </div>
   </div>

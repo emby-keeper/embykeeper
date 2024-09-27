@@ -1,3 +1,13 @@
+<script setup>
+import {
+  VTermynal,
+  VtInput,
+  VtProgress,
+  VtText,
+  VtSpinner,
+} from '@lehoczky/vue-termynal';
+</script>
+
 <template>
   <v-termynal
     class="termynal"
@@ -129,16 +139,6 @@
     </vt-text>
   </v-termynal>
 </template>
-
-<script setup>
-import {
-  VTermynal,
-  VtInput,
-  VtProgress,
-  VtText,
-  VtSpinner,
-} from '@lehoczky/vue-termynal';
-</script>
 
 <style scoped>
 .termynal {

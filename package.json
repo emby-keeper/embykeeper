@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@lehoczky/vue-termynal": "^1.3.0",
+    "pagefind": "^1.1.1",
+    "vitepress-plugin-pagefind": "^0.4.10",
     "vue-lazyload": "^3.0.0"
   }
 }
