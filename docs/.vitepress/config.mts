@@ -6,7 +6,7 @@ import {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  lang: 'zh-cn',
+  lang: 'zh-CN',
   title: 'Embykeeper',
   description: 'Emby 签到保号的自动执行工具',
   cleanUrls: true,
