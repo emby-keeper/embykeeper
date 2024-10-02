@@ -1,5 +1,7 @@
 import asyncio
+from datetime import datetime, timedelta
 import random
+import re
 from urllib.parse import parse_qs, urlparse
 
 from pyrogram.types import Message
@@ -7,6 +9,8 @@ from pyrogram.raw.functions.messages import RequestWebView
 from aiohttp import ClientSession, TCPConnector
 from aiohttp_socks import ProxyConnector, ProxyTimeoutError, ProxyError, ProxyType
 from faker import Faker
+
+from embykeeper.utils import show_exception
 
 from ..link import Link
 from ._base import BotCheckin
@@ -17,14 +21,51 @@ class FutureCheckin(BotCheckin):
     bot_username = "lotayu_bot"
     bot_use_captcha = False
     bot_checkin_cmd = "/start"
-    bot_text_ignore = "請先完成驗證"
+    bot_text_ignore = ["請先完成驗證"]
     additional_auth = ["captcha"]
 
     click_button = ["签到", "簽到"]
+    
+    async def send_checkin(self, retry=False):
+        """发送签到命令, 或依次发送签到命令序列."""
+        if not retry:
+            history_message = await self.get_history_message(limit=10)
+            if history_message:
+                await self.message_handler(self.client, history_message)
+                return
+        return await super().send_checkin(retry=retry)
+    
+    async def get_history_message(self, limit=0):
+        """处理 limit 条历史消息, 并检测是否有验证."""
+        try:
+            m: Message
+            async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
+                if m.text and "點擊下方按鈕並驗證您的身份" in m.text:
+                    time_match = re.search(r'當前時間:(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', m.text)
+                    if not time_match:
+                        return None
+                    time_str = time_match.group(1)
+                    current_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                    now = datetime.now()
+                    time_difference = now - current_time
+                    if time_difference <= timedelta(minutes=2):
+                        return m
+                    else:
+                        return None
+                elif m.caption and "您的驗證已經通過" in m.caption:
+                    return None
+        except Exception as e:
+            self.log.warning("读取历史消息失败, 将不再读取历史消息.")
+            show_exception(e)
+            return None
 
     async def message_handler(self, client, message: Message):
         if message.text and "未加入" in message.text:
             self.log.warning(f"签到失败: 账户错误.")
+            return await self.fail()
+    
+        if message.text and "您有一個還在進行中的驗證會話" in message.text:
+            self.log.warning(f"签到失败: 验证码解析异常, 之前有未完成的验证.")
             return await self.fail()
 
         if message.text and "驗證您的身份" in message.text and message.reply_markup:

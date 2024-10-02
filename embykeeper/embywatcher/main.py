@@ -72,18 +72,6 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
 
     await asyncio.sleep(random.uniform(1, 3))
 
-    # 检查
-    totalticks = obj.object_dict.get("RunTimeTicks")
-    if not totalticks:
-        raise PlayError("无法获取视频长度")
-    if time:
-        if totalticks < time * 10000000:
-            raise PlayError("视频长度低于观看进度所需")
-    else:
-        time = totalticks / 10000000
-
-    await asyncio.sleep(random.uniform(1, 3))
-
     # 获取页面信息
     resp = await c.getJson(
         f"/Videos/{obj.id}/AdditionalParts",
@@ -218,13 +206,14 @@ async def login(config, continuous=False):
                 loggeruser,
                 a.get("time", None if continuous else [120, 240]),
                 True if continuous else a.get("allow_multiple", True),
+                a.get("allow_stream", False),
             )
         else:
             logger.error(f'Emby ({a["url"]}) 无法获取元信息而跳过, 请重新检查配置.')
             continue
 
 
-async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
+async def watch(emby: Emby, loggeruser: Logger, time: float, stream: bool = False, retries: int = 5):
     """
     主执行函数 - 观看一个视频.
     参数:
@@ -242,6 +231,15 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
                     t = random.uniform(*time) + 10
                 else:
                     t = time + 10
+                total_ticks = obj.object_dict.get("RunTimeTicks")
+                if not total_ticks:
+                    if not stream:
+                        rt = random.uniform(30, 60)
+                        loggeruser.info(
+                            f'无法获取视频 "{truncate_str(obj.name, 10)}" 长度, 等待 {rt:.0f} 秒后重试.'
+                        )
+                        await asyncio.sleep(rt)
+                        continue
                 loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({t:.0f} 秒).')
                 while True:
                     try:
@@ -320,7 +318,7 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
             return False
 
 
-async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: int = 5):
+async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, stream: bool = False, retries: int = 5):
     if isinstance(time, Iterable):
         req_time = random.uniform(*time) + 10
     else:
@@ -332,17 +330,20 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
     while True:
         try:
             async for obj in get_random_media(emby):
-                totalticks = obj.object_dict.get("RunTimeTicks")
-                if not totalticks:
-                    rt = random.uniform(30, 60)
-                    loggeruser.info(
-                        f'无法获取视频 "{truncate_str(obj.name, 10)}" 长度, 等待 {rt:.0f} 秒后重试.'
-                    )
-                    await asyncio.sleep(rt)
-                    continue
-                totaltime = totalticks / 10000000
-                if req_time - played_time > totaltime:
-                    play_time = totaltime
+                total_ticks = obj.object_dict.get("RunTimeTicks")
+                if not total_ticks:
+                    if stream:
+                        total_ticks = req_time * 10000000
+                    else:
+                        rt = random.uniform(30, 60)
+                        loggeruser.info(
+                            f'无法获取视频 "{truncate_str(obj.name, 10)}" 长度, 等待 {rt:.0f} 秒后重试.'
+                        )
+                        await asyncio.sleep(rt)
+                        continue
+                total_time = total_ticks / 10000000
+                if req_time - played_time > total_time:
+                    play_time = total_time
                 else:
                     play_time = max(req_time - played_time, 10)
                 loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" ({play_time:.0f} 秒).')
@@ -436,7 +437,7 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, retries: i
             return False
 
 
-async def watch_continuous(emby: Emby, loggeruser: Logger):
+async def watch_continuous(emby: Emby, loggeruser: Logger, stream: bool = False):
     """
     主执行函数 - 持续观看.
 
@@ -447,16 +448,18 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
     while True:
         try:
             async for obj in get_random_media(emby):
-                totalticks = obj.object_dict.get("RunTimeTicks")
-                if not totalticks:
+                total_ticks = obj.object_dict.get("RunTimeTicks")
+                if not total_ticks:
+                    if stream:
+                        loggeruser.warning('"allow_stream" 无法与 "continuous" 共用, 因此已被忽略.')
                     rt = random.uniform(30, 60)
                     loggeruser.info(f"无法获取视频长度, 等待 {rt:.0f} 秒后重试.")
                     await asyncio.sleep(rt)
                     continue
-                totaltime = totalticks / 10000000
-                loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {totaltime:.0f} 秒).')
+                total_time = total_ticks / 10000000
+                loggeruser.info(f'开始尝试播放 "{truncate_str(obj.name, 10)}" (长度 {total_time:.0f} 秒).')
                 try:
-                    await play(obj, loggeruser, time=0)
+                    await play(obj, loggeruser, time=total_time)
                 except PlayError as e:
                     rt = random.uniform(30, 60)
                     loggeruser.info(f"发生错误, 等待 {rt:.0f} 秒后重试: {e}.")
@@ -485,7 +488,7 @@ async def watch_continuous(emby: Emby, loggeruser: Logger):
 async def watcher(config: dict, instant: bool = False):
     """入口函数 - 观看一个视频."""
 
-    async def wrapper(emby: Emby, loggeruser: Logger, time: float, multiple: bool):
+    async def wrapper(emby: Emby, loggeruser: Logger, time: float, multiple: bool, stream: bool):
         try:
             if not instant:
                 wait = random.uniform(180, 360)
@@ -496,17 +499,17 @@ async def watcher(config: dict, instant: bool = False):
             else:
                 tm = time * 6
             if multiple:
-                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), max(tm, 1200))
+                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time, stream), max(tm, 1200))
             else:
-                return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 1200))
+                return await asyncio.wait_for(watch(emby, loggeruser, time, stream), max(tm, 1200))
         except asyncio.TimeoutError:
             loggeruser.warning(f"一定时间内未完成播放, 保活失败.")
             return False
 
     logger.info("开始执行 Emby 保活.")
     tasks = []
-    async for emby, loggeruser, time, multiple in login(config):
-        tasks.append(wrapper(emby, loggeruser, time, multiple))
+    async for emby, loggeruser, time, multiple, stream in login(config):
+        tasks.append(wrapper(emby, loggeruser, time, multiple, stream))
     if not tasks:
         logger.info("没有指定相关的 Emby 服务器, 跳过保活.")
     results = await asyncio.gather(*tasks)
@@ -537,7 +540,7 @@ async def watcher_schedule(
 async def watcher_continuous(config: dict):
     """入口函数 - 持续观看."""
 
-    async def wrapper(emby: Emby, loggeruser: Logger, time: float):
+    async def wrapper(emby: Emby, loggeruser: Logger, time: float, stream: bool):
         if time:
             if isinstance(time, Iterable):
                 time = random.uniform(*time)
@@ -545,7 +548,7 @@ async def watcher_continuous(config: dict):
         else:
             loggeruser.info(f"即将无限连续播放视频.")
         try:
-            await asyncio.wait_for(watch_continuous(emby, loggeruser), time)
+            await asyncio.wait_for(watch_continuous(emby, loggeruser, stream), time)
         except asyncio.TimeoutError:
             loggeruser.info(f"连续播放结束.")
             return True
@@ -554,8 +557,8 @@ async def watcher_continuous(config: dict):
 
     logger.info("开始执行 Emby 持续观看.")
     tasks = []
-    async for emby, loggeruser, time, _ in login(config, continuous=True):
-        tasks.append(wrapper(emby, loggeruser, time))
+    async for emby, loggeruser, time, _, stream in login(config, continuous=True):
+        tasks.append(wrapper(emby, loggeruser, time, stream))
     if not tasks:
         logger.info("没有指定相关的 Emby 服务器, 跳过持续观看.")
     return await asyncio.gather(*tasks)
