@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import random
 import string
-from typing import TYPE_CHECKING, Iterable, Union
+from typing import TYPE_CHECKING, Iterable, Tuple, Union
 from datetime import datetime, time, timezone
 import warnings
 
@@ -492,13 +492,13 @@ async def watcher(config: dict, instant: bool = False):
                 loggeruser.info(f"播放视频前随机等待 {wait:.0f} 秒.")
                 await asyncio.sleep(wait)
             if isinstance(time, Iterable):
-                tm = max(time) * 2
+                tm = max(time) * 6
             else:
-                tm = time * 2
+                tm = time * 6
             if multiple:
-                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), max(tm, 180))
+                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time), max(tm, 1200))
             else:
-                return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 180))
+                return await asyncio.wait_for(watch(emby, loggeruser, time), max(tm, 1200))
         except asyncio.TimeoutError:
             loggeruser.warning(f"一定时间内未完成播放, 保活失败.")
             return False
@@ -516,11 +516,15 @@ async def watcher(config: dict, instant: bool = False):
 
 
 async def watcher_schedule(
-    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: int = 7, instant: bool = False
+    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: Union[int, Tuple[int, int]] = 7, instant: bool = False
 ):
     """计划任务 - 观看一个视频."""
     while True:
-        dt = next_random_datetime(start_time, end_time, interval_days=days)
+        if isinstance(days, int):
+            rand_days = days
+        else:
+            rand_days = random.randint(*days)
+        dt = next_random_datetime(start_time, end_time, interval_days=rand_days)
         logger.bind(scheme="embywatcher").info(f"下一次保活将在 {dt.strftime('%m-%d %H:%M %p')} 进行.")
         await asyncio.sleep((dt - datetime.now()).total_seconds())
         await watcher(config, instant=instant)

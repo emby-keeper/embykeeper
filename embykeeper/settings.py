@@ -31,7 +31,7 @@ def check_config(config):
     schema = Schema(
         {
             Optional("time"): str,
-            Optional("interval"): PositiveInt(),
+            Optional("interval"): Or(PositiveInt(), str),
             Optional("timeout"): PositiveInt(),
             Optional("retries"): PositiveInt(),
             Optional("concurrent"): PositiveInt(),
@@ -127,8 +127,8 @@ def write_faked_config(path, quiet=False):
     doc.add(comment('每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.'))
     doc["time"] = "<8:00AM,10:00AM>"
     doc.add(nl())
-    doc.add(comment('每隔几天进行 Emby 保活, 等同于命令行 "-e" 参数.'))
-    doc["interval"] = 3
+    doc.add(comment('每隔几天进行 Emby 保活, 或随机范围, 等同于命令行 "-e" 参数.'))
+    doc["interval"] = "<3,12>"
     doc.add(nl())
     doc.add(comment("将关键信息发送到第一个 Telegram 账号, 设为 N 以发送到第 N 个."))
     doc["notifier"] = True

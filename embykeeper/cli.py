@@ -60,8 +60,8 @@ async def main(
         show_default="不指定值时默认为8:00AM-10:00AM之间随机时间",
         help="启用每日指定时间签到",
     ),
-    emby: int = typer.Option(
-        Flagged(0, 10000),
+    emby: str = typer.Option(
+        Flagged("", "-"),
         "--emby",
         "-e",
         rich_help_panel="模块开关",
@@ -172,13 +172,13 @@ async def main(
         logger.warning("您当前处于计划任务调试模式, 将在 10 秒后运行计划任务.")
 
     default_time = config.get("time", "<8:00AM,10:00AM>")
-    default_interval = config.get("interval", 3)
+    default_interval = config.get("interval", "<3,12>")
     logger.debug(f"采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.")
-
+        
     if checkin == "-":
         checkin = default_time
 
-    if emby == 10000:
+    if emby == "-":
         emby = default_interval
 
     if not checkin and not monitor and not emby and not send:
@@ -187,8 +187,16 @@ async def main(
         monitor = True
         send = True
 
-    if emby < 0:
-        emby = -emby
+    if not isinstance(emby, int):
+        try:
+            emby = abs(int(emby))
+        except ValueError:
+            interval_range_match = re.match(r"<(\d+),(\d+)>", emby)
+            if interval_range_match:
+                emby = [int(interval_range_match.group(1)), int(interval_range_match.group(2))]
+            else:
+                logger.error(f'无法解析保活间隔天数: {default_interval}, 保活将不会运行.')
+                emby = False
 
     if follow:
         from .telechecker.debug import follower
