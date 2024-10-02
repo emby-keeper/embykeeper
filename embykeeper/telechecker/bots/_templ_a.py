@@ -1,6 +1,8 @@
 from pyrogram.types import Message
 from pyrogram.raw.types.messages import BotCallbackAnswer
 
+from embykeeper.utils import to_iterable
+
 from ._base import BotCheckin
 
 __ignore__ = True
@@ -8,11 +10,13 @@ __ignore__ = True
 
 class TemplateACheckin(BotCheckin):
     bot_checkin_cmd = "/start"
+    templ_panel_keywords = ["请选择功能", "用户面板"]
 
     async def message_handler(self, client, message: Message):
+        text = message.caption or message.text
         if (
-            message.caption
-            and ("请选择功能" in message.caption or "用户面板" in message.caption)
+            text
+            and any(keyword in text for keyword in to_iterable(self.templ_panel_keywords))
             and message.reply_markup
         ):
             keys = [k.text for r in message.reply_markup.inline_keyboard for k in r]
