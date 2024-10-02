@@ -14,7 +14,6 @@ from faker import Faker
 from ..link import Link
 from ._base import BotCheckin
 
-
 class TembyCheckin(BotCheckin):
     name = "Temby"
     bot_username = "HiEmbyBot"
@@ -22,6 +21,7 @@ class TembyCheckin(BotCheckin):
     bot_success_pat = r".*(\d+)"
     max_retries = 1
     additional_auth = ["captcha"]
+    bot_account_fail_keywords = ["需要邀请码"]
 
     async def message_handler(self, client: Client, message: Message):
         if message.text and message.text == "请在一分钟内点击下方按钮完成签到":
