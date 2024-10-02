@@ -25,7 +25,7 @@ class FutureCheckin(BotCheckin):
     additional_auth = ["captcha"]
 
     click_button = ["签到", "簽到"]
-    
+
     async def send_checkin(self, retry=False):
         """发送签到命令, 或依次发送签到命令序列."""
         if not retry:
@@ -34,18 +34,18 @@ class FutureCheckin(BotCheckin):
                 await self.message_handler(self.client, history_message)
                 return
         return await super().send_checkin(retry=retry)
-    
+
     async def get_history_message(self, limit=0):
         """处理 limit 条历史消息, 并检测是否有验证."""
         try:
             m: Message
             async for m in self.client.get_chat_history(self.chat_name or self.bot_username, limit=limit):
                 if m.text and "點擊下方按鈕並驗證您的身份" in m.text:
-                    time_match = re.search(r'當前時間:(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', m.text)
+                    time_match = re.search(r"當前時間:(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", m.text)
                     if not time_match:
                         return None
                     time_str = time_match.group(1)
-                    current_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                    current_time = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
                     now = datetime.now()
                     time_difference = now - current_time
                     if time_difference <= timedelta(minutes=2):
@@ -63,7 +63,7 @@ class FutureCheckin(BotCheckin):
         if message.text and "未加入" in message.text:
             self.log.warning(f"签到失败: 账户错误.")
             return await self.fail()
-    
+
         if message.text and "您有一個還在進行中的驗證會話" in message.text:
             self.log.warning(f"签到失败: 验证码解析异常, 之前有未完成的验证.")
             return await self.fail()
