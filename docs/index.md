@@ -1,4 +1,15 @@
 ---
+head:
+  - - meta
+    - name: description
+      content: Embykeeper 是一个Emby 影视服务器签到保号的自动执行工具, 提供 TG 机器人签到和 Emby 服务器保活功能.
+  - - meta
+    - name: keywords
+      content: Embykeeper, Emby, 签到, 保活, Telegram, 公益服
+  - - meta
+    - name: google-site-verification
+      content: 2Rwsm1-SrtpbMLAgt249LnzWKqx2bbuNVuE-5LiU4dc
+
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
