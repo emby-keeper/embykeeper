@@ -159,3 +159,30 @@ docker-compose up -d
 ::::
 
 欢迎您在实现签到器后, 通过 [Pull requests](https://github.com/emby-keeper/embykeeper/pulls) 向 Embykeeper 分享你的成果.
+
+## 部署在线控制台
+
+当 `EK_WEBPASS` 环境变量被设定时, 将启动在线控制台, 默认的命令行将不会启动.
+
+请使用 `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+  embykeeper:
+    container_name: embykeeper
+    image: embykeeper/embykeeper
+    restart: unless-stopped
+    environment:
+      - EK_WEBPASS=123456
+    ports:
+      - 80:1818
+```
+
+并运行:
+
+```bash
+docker compose up -d
+```
+
+将在 80 端口启动在线控制台 HTTP 服务.
