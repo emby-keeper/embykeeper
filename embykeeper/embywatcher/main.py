@@ -516,7 +516,11 @@ async def watcher(config: dict, instant: bool = False):
 
 
 async def watcher_schedule(
-    config: dict, start_time=time(11, 0), end_time=time(23, 0), days: Union[int, Tuple[int, int]] = 7, instant: bool = False
+    config: dict,
+    start_time=time(11, 0),
+    end_time=time(23, 0),
+    days: Union[int, Tuple[int, int]] = 7,
+    instant: bool = False,
 ):
     """计划任务 - 观看一个视频."""
     while True:

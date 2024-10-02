@@ -14,6 +14,7 @@ from faker import Faker
 from ..link import Link
 from ._base import BotCheckin
 
+
 class TembyCheckin(BotCheckin):
     name = "Temby"
     bot_username = "HiEmbyBot"

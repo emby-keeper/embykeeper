@@ -174,7 +174,7 @@ async def main(
     default_time = config.get("time", "<8:00AM,10:00AM>")
     default_interval = config.get("interval", "<3,12>")
     logger.debug(f"采用默认签到时间范围 {default_time}, 默认保活间隔天数 {default_interval}.")
-        
+
     if checkin == "-":
         checkin = default_time
 
@@ -195,7 +195,7 @@ async def main(
             if interval_range_match:
                 emby = [int(interval_range_match.group(1)), int(interval_range_match.group(2))]
             else:
-                logger.error(f'无法解析保活间隔天数: {default_interval}, 保活将不会运行.')
+                logger.error(f"无法解析保活间隔天数: {default_interval}, 保活将不会运行.")
                 emby = False
 
     if follow:
