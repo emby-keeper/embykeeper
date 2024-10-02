@@ -187,7 +187,7 @@ async def main(
         monitor = True
         send = True
 
-    if not isinstance(emby, int):
+    if emby and not isinstance(emby, int):
         try:
             emby = abs(int(emby))
         except ValueError:
