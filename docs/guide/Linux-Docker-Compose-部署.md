@@ -164,6 +164,10 @@ docker-compose up -d
 
 当 `EK_WEBPASS` 环境变量被设定时, 将启动在线控制台, 默认的命令行将不会启动.
 
+::: warning 注意
+自部署不推荐使用在线控制台, 在自部署模式下, 配置文件不生效, 需要通过环境变量输入配置.
+:::
+
 请使用 `docker-compose.yml`:
 
 ```yaml
