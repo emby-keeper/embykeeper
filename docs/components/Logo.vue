@@ -1,7 +1,8 @@
 <template>
   <svg
-    width="640"
-    height="240"
+    width="100%"
+    height="auto"
+    viewBox="0 0 640 240"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:svg="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -64,3 +65,11 @@
     </g>
   </svg>
 </template>
+
+<style scoped>
+svg {
+  max-width: 640px;
+  width: 100%;
+  height: auto;
+}
+</style>
