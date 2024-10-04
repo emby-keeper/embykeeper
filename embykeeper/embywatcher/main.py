@@ -333,7 +333,7 @@ async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, stream: bo
                 total_ticks = obj.object_dict.get("RunTimeTicks")
                 if not total_ticks:
                     if stream:
-                        total_ticks = req_time * 10000000
+                        total_ticks = min(req_time, random.randint(480, 720)) * 10000000
                     else:
                         rt = random.uniform(30, 60)
                         loggeruser.info(
