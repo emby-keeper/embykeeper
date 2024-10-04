@@ -84,7 +84,8 @@ class FutureCheckin(BotCheckin):
                     else:
                         await asyncio.sleep(random.uniform(3, 5))
                         self.log.info("已成功验证, 即将重新进行签到流程.")
-                    await self.retry()
+                    await asyncio.sleep(self.bot_retry_wait)
+                    await self.send_checkin(retry=True)
                     return
             else:
                 self.log.warning(f"签到失败: 账户错误.")
