@@ -197,7 +197,8 @@ import {
     'Courier New', sans-serif;
   font-size: 14px;
   word-break: break-all;
-  text-wrap: wrap;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 @media (min-width: 960px) {
