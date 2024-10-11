@@ -28,11 +28,10 @@ class FutureCheckin(BotCheckin):
 
     async def send_checkin(self, retry=False):
         """发送签到命令, 或依次发送签到命令序列."""
-        if not retry:
-            history_message = await self.get_history_message(limit=10)
-            if history_message:
-                await self.message_handler(self.client, history_message)
-                return
+        history_message = await self.get_history_message(limit=10)
+        if history_message:
+            await self.message_handler(self.client, history_message)
+            return
         return await super().send_checkin(retry=retry)
 
     async def get_history_message(self, limit=0):
@@ -81,12 +80,13 @@ class FutureCheckin(BotCheckin):
                     ).url
                     if not await self.solve_captcha(url_auth):
                         self.log.error("签到失败: 验证码解析失败, 正在重试.")
+                        await asyncio.sleep(self.bot_retry_wait)
+                        await self.send_checkin(retry=True)
+                        return
                     else:
                         await asyncio.sleep(random.uniform(3, 5))
                         self.log.info("已成功验证, 即将重新进行签到流程.")
-                    await asyncio.sleep(self.bot_retry_wait)
-                    await self.send_checkin(retry=True)
-                    return
+                        return
             else:
                 self.log.warning(f"签到失败: 账户错误.")
                 return await self.fail()
