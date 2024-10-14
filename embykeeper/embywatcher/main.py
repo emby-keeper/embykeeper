@@ -120,57 +120,58 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
     }
 
     task = asyncio.create_task(c.get_stream_noreturn(direct_stream_id or f"/Videos/{obj.id}/stream"))
+    
+    try:
+        await asyncio.sleep(random.uniform(1, 3))
 
-    await asyncio.sleep(random.uniform(1, 3))
+        if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0.1))):
+            raise PlayError("无法开始播放")
 
-    if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0.1))):
-        raise PlayError("无法开始播放")
+        t = time
+        last_report_t = t
+        while t > 0:
+            if last_report_t and last_report_t - t > (5 if debug else 30):
+                loggeruser.info(f'正在播放: "{truncate_str(obj.name, 10)}" (还剩 {t:.0f} 秒).')
+                last_report_t = t
+            st = random.uniform(2, 5)
+            await asyncio.sleep(st)
+            t -= st
+            tick = int((time - t) * 10000000)
+            payload = playing_info(tick)
+            try:
+                resp = await asyncio.wait_for(
+                    c.post("/Sessions/Playing/Progress", data=payload, EventName="timeupdate"), 10
+                )
+            except (
+                ClientError,
+                ConnectionError,
+                TimeoutError,
+                asyncio.TimeoutError,
+                asyncio.IncompleteReadError,
+            ) as e:
+                if isinstance(e, asyncio.IncompleteReadError):
+                    await c._reset_session()
+                loggeruser.debug(f"播放状态设定错误: {e}")
+            else:
+                if not is_ok(resp):
+                    loggeruser.debug(f"播放状态设定错误: {resp}")
 
-    t = time
-    last_report_t = t
-    while t > 0:
-        if last_report_t and last_report_t - t > (5 if debug else 30):
-            loggeruser.info(f'正在播放: "{truncate_str(obj.name, 10)}" (还剩 {t:.0f} 秒).')
-            last_report_t = t
-        st = random.uniform(2, 5)
-        await asyncio.sleep(st)
-        t -= st
-        tick = int((time - t) * 10000000)
-        payload = playing_info(tick)
+        await asyncio.sleep(random.uniform(1, 3))
+    finally:
+        task.cancel()
         try:
-            resp = await asyncio.wait_for(
-                c.post("/Sessions/Playing/Progress", data=payload, EventName="timeupdate"), 10
-            )
-        except (
-            ClientError,
-            ConnectionError,
-            TimeoutError,
-            asyncio.TimeoutError,
-            asyncio.IncompleteReadError,
-        ) as e:
-            if isinstance(e, asyncio.IncompleteReadError):
-                await c._reset_session()
-            loggeruser.debug(f"播放状态设定错误: {e}")
-        else:
-            if not is_ok(resp):
-                loggeruser.debug(f"播放状态设定错误: {resp}")
-
-    await asyncio.sleep(random.uniform(1, 3))
+            await task
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            loggeruser.warning(f"模拟播放时, 访问流媒体文件失败.")
+            show_exception(e)
 
     if not is_ok(await c.post("/Sessions/Playing/Stopped", data=playing_info(time * 10000000))):
         raise PlayError("无法停止播放")
     else:
         loggeruser.info(f"播放完成, 共 {time:.0f} 秒.")
-
-    task.cancel()
-    try:
-        await task
-    except asyncio.CancelledError:
-        pass
-    except Exception as e:
-        loggeruser.warning(f"模拟播放时, 访问流媒体文件失败.")
-        show_exception(e)
-    return True
+        return True
 
 
 async def login(config, continuous=False):
@@ -213,7 +214,7 @@ async def login(config, continuous=False):
             continue
 
 
-async def watch(emby: Emby, loggeruser: Logger, time: float, stream: bool = False, retries: int = 5):
+async def watch(emby: Emby, loggeruser: Logger, time: Union[float, Tuple[float, float]], stream: bool = False, retries: int = 5):
     """
     主执行函数 - 观看一个视频.
     参数:
@@ -318,7 +319,7 @@ async def watch(emby: Emby, loggeruser: Logger, time: float, stream: bool = Fals
             return False
 
 
-async def watch_multiple(emby: Emby, loggeruser: Logger, time: float, stream: bool = False, retries: int = 5):
+async def watch_multiple(emby: Emby, loggeruser: Logger, time: Union[float, Tuple[float, float]], stream: bool = False, retries: int = 5):
     if isinstance(time, Iterable):
         req_time = random.uniform(*time) + 10
     else:
@@ -495,13 +496,13 @@ async def watcher(config: dict, instant: bool = False):
                 loggeruser.info(f"播放视频前随机等待 {wait:.0f} 秒.")
                 await asyncio.sleep(wait)
             if isinstance(time, Iterable):
-                tm = max(time) * 6
+                tm = max(time) * 3
             else:
-                tm = time * 6
+                tm = time * 3
             if multiple:
-                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time, stream), max(tm, 1200))
+                return await asyncio.wait_for(watch_multiple(emby, loggeruser, time, stream), max(tm, 600))
             else:
-                return await asyncio.wait_for(watch(emby, loggeruser, time, stream), max(tm, 1200))
+                return await asyncio.wait_for(watch(emby, loggeruser, time, stream), max(tm, 600))
         except asyncio.TimeoutError:
             loggeruser.warning(f"一定时间内未完成播放, 保活失败.")
             return False
@@ -550,7 +551,7 @@ async def watcher_continuous(config: dict):
         try:
             await asyncio.wait_for(watch_continuous(emby, loggeruser, stream), time)
         except asyncio.TimeoutError:
-            loggeruser.info(f"连续播放结束.")
+            loggeruser.info(f"连续播放结束, 将在明天继续连续播放.")
             return True
         else:
             return False
