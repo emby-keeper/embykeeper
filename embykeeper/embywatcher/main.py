@@ -120,7 +120,7 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
     }
 
     task = asyncio.create_task(c.get_stream_noreturn(direct_stream_id or f"/Videos/{obj.id}/stream"))
-    
+
     try:
         await asyncio.sleep(random.uniform(1, 3))
 
@@ -214,7 +214,13 @@ async def login(config, continuous=False):
             continue
 
 
-async def watch(emby: Emby, loggeruser: Logger, time: Union[float, Tuple[float, float]], stream: bool = False, retries: int = 5):
+async def watch(
+    emby: Emby,
+    loggeruser: Logger,
+    time: Union[float, Tuple[float, float]],
+    stream: bool = False,
+    retries: int = 5,
+):
     """
     主执行函数 - 观看一个视频.
     参数:
@@ -319,7 +325,13 @@ async def watch(emby: Emby, loggeruser: Logger, time: Union[float, Tuple[float, 
             return False
 
 
-async def watch_multiple(emby: Emby, loggeruser: Logger, time: Union[float, Tuple[float, float]], stream: bool = False, retries: int = 5):
+async def watch_multiple(
+    emby: Emby,
+    loggeruser: Logger,
+    time: Union[float, Tuple[float, float]],
+    stream: bool = False,
+    retries: int = 5,
+):
     if isinstance(time, Iterable):
         req_time = random.uniform(*time) + 10
     else:

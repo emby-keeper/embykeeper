@@ -4,6 +4,7 @@ from ._base import BotCheckin
 
 __ignore__ = True
 
+
 class MarmotGroupCheckin(BotCheckin):
     name = "Marmot 群组发言"
     chat_name = -1001975531465

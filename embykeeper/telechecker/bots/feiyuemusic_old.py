@@ -4,6 +4,7 @@ from ._base import BotCheckin
 
 __ignore__ = True
 
+
 class FeiyueMusicGroupCheckin(BotCheckin):
     name = "飞跃星空群组发言"
     chat_name = -1002197507537
