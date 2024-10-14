@@ -2,6 +2,7 @@ import random
 from ...utils import to_iterable
 from ._base import BotCheckin
 
+__ignore__ = True
 
 class FeiyueMusicGroupCheckin(BotCheckin):
     name = "飞跃星空群组发言"

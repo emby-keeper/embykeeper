@@ -1,4 +1,4 @@
-from .feiyuemusic import FeiyueMusicGroupCheckin
+from .feiyuemusic_old import FeiyueMusicGroupCheckin
 
 __ignore__ = True
 

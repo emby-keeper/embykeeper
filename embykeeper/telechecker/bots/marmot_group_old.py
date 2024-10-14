@@ -2,6 +2,7 @@ import random
 from ...utils import to_iterable
 from ._base import BotCheckin
 
+__ignore__ = True
 
 class MarmotGroupCheckin(BotCheckin):
     name = "Marmot 群组发言"

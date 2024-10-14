@@ -1,4 +1,4 @@
-from .marmot_group import MarmotGroupCheckin
+from .marmot_group_old import MarmotGroupCheckin
 
 __ignore__ = True
 
