@@ -1,4 +1,4 @@
-FROM embykeeper/embykeeper:v5.0.6
+FROM embykeeper/embykeeper:v5.0.7
 
 RUN useradd -m -u 1000 embykeeper \
     && chown embykeeper:embykeeper /app -R
