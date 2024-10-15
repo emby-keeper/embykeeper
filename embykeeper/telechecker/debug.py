@@ -13,7 +13,7 @@ from pyrogram.handlers import (
     MessageHandler,
     RawUpdateHandler,
 )
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineQuery, Message, ReplyKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
 from rich import box
 from rich.live import Live
 from rich.panel import Panel
@@ -116,17 +116,33 @@ async def follower(config: dict):
         with Live(table, refresh_per_second=4, vertical_overflow="visible"):
             await idle()
 
+def _dumper_mask_update(update):
+    if getattr(update, 'outgoing', False):
+        from_user = getattr(update, 'from_user', {})
+        if from_user:
+            if hasattr(from_user, 'id'):
+                setattr(from_user, 'id', "(sender)")
+            if hasattr(from_user, 'first_name'):
+                setattr(from_user, 'first_name', "(sender)")
+            if hasattr(from_user, 'last_name'):
+                setattr(from_user, 'last_name', "(sender)")
+            if hasattr(from_user, 'next_offline_date'):
+                setattr(from_user, 'next_offline_date', "(sender)")
+            if hasattr(from_user, 'username'):
+                setattr(from_user, 'username', "(sender)")
+    return update
+
 
 async def _dumper_raw(client, update, users, chats):
-    await client.queue.put(update)
+    await client.queue.put(_dumper_mask_update(update))
 
 
 async def _dumper_update(client, update):
     if isinstance(update, list):
         for u in update:
-            await client.queue.put(u)
+            await client.queue.put(_dumper_mask_update(u))
     else:
-        await client.queue.put(update)
+        await client.queue.put(_dumper_mask_update(update))
 
 
 async def dumper(config: dict, specs=["message"]):
@@ -163,7 +179,8 @@ async def dumper(config: dict, specs=["message"]):
                 await tg.add_handler(handler)
             log.info(f'开始监控账号: "{tg.me.name}" 中的更新.')
         while True:
-            update = await queue.get()
+            update = str(await queue.get())
+            
             print(update, flush=True)
 
 
