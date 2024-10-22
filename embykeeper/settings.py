@@ -436,12 +436,16 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
     error_str = str(error)
     if error:
         if "'true' should be instance of 'bool'" in error_str:
-            error_str += '\n说明: 您可能使用了 "true" 或 \'true\' 作为是/否的配置, 请去除引号 (xxx = true).'
+            error_str += "\n说明: 您可能使用了 \"true\" 或 'true' 作为是/否的配置, 请去除引号 (xxx = true)."
         if "'false' should be instance of 'bool'" in error_str:
-            error_str += '\n说明: 您可能使用了 "false" 或 \'false\' 作为是/否的配置, 请去除引号 (xxx = false).'
+            error_str += (
+                "\n说明: 您可能使用了 \"false\" 或 'false' 作为是/否的配置, 请去除引号 (xxx = false)."
+            )
         if "should be instance of 'int'" in error_str:
-            error_str += f'\n说明: 您可能对需要使用数值的参数设置了字符串, 请去除引号 (xxx = 1234).'
-        logger.error(f"配置文件错误, 请检查配置文件 (参考: https://emby-keeper.github.io/guide/配置指南):\n{error_str}")
+            error_str += f"\n说明: 您可能对需要使用数值的参数设置了字符串, 请去除引号 (xxx = 1234)."
+        logger.error(
+            f"配置文件错误, 请检查配置文件 (参考: https://emby-keeper.github.io/guide/配置指南):\n{error_str}"
+        )
         sys.exit(253)
     proxy: dict = config.get("proxy", None)
     if proxy:

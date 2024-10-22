@@ -149,10 +149,12 @@ class FutureCheckin(BotCheckin):
                             if "完成" in result:
                                 return True
                             else:
-                                self.log.warning(f'验证码识别后接口返回异常信息:\n{result}')
+                                self.log.warning(f"验证码识别后接口返回异常信息:\n{result}")
                                 return False
                 except (ProxyTimeoutError, ProxyError, OSError):
-                    self.log.warning(f'无法连接到站点的页面, 可能是您的网络或代理不稳定, 正在重试 ({i+1}/10).')
+                    self.log.warning(
+                        f"无法连接到站点的页面, 可能是您的网络或代理不稳定, 正在重试 ({i+1}/10)."
+                    )
                     continue
             else:
                 self.log.warning(f'无法连接到站点的页面: "{url_submit}", 可能是您的网络或代理不稳定.')

@@ -70,4 +70,3 @@ url = "https://garcia-newton.org/"
 username = "brownmichael"
 password = "+5ZcqpsKbx"
 time = [120, 240] # 模拟观看的时长范围 (秒)
-

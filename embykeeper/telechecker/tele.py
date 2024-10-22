@@ -632,7 +632,7 @@ class ClientsSession:
                 port=proxy["port"],
                 username=proxy.get("username", None),
                 password=proxy.get("password", None),
-                **kw
+                **kw,
             )
         else:
             connector = aiohttp.TCPConnector(**kw)
@@ -675,12 +675,12 @@ class ClientsSession:
                         resp_dict: dict = await resp.json()
                     else:
                         raise RuntimeError()
-                
+
                 api_time_str = resp_dict["dateTime"]
                 api_time = datetime.strptime(api_time_str.split(".")[0], "%Y-%m-%dT%H:%M:%S")
                 api_time = api_time.replace(tzinfo=timezone.utc)
                 api_timestamp = api_time.timestamp()
-                
+
                 nowtime = datetime.now(timezone.utc).timestamp()
                 if abs(nowtime - api_timestamp) > 30:
                     logger.warning(
