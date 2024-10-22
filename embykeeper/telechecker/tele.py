@@ -4,7 +4,7 @@ import binascii
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import asyncio
 import inspect
 from pathlib import Path
@@ -624,7 +624,7 @@ class ClientsSession:
         if not self.watch:
             self.__class__.watch = asyncio.create_task(self.watchdog())
 
-    def get_connector(self, proxy=None):
+    def get_connector(self, proxy=None, **kw):
         if proxy:
             connector = ProxyConnector(
                 proxy_type=ProxyType[proxy["scheme"].upper()],
@@ -632,9 +632,10 @@ class ClientsSession:
                 port=proxy["port"],
                 username=proxy.get("username", None),
                 password=proxy.get("password", None),
+                **kw
             )
         else:
-            connector = aiohttp.TCPConnector()
+            connector = aiohttp.TCPConnector(**kw)
         return connector
 
     async def test_network(self, proxy=None):
@@ -665,7 +666,7 @@ class ClientsSession:
                 return False
 
     async def test_time(self, proxy=None):
-        url = "http://worldtimeapi.org/api/timezone/Etc/UTC"
+        url = "https://timeapi.io/api/Time/current/zone?timeZone=UTC"
         connector = self.get_connector(proxy=proxy)
         async with aiohttp.ClientSession(connector=connector) as session:
             try:
@@ -674,14 +675,20 @@ class ClientsSession:
                         resp_dict: dict = await resp.json()
                     else:
                         raise RuntimeError()
-                unixtime = int(resp_dict.get("unixtime", None))
-                nowtime = datetime.now().timestamp()
-                if abs(nowtime - unixtime) > 30:
+                
+                api_time_str = resp_dict["dateTime"]
+                api_time = datetime.strptime(api_time_str.split(".")[0], "%Y-%m-%dT%H:%M:%S")
+                api_time = api_time.replace(tzinfo=timezone.utc)
+                api_timestamp = api_time.timestamp()
+                
+                nowtime = datetime.now(timezone.utc).timestamp()
+                if abs(nowtime - api_timestamp) > 30:
                     logger.warning(
-                        f"您的系统时间设置不正确, 与世界时间差距过大, 可能会导致连接失败失败, 敬请注意. 程序将继续运行."
+                        f"您的系统时间设置不正确, 与世界时间差距过大, 可能会导致连接失败, 敬请注意. 程序将继续运行."
                     )
-            except Exception:
+            except Exception as e:
                 logger.warning(f"检测世界时间发生错误, 时间检测将被跳过.")
+                show_exception(e)
                 return False
 
     async def login(self, account, proxy):

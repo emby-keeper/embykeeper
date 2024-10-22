@@ -23,6 +23,7 @@ class FutureCheckin(BotCheckin):
     bot_checkin_cmd = "/start"
     bot_text_ignore = ["請先完成驗證"]
     additional_auth = ["captcha"]
+    max_retries = 2
 
     click_button = ["签到", "簽到"]
 
@@ -81,7 +82,7 @@ class FutureCheckin(BotCheckin):
                     if not await self.solve_captcha(url_auth):
                         self.log.error("签到失败: 验证码解析失败, 正在重试.")
                         await asyncio.sleep(self.bot_retry_wait)
-                        await self.send_checkin(retry=True)
+                        await self.retry()
                         return
                     else:
                         await asyncio.sleep(random.uniform(3, 5))
@@ -140,11 +141,19 @@ class FutureCheckin(BotCheckin):
                 "uuid": uuid,
                 "cf-turnstile-response": token,
             }
-            try:
-                async with ClientSession(connector=connector) as session:
-                    async with session.post(url_submit, headers=headers, data=data) as resp:
-                        result = await resp.text()
-                        if "完成" in result:
-                            return True
-            except (ProxyTimeoutError, ProxyError, OSError):
+            for i in range(10):
+                try:
+                    async with ClientSession(connector=connector) as session:
+                        async with session.post(url_submit, headers=headers, data=data) as resp:
+                            result = await resp.text()
+                            if "完成" in result:
+                                return True
+                            else:
+                                self.log.warning(f'验证码识别后接口返回异常信息:\n{result}')
+                                return False
+                except (ProxyTimeoutError, ProxyError, OSError):
+                    self.log.warning(f'无法连接到站点的页面, 可能是您的网络或代理不稳定, 正在重试 ({i+1}/10).')
+                    continue
+            else:
+                self.log.warning(f'无法连接到站点的页面: "{url_submit}", 可能是您的网络或代理不稳定.')
                 return False
