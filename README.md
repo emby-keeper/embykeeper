@@ -113,6 +113,9 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
   - Raismusic (`raismusic`): [频道](https://t.me/raisemby_channel) [群组1](https://t.me/raismusic_group) [群组2](https://t.me/Raisembyg) [机器人](https://t.me/raismusicbot)
   - AVIBI (`avibi`): [频道](https://t.me/plus_emby) [群组](https://t.me/plusemby) [机器人](https://t.me/AIVBIbot)
   - Alpha 海外服 (`alpha`): [频道](https://t.me/AlphaTVOverseaChannel) [群组](https://t.me/AlphaTVOverseaGroup) [机器人](https://t.me/AlphaTVOverseaBoss_bot)
+  - 月饼 (`mooncake`): [频道](https://t.me/Mooncake_notify) [群组](https://t.me/Mooncake_Emby) [机器人](https://t.me/Moonkkbot)
+  - Plumber (`plumber`): [频道](http://t.me/PlumberEmby) [群组](http://t.me/+S060mYNUi1xlODlh) [机器人](https://t.me/Plumberembybot)
+  - 飞跃地平线 (`feiyuedpx`): [频道](https://t.me/dpxpindao) [群组](https://t.me/+vHiy1TBnnjNiOWU1) [机器人](https://t.me/feiyueDPX_bot)
 
   <!-- #endregion checkiner-sites -->
   - 测试中新签到器 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
