@@ -16,6 +16,7 @@ from ._base import BotCheckin
 
 __ignore__ = True
 
+
 class TembyCheckin(BotCheckin):
     name = "Temby"
     bot_username = "HiEmbyBot"
