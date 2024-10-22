@@ -30,43 +30,44 @@ random = 60
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 5.0.9 生成的.
+# 该部分内容是根据 Embykeeper 5.0.10 生成的.
 # 使用 checkiner = ["all"] 以启用所有签到器, 使用 checkiner = ["sgk"] 以启用所有社工库签到器.
 
 # 默认启用站点:
 # [service]
-# checkiner = ["apop", "apoppro", "awamusic", "awatv", "cc", "datasgk", "dvfilm", "feiyue", "feiyuedpx", "future", "jms", "jsq", "lili", "lyrebird", "magic", "micu", "mjj", "mooncake", "pandatv", "pandatv_group", "peach", "pilipili", "plumber", "pornemby", "raismusic", "sfcju", "shufu", "skysink", "temby", "terminus", "tiannan", "watermelon", "yomo"]
+# checkiner = ["apoppro", "awamusic", "awatv", "cc", "datasgk", "dvfilm", "feiyue", "feiyuedpx", "future", "jms", "jsq", "lili", "lyrebird", "magic", "micu", "mjj", "mooncake", "pandatv", "pandatv_group", "peach", "pilipili", "plumber", "pornemby", "raismusic", "sfcju", "shufu", "skysink", "terminus", "tiannan", "watermelon", "yomo"]
 # monitor = ["bgk", "future", "infinity_fly", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "viper"]
 # messager = ["pornemby"]
 
 # 全部可用站点:
 # [service]
-# checkiner = ["_templ_a", "_templ_b", "agentsgk", "aisgk", "akuai", "alpha", "apop", "apoppro", "avibi", "awamusic", "awatv", "baidusgk", "bearsgk", "bingdaosgk", "bitsgk", "bluesea", "bostsgk", "carll1sgk", "carll2sgk", "cc", "charon", "charon_old", "chunjiangsgk", "datasgk", "dingdangsgk", "dogsgk", "dvfilm", "embyhub", "fanhuasgk", "feiji", "feiyue", "feiyuedpx", "feiyuemusic_old", "future", "happy", "heisi", "huasgk", "infsgk", "ingeeksgk", "jms", "jms_iptv", "jms_old", "johnsgk", "jsq", "judog", "koisgk", "lili", "ljyy", "ljyy_old", "lyrebird", "magic", "marmot_group_old", "mastersgk", "micu", "minisgk", "misty", "mjj", "mooncake", "moshensgk", "nebula", "niaoge", "pandatv", "pandatv_group", "peach", "pilipili", "pingansgk", "plumber", "pornemby", "qingfengsgk", "raismusic", "rednosesgk", "seedsgk", "sfcju", "shufu", "shzi", "singularity", "skysink", "sssq", "starsgk", "temby", "temby_old", "terminus", "terminus_old", "theend", "tianmaosgk", "tiannan", "unionsgk", "watermelon", "xraysgk", "yomo", "zhihusgk", "zhipian", "zhushousgk"]
+# checkiner = ["_templ_a", "_templ_b", "agentsgk", "aisgk", "akuai", "alpha", "apop", "apoppro", "avibi", "awamusic", "awatv", "baidusgk", "bearsgk", "bingdaosgk", "bitsgk", "bluesea", "bostsgk", "carll1sgk", "carll2sgk", "cc", "charon", "charon_old", "chunjiangsgk", "datasgk", "dingdangsgk", "dogsgk", "dvfilm", "embyhub", "fanhuasgk", "feiji", "feiyue", "feiyuedpx", "feiyuemusic_old", "future", "happy", "heisi", "huasgk", "infsgk", "ingeeksgk", "jms", "jms_iptv", "jms_old", "johnsgk", "jsq", "judog", "koisgk", "lili", "ljyy", "ljyy_old", "lyrebird", "magic", "marmot_group_old", "mastersgk", "micu", "minisgk", "misty", "mjj", "mooncake", "moshensgk", "nebula", "niaoge", "pandatv", "pandatv_group", "peach", "pilipili", "pingansgk", "plumber", "pornemby", "qingfengsgk", "raismusic", "rednosesgk", "seedsgk", "sfcju", "shufu", "shzi", "singularity", "skysink", "sssq", "starsgk", "temby", "temby_beta", "temby_old", "terminus", "terminus_old", "theend", "tianmaosgk", "tiannan", "unionsgk", "watermelon", "xraysgk", "yomo", "zhihusgk", "zhipian", "zhushousgk"]
 # monitor = ["bgk", "embyhub", "follow", "future", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
 # messager = ["nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8618663075195"
+phone = "+8614220615864"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8614940492666"
+phone = "+8615116889950"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://thomas.com/"
-username = "dgrimes"
-password = ")m*^8@Ez6j"
+url = "https://www.evans.com/"
+username = "kayla00"
+password = "j)S39OBmo@"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://www.mills.biz/"
-username = "michael54"
-password = "FasV_1VfUO"
+url = "https://olson.org/"
+username = "markmyers"
+password = "#&EoNFZx&0"
 time = [120, 240] # 模拟观看的时长范围 (秒)
+
