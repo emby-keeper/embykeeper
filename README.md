@@ -180,6 +180,8 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
     - Shzi (`shzi`): [机器人](https://t.me/aishuazibot?start=QvSBSqCG)
     - 飞机工具箱 (`feiji`): [机器人](https://t.me/fjtool_bot?start=6489896414C44)
     - 鸟哥轰炸 (`niaoge`): [机器人](https://t.me/nb3344bot?start=6489896414)
+    - Akile (`akile`): [群组](https://t.me/akileChat)
+    - Bytevirt (`bytevirt`): [群组](https://t.me/bytevirtchat)
 
     <!-- #endregion checkiner-other-sites -->
 - **Telegram 自动监控信息**
