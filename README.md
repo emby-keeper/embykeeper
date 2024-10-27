@@ -114,7 +114,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
   - 月饼 (`mooncake`): [频道](https://t.me/Mooncake_notify) [群组](https://t.me/Mooncake_Emby) [机器人](https://t.me/Moonkkbot)
   - Plumber (`plumber`): [频道](http://t.me/PlumberEmby) [群组](http://t.me/+S060mYNUi1xlODlh) [机器人](https://t.me/Plumberembybot)
   - 飞跃地平线 (`feiyuedpx`): [频道](https://t.me/dpxpindao) [群组](https://t.me/+vHiy1TBnnjNiOWU1) [机器人](https://t.me/feiyueDPX_bot)
-  - Levilde Luminia (`Levilde Luminia`): [频道](https://t.me/+X5jJKAnbkl8wNWNl) [群组](https://t.me/+LzAmejEBy-I4N2E1) [机器人](https://t.me/Levilde_Luminia_Bot)
+  - Levilde Luminia (`levilde`): [频道](https://t.me/+X5jJKAnbkl8wNWNl) [群组](https://t.me/+LzAmejEBy-I4N2E1) [机器人](https://t.me/Levilde_Luminia_Bot)
   - 收束世界线 (`worldline`): [机器人](https://t.me/WorldLineEmby_bot)
 
   <!-- #endregion checkiner-sites -->
@@ -145,9 +145,9 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
   - 其他非 Emby 相关 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region checkiner-other-sites -->
 
-    - 搜书神器 (`sssq`) ([@chneez](https://github.com/emby-keeper/embykeeper/pull/8) 增加): [机器人](https://t.me/sosdbot?start=fromid_6489896414)
+    - 搜书神器 (`sssq`): [机器人](https://t.me/sosdbot?start=fromid_6489896414)
     - 纸片 DDoS (`zhipian`): [频道](https://t.me/PaperBotnet) [机器人](https://t.me/zhipianbot?start=2zbx04e)
-    - 情报局社工库 (`infsgk`) ([@GrandDuke1106](https://github.com/GrandDuke1106) 增加): [机器人](https://t.me/qbjSGKzhuquebot?start=NjQ4OTg5NjQxNA==)
+    - 情报局社工库 (`infsgk`): [机器人](https://t.me/qbjSGKzhuquebot?start=NjQ4OTg5NjQxNA==)
     - AI 社工库 (`aisgk`): [频道](https://t.me/AISGKChannel) [机器人](https://t.me/aishegongkubot?start=AISGK_BZ5728VM)
     - 狗狗社工库 (`dogsgk`): [频道](https://t.me/DogeSGK) [机器人](https://t.me/DogeSGK_bot?start=6489896414)
     - 花花社工库 (`huasgk`): [频道](https://t.me/sgkhua) [机器人](https://t.me/sgkvipbot?start=vip_1211595)
@@ -182,8 +182,8 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
     - Shzi (`shzi`): [机器人](https://t.me/aishuazibot?start=QvSBSqCG)
     - 飞机工具箱 (`feiji`): [机器人](https://t.me/fjtool_bot?start=6489896414C44)
     - 鸟哥轰炸 (`niaoge`): [机器人](https://t.me/nb3344bot?start=6489896414)
-    - Akile (`akile`): [群组](https://t.me/akileChat)
-    - Bytevirt (`bytevirt`): [群组](https://t.me/bytevirtchat)
+    - Akile (`akile_group`): [群组](https://t.me/akileChat)
+    - Bytevirt (`bytevirt_group`): [群组](https://t.me/bytevirtchat)
 
     <!-- #endregion checkiner-other-sites -->
 - **Telegram 自动监控信息**

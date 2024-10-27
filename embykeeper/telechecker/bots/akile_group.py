@@ -1,5 +1,3 @@
-import random
-from ...utils import to_iterable
 from ._base import BotCheckin
 
 __ignore__ = True
@@ -7,10 +5,6 @@ __ignore__ = True
 
 class AkileGroupCheckin(BotCheckin):
     name = "Akile 群组发言"
-    chat_name = -1001796203774
+    chat_name = "akileChat"
     bot_checkin_cmd = ["/checkin@akilecloud_bot"]
-
-    async def send_checkin(self):
-        cmd = random.choice(to_iterable(self.bot_checkin_cmd))
-        await self.send(cmd)
-        self.finished.set()
+    bot_account_fail_keywords = ["未绑定"]
