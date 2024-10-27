@@ -1,5 +1,6 @@
 from .pornemby_double import PornembyDoubleMonitor
 
+
 class TestPornembyDoubleMonitor(PornembyDoubleMonitor):
     name = "Pornemby 怪兽自动翻倍 测试"
     chat_name = "api_group"

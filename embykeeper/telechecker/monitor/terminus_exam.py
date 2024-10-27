@@ -7,6 +7,7 @@ from ._base import Monitor
 
 __ignore__ = True
 
+
 class TerminusExamMonitor(Monitor):
     name = "终点站考试辅助"
     chat_name = "EmbyPublicBot"
@@ -17,7 +18,7 @@ class TerminusExamMonitor(Monitor):
     trigger_interval = 0
 
     async def on_trigger(self, message: Message, key, reply):
-        self.log.info(f'新题: {key}, 解析中...')
+        self.log.info(f"新题: {key}, 解析中...")
         if message.reply_markup and message.reply_markup.inline_keyboard:
             options = []
             for row in message.reply_markup.inline_keyboard:
@@ -30,5 +31,4 @@ class TerminusExamMonitor(Monitor):
             console.print(result)
             console.rule()
         else:
-            self.log.warning('解析失败! 请自行回答.')
-            
+            self.log.warning("解析失败! 请自行回答.")

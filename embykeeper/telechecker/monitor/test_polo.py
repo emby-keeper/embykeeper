@@ -1,5 +1,6 @@
 from .polo import PoloMonitor
 
+
 class TestPoloMonitor(PoloMonitor):
     name = "Polo 测试"
     chat_name = "api_group"

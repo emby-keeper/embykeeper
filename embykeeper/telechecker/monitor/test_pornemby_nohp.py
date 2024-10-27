@@ -1,5 +1,6 @@
 from .pornemby_nohp import PornembyNoHPMonitor
 
+
 class TestPornembyNoHPMonitor(PornembyNoHPMonitor):
     name = "Pornemby 血量耗尽停止发言 测试"
     chat_name = "api_group"

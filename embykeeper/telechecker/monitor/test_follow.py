@@ -1,5 +1,6 @@
 from ._base import Monitor
 
+
 class TestFollowMonitor(Monitor):
     name = "从众 测试"
     chat_name = "api_group"
@@ -8,4 +9,3 @@ class TestFollowMonitor(Monitor):
     chat_follow_user = 3
     chat_delay = 1
     chat_reply = "我来"
-

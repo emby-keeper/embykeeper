@@ -12,6 +12,7 @@ from ..link import Link
 from ..lock import pornemby_alert
 from ._base import Monitor
 
+
 class _PornembyAnswerResultMonitor(Monitor):
     name = "Pornemby 科举答案"
     history_chat_name = ["Pornemby", "PornembyFun"]
@@ -24,6 +25,7 @@ class _PornembyAnswerResultMonitor(Monitor):
     async def on_trigger(self, message: Message, key, reply):
         spec = f"[gray50]({truncate_str(key[0], 10)})[/]"
         self.log.info(f"本题正确答案为 {key[5]} ({key[self.key_map[key[5]]]}): {spec}.")
+
 
 class _PornembyAnswerAnswerMonitor(Monitor):
     name = "Pornemby 科举"
@@ -78,9 +80,7 @@ class _PornembyAnswerAnswerMonitor(Monitor):
                 finished = True
                 m: Message
                 for g in self.history_chat_name:
-                    async for m in self.client.search_messages(
-                        g, limit=100, offset=count, query="答案为"
-                    ):
+                    async for m in self.client.search_messages(g, limit=100, offset=count, query="答案为"):
                         if m.date < to_date:
                             break
                         count += 1
@@ -170,13 +170,17 @@ class _PornembyAnswerAnswerMonitor(Monitor):
             self.log.info(f"点击失败: {result} 不是可用的答案 {spec}.")
         except RPCError:
             self.log.info(f"点击失败: 问题已失效.")
-            
+
+
 class PornembyAnswerMonitor:
     class PornembyAnswerResultMonitorA(_PornembyAnswerResultMonitor):
         chat_name = "Pornemby"
+
     class PornembyAnswerResultMonitorB(_PornembyAnswerResultMonitor):
         chat_name = "PornembyFun"
+
     class PornembyAnswerAnswerMonitorA(_PornembyAnswerAnswerMonitor):
         chat_name = "Pornemby"
+
     class PornembyAnswerAnswerMonitorB(_PornembyAnswerAnswerMonitor):
         chat_name = "PornembyFun"

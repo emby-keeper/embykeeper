@@ -8,7 +8,15 @@ from loguru import logger
 import tomli as tomllib
 from pyrogram import filters
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.types import Message, BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, CallbackQuery
+from pyrogram.types import (
+    Message,
+    BotCommand,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    CallbackQuery,
+)
 
 from embykeeper.utils import AsyncTyper
 from embykeeper.telechecker.tele import Client, API_KEY
@@ -32,23 +40,19 @@ async def exam(client: Client, message: Message):
     user_id = message.from_user.id
 
     # Initialize user state
-    user_states[user_id] = {
-        "waiting_for_exam_choice": True
-    }
+    user_states[user_id] = {"waiting_for_exam_choice": True}
 
     # Send initial exam information
     initial_message = (
         "通过考核才能注册 Emby 公益服账号或继续使用账号，是否开始考核？ ( 本次考核需要消耗 40 积分 )"
     )
-    keyboard = ReplyKeyboardMarkup([
-        ["✅ 开始", "🚫 放弃"]
-    ], resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup([["✅ 开始", "🚫 放弃"]], resize_keyboard=True, one_time_keyboard=True)
     await client.send_message(user_id, initial_message, reply_markup=keyboard)
 
 
 async def handle_exam_choice(client: Client, message: Message):
     user_id = message.from_user.id
-    
+
     if user_id not in user_states or not user_states[user_id].get("waiting_for_exam_choice"):
         await client.send_message(user_id, "请先使用 /exam 命令开始考试。")
         return
@@ -64,12 +68,9 @@ async def handle_exam_choice(client: Client, message: Message):
         await client.send_message(user_id, start_message, reply_markup=ReplyKeyboardRemove())
 
         # Initialize user state and start the exam
-        user_states[user_id].update({
-            "current_question": 0,
-            "score": 0,
-            "start_time": message.date,
-            "waiting_for_exam_choice": False
-        })
+        user_states[user_id].update(
+            {"current_question": 0, "score": 0, "start_time": message.date, "waiting_for_exam_choice": False}
+        )
         await send_question(client, user_id)
     elif choice == "🚫 放弃":
         await client.send_message(user_id, "考核已取消。", reply_markup=ReplyKeyboardRemove())
@@ -84,26 +85,26 @@ async def send_question(client: Client, user_id):
     if user_id not in user_states:
         await client.send_message(user_id, "考试已结束或尚未开始。请使用 /exam 命令开始新的考试。")
         return
-    
+
     state = user_states[user_id]
     if state["current_question"] >= len(questions):
         await end_exam(client, user_id)
         return
 
     question = questions[state["current_question"]]
-    
+
     # Randomize the order of choices and generate unique IDs
     choices = [(generate_random_id(), option) for option in question["choices"]]
     random.shuffle(choices)
-    
+
     # Store the mapping of IDs to choices for later verification
     state["current_choices"] = {id: option for id, option in choices}
-    
+
     keyboard = [[InlineKeyboardButton(option, callback_data=f"exam-{id}")] for id, option in choices]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     text = f"{question['question']}\n\n本题贡献者: @测试题库\n\n进度: {state['current_question'] + 1}/{len(questions)}  |  当前分数: {state['score']}"
-    
+
     if "message_id" not in state:
         message = await client.send_message(user_id, text, reply_markup=reply_markup)
         state["message_id"] = message.id
@@ -114,34 +115,34 @@ async def send_question(client: Client, user_id):
 async def handle_answer(client: Client, callback_query: CallbackQuery):
     global questions
     user_id = callback_query.from_user.id
-    
+
     if user_id not in user_states:
         await callback_query.answer("考试已结束或尚未开始。请使用 /exam 命令开始新的考试。", show_alert=True)
         return
-    
+
     state = user_states[user_id]
     if "current_question" not in state or state["current_question"] >= len(questions):
         await callback_query.answer("当前没有活动的问题。考试可能已经结束。", show_alert=True)
         return
-    
+
     question = questions[state["current_question"]]
-    
+
     selected_id = callback_query.data.split("-")[1]
     if selected_id not in state.get("current_choices", {}):
         await callback_query.answer("无效的选项。请重新选择。", show_alert=True)
         return
-    
+
     selected_answer = state["current_choices"][selected_id]
     is_correct = selected_answer == question["correct_answer"]
-    
+
     if is_correct:
         state["score"] += 3
         feedback = "✅ 正确"
     else:
         feedback = "❌ 错误"
-    
+
     await callback_query.answer(feedback, show_alert=False)
-    
+
     state["current_question"] += 1
     await send_question(client, user_id)
 
@@ -151,7 +152,7 @@ async def end_exam(client: Client, user_id):
     score = state["score"]
     passed = score >= 90
     result_text = f"考试结束！\n\n成绩 {score} 分，考核{'通过' if passed else '失败'}，{'恭喜你通过考核！' if passed else '需要 90 分才能及格'}"
-    
+
     await client.edit_message_text(user_id, state["message_id"], result_text, reply_markup=None)
     del user_states[user_id]
 
@@ -170,7 +171,7 @@ def load_exam_questions():
 
 
 def generate_random_id():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+    return "".join(random.choices(string.ascii_letters + string.digits, k=32))
 
 
 @app.async_command()

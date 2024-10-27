@@ -1,5 +1,6 @@
 from .misty import MistyMonitor
 
+
 class TestMistyMonitor(MistyMonitor):
     name = "Misty 测试"
     chat_name = "api_group"

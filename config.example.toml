@@ -70,4 +70,3 @@ url = "https://www.russell.info/"
 username = "john48"
 password = "71%s2IEq)@"
 time = [120, 240] # 模拟观看的时长范围 (秒)
-

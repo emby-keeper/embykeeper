@@ -1,6 +1,7 @@
 from pyrogram.types import Message
 from ._base import Monitor
 
+
 class TestGroupMonitor(Monitor):
     name = "多组 测试"
     chat_name = "api_group"
@@ -10,4 +11,3 @@ class TestGroupMonitor(Monitor):
 
     def chat_reply(self, message: Message, keys):
         return f'接收到: "{keys[0]}" => "{keys[1]}"'
-
