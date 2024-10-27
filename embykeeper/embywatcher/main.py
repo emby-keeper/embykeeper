@@ -112,7 +112,6 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
         "MediaSourceId": media_source_id,
         "PlayMethod": "DirectStream",
         "PlaySessionId": play_session_id,
-        "PlaybackStartTimeTicks": datetime.now().timestamp() * 10000000,
         "PlaylistIndex": 0,
         "PlaylistLength": 1,
         "PositionTicks": tick,
@@ -123,8 +122,10 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
 
     try:
         await asyncio.sleep(random.uniform(1, 3))
+        
+        resp = await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0))
 
-        if not is_ok(await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0.1))):
+        if not is_ok(resp):
             raise PlayError("无法开始播放")
 
         t = time
