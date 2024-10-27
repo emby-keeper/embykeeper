@@ -25,16 +25,34 @@ __ignore__ = True
 
 
 @dataclass(eq=False)
-class MessageSchedule:
+class _MessageSchedule:
     """定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送."""
 
     messages: Iterable[str]
     at: Union[Iterable[Union[str, time]], Union[str, time]] = ("0:00", "23:59")
-    days: int = 0
     possibility: float = 1.0
     multiply: int = 1
     only: str = None
 
+@dataclass(eq=False)
+class MessageSchedule:
+    """定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送, 允许使用一个话术列表资源名作为基础配置."""
+    
+    spec: str = None
+    messages: Iterable[str] = None
+    at: Union[Iterable[Union[str, time]], Union[str, time]] = None
+    possibility: float = None
+    only: str = None
+    multiply: int = None
+
+    def to_message_schedule(self) -> _MessageSchedule:
+        return _MessageSchedule(
+            messages=self.messages,
+            at=self.at or ("0:00", "23:59"),
+            possibility=self.possibility or 1,
+            multiply=self.multiply or 1,
+            only=self.only,
+        )
 
 @dataclass(eq=False)
 class MessagePlan:
@@ -42,7 +60,7 @@ class MessagePlan:
 
     message: str
     at: datetime
-    schedule: MessageSchedule
+    schedule: _MessageSchedule
     skip: bool = False
 
 
@@ -51,8 +69,10 @@ class Messager:
 
     name: str = None  # 水群器名称
     chat_name: str = None  # 群聊的名称
-    default_messages: List[str] = []  # 默认的话术列表资源名
+    default_messages: List[Union[str, MessageSchedule]] = []  # 默认的话术列表资源名
     additional_auth: List[str] = []  # 额外认证要求
+    min_interval: int = None # 预设两条消息间的最小间隔时间
+    max_interval: int = None # 预设两条消息间的最大间隔时间
 
     site_last_message_time = None
     site_lock = asyncio.Lock()
@@ -75,8 +95,8 @@ class Messager:
         self.config = config
         self.me = me
 
-        self.min_interval = config.get("min_interval", config.get("interval", 60))  # 两条消息间的最小间隔时间
-        self.max_interval = config.get("max_interval", None)  # 两条消息间的最大间隔时间
+        self.min_interval = config.get("min_interval", config.get("interval", self.min_interval or 60))  # 两条消息间的最小间隔时间
+        self.max_interval = config.get("max_interval", self.max_interval)  # 两条消息间的最大间隔时间
         self.log = logger.bind(scheme="telemessager", name=self.name, username=me.name)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
 
@@ -88,7 +108,6 @@ class Messager:
             {
                 "messages": [str],
                 Optional("at"): [str],
-                Optional("days"): int,
                 Optional("possibility"): float,
                 Optional("only"): str,
             }
@@ -97,17 +116,20 @@ class Messager:
         at = data.get("at", ("9:00", "23:00"))
         assert len(at) == 2
         at = [parser.parse(t).time() for t in at]
-        return MessageSchedule(
+        return _MessageSchedule(
             messages=data.get("messages"),
             at=at,
-            days=data.get("days", 0),
             possibility=data.get("possibility", 1.0),
             only=data.get("only", None),
         )
 
-    def add(self, schedule: MessageSchedule, use_multiply=False):
+    def add(self, schedule: _MessageSchedule, use_multiply=False):
         """根据规划, 生成计划, 并增加到时间线."""
         start_time, end_time = schedule.at
+        if isinstance(start_time, str):
+            start_time = parser.parse(start_time).time()
+        if isinstance(end_time, str):
+            end_time = parser.parse(end_time).time()
         start_datetime = datetime.combine(date.today(), start_time or time(0, 0))
         end_datetime = datetime.combine(date.today(), end_time or time(23, 59, 59))
         if end_datetime < start_datetime:
@@ -164,18 +186,42 @@ class Messager:
         else:
             return spec
 
-    async def get_spec_schedule(self, spec):
+    async def get_spec_schedule(self, spec_or_schedule):
         """解析话术文件对应的本地或云端文件."""
-        file = await self.get_spec_path(spec)
-        if not file:
-            self.log.warning(f'话术文件 "{spec}" 无法下载或不存在, 将被跳过.')
-            return None
-        try:
-            return self.parse_message_yaml(file)
-        except (OSError, yaml.YAMLError, SchemaError) as e:
-            self.log.warning(f'话术文件 "{spec}" 错误, 将被跳过: {e}')
-            show_exception(e)
-            return None
+        if isinstance(spec_or_schedule, MessageSchedule):
+            if spec_or_schedule.spec:
+                file = await self.get_spec_path(spec_or_schedule.spec)
+                if not file:
+                    self.log.warning(f'话术文件 "{spec_or_schedule.spec}" 无法下载或不存在, 将被跳过.')
+                    return None
+                try:
+                    base_schedule = self.parse_message_yaml(file)
+                    # Merge base_schedule with spec_or_schedule
+                    return _MessageSchedule(
+                        messages=spec_or_schedule.messages or base_schedule.messages,
+                        at=spec_or_schedule.at or base_schedule.at,
+                        possibility=spec_or_schedule.possibility or base_schedule.possibility,
+                        multiply=spec_or_schedule.multiply or base_schedule.multiply,
+                        only=spec_or_schedule.only or base_schedule.only,
+                    )
+                except (OSError, yaml.YAMLError, SchemaError) as e:
+                    self.log.warning(f'话术文件 "{spec_or_schedule.spec}" 错误, 将被跳过: {e}')
+                    show_exception(e)
+                    return None
+            else:
+                return spec_or_schedule.to_message_schedule()
+        else:
+            file = await self.get_spec_path(spec_or_schedule)
+            if not file:
+                self.log.warning(f'话术文件 "{spec_or_schedule}" 无法下载或不存在, 将被跳过.')
+                return None
+            try:
+                return self.parse_message_yaml(file)
+            except (OSError, yaml.YAMLError, SchemaError) as e:
+                self.log.warning(f'话术文件 "{spec_or_schedule}" 错误, 将被跳过: {e}')
+                show_exception(e)
+                return None
+
 
     async def _start(self):
         """自动水群器的入口函数的错误处理外壳."""
@@ -214,17 +260,22 @@ class Messager:
 
         schedules = []
         for m in messages:
-            match = re.match(r"(.*)\*\s?(\d+)", m)
-            if match:
-                multiply = int(match.group(2))
-                spec = match.group(1).strip()
+            if isinstance(m, MessageSchedule):
+                schedule = await self.get_spec_schedule(m)
+                if schedule:
+                    schedules.append(schedule)
             else:
-                multiply = 1
-                spec = m
-            schedule = await self.get_spec_schedule(spec)
-            if schedule:
-                schedule.multiply = multiply
-                schedules.append(schedule)
+                match = re.match(r"(.*)\*\s?(\d+)", m)
+                if match:
+                    multiply = int(match.group(2))
+                    spec = match.group(1).strip()
+                else:
+                    multiply = 1
+                    spec = m
+                schedule = await self.get_spec_schedule(spec)
+                if schedule:
+                    schedule.multiply = multiply
+                    schedules.append(schedule)
 
         nmsgs = sum([s.multiply for s in schedules])
         self.log.info(f"共启用 {len(schedules)} 个消息规划, 发送 {nmsgs} 条消息.")
@@ -239,7 +290,7 @@ class Messager:
                 if debug > 1:
                     self.log.debug(
                         "时间序列: "
-                        + " ".join([p.at.strftime("%H%M%S") for p in sorted(valid_p, key=lambda x: x.at)])
+                        + " ".join([p.at.strftime("%d%H%M%S") for p in sorted(valid_p, key=lambda x: x.at)])
                     )
                 if valid_p:
                     next_valid_p = min(valid_p, key=lambda x: x.at)
