@@ -8,7 +8,6 @@ from loguru import logger
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.handlers import (
-    CallbackQueryHandler,
     EditedMessageHandler,
     MessageHandler,
     RawUpdateHandler,
@@ -150,7 +149,6 @@ async def dumper(config: dict, specs=["message"]):
     type_handler = {
         "message": MessageHandler(_dumper_update),
         "edited_message": EditedMessageHandler(_dumper_update),
-        "callback": CallbackQueryHandler(_dumper_update),
         "raw": RawUpdateHandler(_dumper_raw),
     }
     queue = asyncio.Queue()
@@ -165,7 +163,7 @@ async def dumper(config: dict, specs=["message"]):
                     t = s
                     c = []
                 if t == "all":
-                    handlers = [type_handler[t] for t in ["message", "edited_message", "callback"]]
+                    handlers = [type_handler[t] for t in ["message", "edited_message"]]
                     for h in handlers:
                         h.filters = filters.chat(c) if c else None
                         await tg.add_handler(h)
