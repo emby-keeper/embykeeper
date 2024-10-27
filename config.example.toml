@@ -30,7 +30,7 @@ random = 60
 # scheme = "socks5" # 可选: http / socks5
 
 # 服务设置, 当您需要禁用某些站点时, 请将该段取消注释并修改.
-# 该部分内容是根据 Embykeeper 5.0.11 生成的.
+# 该部分内容是根据 Embykeeper 5.0.12 生成的.
 # 使用 checkiner = ["all"] 以启用所有签到器, 使用 checkiner = ["sgk"] 以启用所有社工库签到器.
 
 # 默认启用站点:
@@ -43,30 +43,31 @@ random = 60
 # [service]
 # checkiner = ["_templ_a", "_templ_b", "agentsgk", "aisgk", "akile_group", "akuai", "alpha", "apop", "apoppro", "avibi", "awamusic", "awatv", "baidusgk", "bearsgk", "bingdaosgk", "bitsgk", "bluesea", "bostsgk", "bytevirt_group", "carll1sgk", "carll2sgk", "cc", "charon", "charon_old", "chunjiangsgk", "ciji", "datasgk", "dingdangsgk", "dogsgk", "dvfilm", "embyhub", "fanhuasgk", "feiji", "feiyue", "feiyuedpx", "feiyuemusic", "feiyuemusic_group_old", "future", "happy", "heisi", "huasgk", "infsgk", "ingeeksgk", "jms", "jms_iptv", "jms_old", "johnsgk", "jsq", "judog", "koisgk", "levilde", "lili", "ljyy", "ljyy_old", "lyrebird", "magic", "marmot_group_old", "mastersgk", "micu", "minisgk", "misty", "mjj", "mooncake", "moshensgk", "nebula", "niaoge", "pandatv", "pandatv_group", "peach", "pilipili", "pingansgk", "plumber", "pornemby", "qingfengsgk", "raismusic", "rednosesgk", "seedsgk", "sfcju", "shufu", "shzi", "singularity", "skysink", "sssq", "starsgk", "temby", "temby_beta", "temby_old", "terminus", "terminus_old", "theend", "tianmaosgk", "tiannan", "unionsgk", "watermelon", "worldline", "xraysgk", "yomo", "zhihusgk", "zhipian", "zhushousgk"]
 # monitor = ["bgk", "embyhub", "follow", "future", "infinity_fly", "judog", "misty", "polo", "pornemby_alert", "pornemby_answer", "pornemby_double", "pornemby_dragon_rain", "pornemby_nohp", "pornemby_register", "viper"]
-# messager = ["nakonako", "pornemby"]
+# messager = ["marmot", "nakonako", "pornemby"]
 
 # Telegram 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[telegram]]
-phone = "+8614963337348"
+phone = "+8615534434575"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 [[telegram]]
-phone = "+8619570794275"
+phone = "+8617550032517"
 send = false # 启用该账号的自动水群功能 (需要高级账号, 谨慎使用)
 monitor = false # 启用该账号的自动监控功能 (需要高级账号)
 
 # Emby 账号设置, 您可以重复该片段多次以增加多个账号.
 
 [[emby]]
-url = "https://www.lambert.org/"
-username = "sophiacarlson"
-password = "997k5D7yH("
+url = "https://lowery.com/"
+username = "jamie63"
+password = "04)KxYc6*2"
 time = [120, 240] # 模拟观看的时长范围 (秒)
 
 [[emby]]
-url = "https://francis-porter.com/"
-username = "edwinmontgomery"
-password = "!DA0weP6k0"
+url = "https://www.russell.info/"
+username = "john48"
+password = "71%s2IEq)@"
 time = [120, 240] # 模拟观看的时长范围 (秒)
+
