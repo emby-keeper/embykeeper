@@ -214,7 +214,7 @@ class Link:
         async with account_status_lock:
             super_ad_shown = account_status.get(self.client.me.id, {}).get("super_ad_shown", False)
             if not super_ad_shown:
-                self.log.info("请访问 https://bit.ly/eksuper 赞助项目以升级为高级用户, 尊享更多功能.")
+                self.log.info("请访问 https://go.zetx.tech/eksuper 赞助项目以升级为高级用户, 尊享更多功能.")
                 if self.client.me.id in account_status:
                     account_status[self.client.me.id]["super_ad_shown"] = True
                 else:
@@ -241,9 +241,17 @@ class Link:
         else:
             return None
 
-    async def answer(self, question: str):
+    async def pornemby_answer(self, question: str):
         """向机器人发送问题回答请求."""
-        results = await self.post(f"/answer {self.instance} {question}", timeout=20, name="请求问题回答")
+        results = await self.post(f"/pornemby_answer {self.instance} {question}", timeout=20, name="请求问题回答")
+        if results:
+            return results.get("answer", None), results.get("by", None)
+        else:
+            return None, None
+        
+    async def terminus_answer(self, question: str):
+        """向机器人发送问题回答请求."""
+        results = await self.post(f"/terminus_answer {self.instance} {question}", timeout=20, name="请求问题回答")
         if results:
             return results.get("answer", None), results.get("by", None)
         else:
