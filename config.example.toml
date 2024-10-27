@@ -70,4 +70,3 @@ url = "https://sandoval.net/"
 username = "smithapril"
 password = "cA5%0M+eoz"
 time = [120, 240] # 模拟观看的时长范围 (秒)
-

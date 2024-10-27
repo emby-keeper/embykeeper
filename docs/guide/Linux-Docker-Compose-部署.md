@@ -186,7 +186,7 @@ services:
 并运行:
 
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 将在 80 端口启动在线控制台 HTTP 服务.
