@@ -27,7 +27,7 @@ class TemplateACheckin(BotCheckin):
                     except TimeoutError:
                         self.log.debug(f"点击签到按钮无响应, 可能按钮未正确处理点击回复. 一般来说不影响签到.")
                     else:
-                        await self.on_text(Message(id=0), answer.message)
+                        await self.on_text(Message(id=0, text=answer.message), answer.message)
                     return
             else:
                 self.log.warning(f"签到失败: 账户错误.")

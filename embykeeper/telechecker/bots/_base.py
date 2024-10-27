@@ -49,7 +49,7 @@ default_keywords = {
         "不存在",
     ),
     "too_many_tries_fail": ("已尝试", "过多"),
-    "checked": ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到"),
+    "checked": ("只能", "已经", "下次", "过了", "签过", "明日再来", "上次签到", "重复签到"),
     "fail": ("失败", "错误", "超时"),
     "success": ("成功", "通过", "完成", "获得"),
 }
@@ -570,20 +570,26 @@ class BotCheckin(BaseBotCheckin):
             await self.retry()
         elif any(s in text for s in to_iterable(self.bot_success_keywords) or default_keywords["success"]):
             if await self.before_success():
-                matches = re.search(self.bot_success_pat, text)
-                if matches:
-                    try:
-                        self.log.info(
-                            f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分."
-                        )
-                    except IndexError:
-                        self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
-                else:
-                    matches = re.search(r"\d+", text)
+                if self.bot_success_pat:
+                    matches = re.search(self.bot_success_pat, text)
                     if matches:
-                        self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
+                        try:
+                            self.log.info(
+                                f"[yellow]签到成功[/]: + {matches.group(1)} 分 -> {matches.group(2)} 分."
+                            )
+                        except IndexError:
+                            try:
+                                self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(1)} 分.")
+                            except IndexError:
+                                self.log.info(f"[yellow]签到成功[/].")
                     else:
-                        self.log.info(f"[yellow]签到成功[/].")
+                        matches = re.search(r"\d+", text)
+                        if matches:
+                            self.log.info(f"[yellow]签到成功[/]: 当前/增加 {matches.group(0)} 分.")
+                        else:
+                            self.log.info(f"[yellow]签到成功[/].")
+                else:
+                    self.log.info(f"[yellow]签到成功[/].")
                 await self.after_success()
                 self.finished.set()
         else:
