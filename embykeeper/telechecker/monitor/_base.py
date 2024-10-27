@@ -10,7 +10,7 @@ from typing import Awaitable, Callable, Iterable, List, Optional, Sized, Union
 from loguru import logger
 from appdirs import user_data_dir
 from pyrogram import filters
-from pyrogram.enums import ChatMemberStatus
+from pyrogram.enums import ChatType
 from pyrogram.errors import UsernameNotOccupied, UserNotParticipant, FloodWait
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Message, User
@@ -104,7 +104,7 @@ class Monitor:
     unique_cache = UniqueUsername()
 
     name: str = None  # 监控器名称
-    chat_name: Union[str, List[str]] = []  # 监控的群聊名称
+    chat_name: str = None  # 监控的群聊名称
     chat_allow_outgoing: bool = False  # 是否支持自己发言触发
     chat_user: Union[str, List[str]] = []  # 仅被列表中用户的发言触发 (支持 username / userid)
     chat_keyword: Union[str, List[str]] = []  # 仅当消息含有列表中的关键词时触发, 支持 regex
@@ -144,7 +144,7 @@ class Monitor:
         """设定要监控的目标."""
         filter = filters.all
         if self.chat_name:
-            filter = filter & filters.chat(to_iterable(self.chat_name))
+            filter = filter & filters.chat(self.chat_name)
         if not self.chat_allow_outgoing:
             filter = filter & (~filters.outgoing)
         return filter
@@ -186,33 +186,30 @@ class Monitor:
 
     async def start(self):
         """监控器的入口函数."""
-        chat_ids = []
-        for cn in to_iterable(self.chat_name):
-            while True:
-                try:
-                    chat = await self.client.get_chat(cn)
-                    chat_ids.append(chat.id)
-                except UsernameNotOccupied:
-                    self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
-                    return False
-                except KeyError as e:
-                    self.log.info(f"初始化错误: 无法访问, 您可能已被封禁.")
-                    show_exception(e)
-                    return False
-                except FloodWait as e:
-                    self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
-                    if e.value < 360:
-                        await asyncio.sleep(e.value)
-                    else:
-                        self.log.info(
-                            f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 监控器将停止."
-                        )
-                        return False
-                else:
-                    break
-        self.chat_name = chat_ids
         try:
-            me = await chat.get_member("me")
+            chat = await self.client.get_chat(self.chat_name)
+        except UsernameNotOccupied:
+            self.log.warning(f'初始化错误: 群组 "{self.chat_name}" 不存在.')
+            return False
+        except UserNotParticipant:
+            self.log.info(f'跳过监控: 尚未加入群组 "{chat.title}".')
+            return False
+        except KeyError as e:
+            self.log.info(f"初始化错误: 无法访问, 您可能已被封禁.")
+            show_exception(e)
+            return False
+        except FloodWait as e:
+            self.log.info(f"初始化信息: Telegram 要求等待 {e.value} 秒.")
+            if e.value < 360:
+                await asyncio.sleep(e.value)
+            else:
+                self.log.info(
+                    f"初始化信息: Telegram 要求等待 {e.value} 秒, 您可能操作过于频繁, 监控器将停止."
+                )
+                return False
+        try:
+            if chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
+                await chat.get_member("me")
         except UserNotParticipant:
             self.log.info(f'跳过监控: 尚未加入群组 "{chat.title}".')
             return False
@@ -225,7 +222,7 @@ class Monitor:
             return False
         if self.notify_create_name:
             self.unique_name = self.get_unique_name()
-        spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]"
+        spec = f"[green]{chat.title}[/] [gray50](@{chat.username})[/]" if chat.title else f"@{chat.username}"
         self.log.info(f"开始监视: {spec}.")
         async with self.listener():
             await self.failed.wait()
