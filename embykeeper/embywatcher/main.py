@@ -123,7 +123,7 @@ async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
 
     try:
         await asyncio.sleep(random.uniform(1, 3))
-        
+
         resp = await c.post("Sessions/Playing", MediaSourceId=media_source_id, data=playing_info(0))
 
         if not is_ok(resp):

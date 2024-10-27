@@ -2,6 +2,7 @@ from ._base import BotCheckin
 
 __ignore__ = True
 
+
 class ByteVirtGroupCheckin(BotCheckin):
     name = "ByteVirt 群组发言"
     chat_name = "bytevirtchat"
