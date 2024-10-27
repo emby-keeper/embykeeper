@@ -9,6 +9,7 @@ import warnings
 
 from aiohttp import ClientError, ClientConnectionError
 from loguru import logger
+from dateutil import parser
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -63,7 +64,7 @@ async def hide_from_resume(obj: EmbyObject):
 def get_last_played(obj: EmbyObject):
     """获取上次播放时间."""
     last_played = obj.object_dict.get("UserData", {}).get("LastPlayedDate", None)
-    return datetime.fromisoformat(last_played[:-2]) if last_played else None
+    return parser.parse(last_played) if last_played else None
 
 
 async def play(obj: EmbyObject, loggeruser: Logger, time: float = 10):
@@ -300,10 +301,10 @@ async def watch(
                         try:
                             if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 5)):
                                 loggeruser.debug(f"未能成功从最近播放中隐藏视频.")
+                            else:
+                                loggeruser.info(f"已从最近播放中隐藏该视频.")
                         except asyncio.TimeoutError:
                             loggeruser.debug(f"从最近播放中隐藏视频超时.")
-                        else:
-                            loggeruser.info(f"已从最近播放中隐藏该视频.")
             else:
                 loggeruser.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False
@@ -425,10 +426,10 @@ async def watch_multiple(
                         try:
                             if not await asyncio.shield(asyncio.wait_for(hide_from_resume(obj), 5)):
                                 loggeruser.debug(f"未能成功从最近播放中隐藏视频.")
+                            else:
+                                loggeruser.info(f"已从最近播放中隐藏该视频.")
                         except asyncio.TimeoutError:
                             loggeruser.debug(f"从最近播放中隐藏视频超时.")
-                        else:
-                            loggeruser.info(f"已从最近播放中隐藏该视频.")
             else:
                 loggeruser.warning(f"由于没有成功播放视频, 保活失败, 请重新检查配置.")
                 return False

@@ -156,9 +156,10 @@ class Connector(_Connector):
         for i in range(self.tries):
             url = self.get_url(path, **query)
             try:
-                resp = await method(url, timeout=self.timeout, **params)
+                params = {'timeout': self.timeout, **params}
+                resp = await method(url, **params)
             except (aiohttp.ClientConnectionError, OSError, asyncio.TimeoutError) as e:
-                logger.debug(f'连接 "{url}" 失败: {e.__class__.__name__}: {e}')
+                logger.debug(f'连接 "{url}" 失败, 即将重连: {e.__class__.__name__}: {e}')
             else:
                 if self.attempt_login and resp.status == 401:
                     raise aiohttp.ClientConnectionError("用户名密码错误")
@@ -171,7 +172,7 @@ class Connector(_Connector):
     async def get_stream_noreturn(self, path, **query):
         try:
             session = await self._get_session()
-            async with await self._req(session.get, path, **query) as resp:
+            async with await self._req(session.get, path, params={'timeout': 0}, **query) as resp:
                 async for _ in resp.content.iter_any():
                     await asyncio.sleep(random.uniform(5, 10))
         finally:
