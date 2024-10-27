@@ -34,10 +34,11 @@ class _MessageSchedule:
     multiply: int = 1
     only: str = None
 
+
 @dataclass(eq=False)
 class MessageSchedule:
     """定义一个发送规划, 即在特定时间段内某些消息中的一个有一定几率被发送, 允许使用一个话术列表资源名作为基础配置."""
-    
+
     spec: str = None
     messages: Iterable[str] = None
     at: Union[Iterable[Union[str, time]], Union[str, time]] = None
@@ -53,6 +54,7 @@ class MessageSchedule:
             multiply=self.multiply or 1,
             only=self.only,
         )
+
 
 @dataclass(eq=False)
 class MessagePlan:
@@ -71,8 +73,8 @@ class Messager:
     chat_name: str = None  # 群聊的名称
     default_messages: List[Union[str, MessageSchedule]] = []  # 默认的话术列表资源名
     additional_auth: List[str] = []  # 额外认证要求
-    min_interval: int = None # 预设两条消息间的最小间隔时间
-    max_interval: int = None # 预设两条消息间的最大间隔时间
+    min_interval: int = None  # 预设两条消息间的最小间隔时间
+    max_interval: int = None  # 预设两条消息间的最大间隔时间
 
     site_last_message_time = None
     site_lock = asyncio.Lock()
@@ -95,7 +97,9 @@ class Messager:
         self.config = config
         self.me = me
 
-        self.min_interval = config.get("min_interval", config.get("interval", self.min_interval or 60))  # 两条消息间的最小间隔时间
+        self.min_interval = config.get(
+            "min_interval", config.get("interval", self.min_interval or 60)
+        )  # 两条消息间的最小间隔时间
         self.max_interval = config.get("max_interval", self.max_interval)  # 两条消息间的最大间隔时间
         self.log = logger.bind(scheme="telemessager", name=self.name, username=me.name)
         self.timeline: List[MessagePlan] = []  # 消息计划序列
@@ -221,7 +225,6 @@ class Messager:
                 self.log.warning(f'话术文件 "{spec_or_schedule}" 错误, 将被跳过: {e}')
                 show_exception(e)
                 return None
-
 
     async def _start(self):
         """自动水群器的入口函数的错误处理外壳."""

@@ -2,6 +2,7 @@ from ._base import Messager, MessageSchedule
 
 __ignore__ = True
 
+
 class MarmotMessager(Messager):
     name = "Marmot"
     chat_name = -1001975531465
