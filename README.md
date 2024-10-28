@@ -186,7 +186,9 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
     - Shzi (`shzi`): [机器人](https://t.me/aishuazibot?start=QvSBSqCG)
     - 飞机工具箱 (`feiji`): [机器人](https://t.me/fjtool_bot?start=6489896414C44)
     - 鸟哥轰炸 (`niaoge`): [机器人](https://t.me/nb3344bot?start=6489896414)
-    - Akile (`akile_group`): [群组](https://t.me/akileChat)
+    - Akile: [群组](https://t.me/akileChat)
+      - 群组内签到 (`akile_group`): [群组](https://t.me/akileChat) [机器人](https://t.me/akilecloud_bot)
+      - 机器人签到 (`akile`): [机器人](https://t.me/akilecloud_bot)
     - Bytevirt (`bytevirt_group`): [群组](https://t.me/bytevirtchat)
 
     <!-- #endregion checkiner-other-sites -->
