@@ -41,7 +41,7 @@ class MistyCheckin(BotCheckin):
                     if "选择您要使用的功能" in (msg.caption or msg.text):
                         await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🎲更多功能")
-                    if "请选择功能" in msg.text or msg.caption:
+                    if "请选择功能" in (msg.text or msg.caption):
                         await asyncio.sleep(random.uniform(2, 4))
                         msg = await wr("🛎每日签到")
                         if "获取账号失败" in (msg.text or msg.caption):
