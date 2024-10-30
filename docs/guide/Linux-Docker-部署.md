@@ -12,7 +12,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 `--net=host` 用于连接主机上的代理, 若您不需要可以不使用这个选项.
 :::
 
-命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/emby-keeper/embykeeper/blob/main/config.example.toml)下载).
+命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml)下载).
 
 <!--@include: ./_简要配置.md-->
 
@@ -108,4 +108,4 @@ docker run -v $(pwd)/embykeeper-src:/src -v $(pwd)/embykeeper:/app --rm -it --ne
 
 ::::
 
-欢迎您在实现签到器后, 通过 [Pull requests](https://github.com/emby-keeper/embykeeper/pulls) 向 Embykeeper 分享你的成果.
+欢迎您在实现签到器后, 通过 [Pull requests](https://github.com/embykeeper/embykeeper/pulls) 向 Embykeeper 分享你的成果.

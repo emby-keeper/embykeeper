@@ -6,11 +6,11 @@
 
 ## 安装教程
 
-您需要转到 [Release](https://github.com/emby-keeper/embykeeper/releases) 界面, 选择最新版本 (`Latest`), 然后展开 `Assets`, 点击下载 `embykeeper-win-vx.x.x.zip` 文件 (请注意**不是** `exe`!).
+您需要转到 [Release](https://github.com/embykeeper/embykeeper/releases) 界面, 选择最新版本 (`Latest`), 然后展开 `Assets`, 点击下载 `embykeeper-win-vx.x.x.zip` 文件 (请注意**不是** `exe`!).
 
 解压后运行 `Embykeeper.bat`, Embykeeper 将会自动安装到当前文件夹中.
 
-安装后 Embykeeper 将首次运行并在当前目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/emby-keeper/embykeeper/blob/main/config.example.toml)下载).
+安装后 Embykeeper 将首次运行并在当前目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml)下载).
 
 <!--@include: ./_简要配置.md-->
 
