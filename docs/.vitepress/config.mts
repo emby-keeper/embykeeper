@@ -12,7 +12,7 @@ export default defineConfig({
   cleanUrls: true,
   head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
   sitemap: {
-    hostname: 'https://emby-keeper.github.io',
+    hostname: 'https://embykeeper.github.io',
   },
   vite: {
     plugins: [

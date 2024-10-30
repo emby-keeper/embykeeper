@@ -444,7 +444,7 @@ async def prepare_config(config_file=None, basedir=None, public=False, windows=F
         if "should be instance of 'int'" in error_str:
             error_str += f"\n说明: 您可能对需要使用数值的参数设置了字符串, 请去除引号 (xxx = 1234)."
         logger.error(
-            f"配置文件错误, 请检查配置文件 (参考: https://emby-keeper.github.io/guide/配置指南):\n{error_str}"
+            f"配置文件错误, 请检查配置文件 (参考: https://embykeeper.github.io/guide/配置指南):\n{error_str}"
         )
         sys.exit(253)
     proxy: dict = config.get("proxy", None)
