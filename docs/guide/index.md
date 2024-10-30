@@ -7,7 +7,7 @@ import Logo from '../components/Logo.vue';
 # 什么是 Embykeeper?
 
 <p align="center">
-  <a href='https://github.com/embykeeper/embykeeper'>
+  <a href='https://github.com/emby-keeper/embykeeper'>
     <Logo />
   </a>
 </p>

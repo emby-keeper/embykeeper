@@ -32,7 +32,7 @@ hero:
       link: /guide/配置文件
     - theme: alt
       text: Github
-      link: https://github.com/embykeeper/embykeeper
+      link: https://github.com/emby-keeper/embykeeper
 
 features:
   - icon:

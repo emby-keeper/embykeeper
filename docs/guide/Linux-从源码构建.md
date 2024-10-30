@@ -5,11 +5,11 @@
 Embykeeper 可以从源码构建, 首先请拉取并设置环境:
 
 ```bash
-git clone https://github.com/embykeeper/embykeeper.git
+git clone https://github.com/emby-keeper/embykeeper.git
 make install && make run
 ```
 
-命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/embykeeper/embykeeper/blob/main/config.example.toml)下载).
+命令将会在 `embykeeper` 目录下生成模板 `config.toml` 文件 (您也可以从[这里](https://github.com/emby-keeper/embykeeper/blob/main/config.example.toml)下载).
 
 <!--@include: ./_简要配置.md-->
 

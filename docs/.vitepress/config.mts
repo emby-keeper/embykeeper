@@ -103,11 +103,11 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/embykeeper/embykeeper' },
+      { icon: 'github', link: 'https://github.com/emby-keeper/embykeeper' },
     ],
 
     editLink: {
-      pattern: 'https://github.com/embykeeper/embykeeper/edit/main/docs/:path',
+      pattern: 'https://github.com/emby-keeper/embykeeper/edit/main/docs/:path',
     },
   },
 });
