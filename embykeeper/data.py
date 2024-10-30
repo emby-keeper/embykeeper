@@ -14,9 +14,9 @@ from .utils import format_byte_human, no_waiting, show_exception, to_iterable
 logger = logger.bind(scheme="datamanager")
 
 cdn_urls = [
-    "https://raw.githubusercontent.com/emby-keeper/embykeeper-data/main",
-    "https://raw.gitmirror.com/emby-keeper/embykeeper-data/main",
-    "https://cdn.jsdelivr.net/gh/emby-keeper/embykeeper-data",
+    "https://raw.githubusercontent.com/emby-keeper/emby-keeper-data/main",
+    "https://raw.gitmirror.com/emby-keeper/emby-keeper-data/main",
+    "https://cdn.jsdelivr.net/gh/emby-keeper/emby-keeper-data",
 ]
 
 versions = TTLCache(maxsize=128, ttl=600)
