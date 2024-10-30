@@ -158,7 +158,7 @@ docker-compose up -d
 
 ::::
 
-欢迎您在实现签到器后, 通过 [Pull requests](https://github.com/emby-keeper/embykeeper/pulls) 向 Embykeeper 分享你的成果.
+欢迎您在实现签到器后, 通过 [Pull requests](https://github.com/emby-keeper/emby-keeper/pulls) 向 Embykeeper 分享你的成果.
 
 ## 部署在线控制台
 

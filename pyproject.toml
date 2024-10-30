@@ -34,7 +34,7 @@ requires-python = ">=3.8,<3.11"
 dynamic = ["dependencies"]
 
 [project.urls]
-Homepage = "https://github.com/emby-keeper/embykeeper"
+Homepage = "https://github.com/emby-keeper/emby-keeper"
 
 [project.readme]
 file = "README.md"
