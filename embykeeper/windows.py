@@ -27,7 +27,7 @@ def generate_config(config: Path):
     urls = Table.grid(padding=2)
     urls.add_column(style="green", justify="right")
     urls.add_column(no_wrap=True)
-    urls.add_row("配置教程", "https://embykeeper.github.io/guide/配置文件")
+    urls.add_row("配置教程", "https://emby-keeper.github.io/guide/配置文件")
     message.add_row("您需要在即将打开的文件中进行账户配置, 您可以根据注释提示进行配置.")
     message.add_row("您也可以参考 Wiki, 链接如下:")
     message.add_row(urls)

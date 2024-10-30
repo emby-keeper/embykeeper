@@ -1,6 +1,6 @@
 # 这是一个配置文件范例.
 # 所有账户信息为生成, 请填写您的账户信息.
-# 查看帮助与详情: https://embykeeper.github.io#安装与使用
+# 查看帮助与详情: https://emby-keeper.github.io#安装与使用
 
 # 每天进行 Telegram Bot 签到的时间范围, 等同于命令行 "-c" 参数.
 time = "<8:00AM,10:00AM>"

@@ -49,7 +49,7 @@ Embykeeper 将自动向 Embykeeper Auth Bot ([@embykeeper_auth_bot](https://t.me
 
 Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 请点击下方按钮开始部署:
 
-[![Setup Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/setup-button.svg)](https://embykeeper.github.io/guide/安装指南)
+[![Setup Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/setup-button.svg)](https://emby-keeper.github.io/guide/安装指南)
 
 若您没有服务器, 您可以通过免费托管平台进行部署, 点击下方按钮开始部署:
 
@@ -57,15 +57,15 @@ Embykeeper 支持 Docker 或 PyPI 安装 (Linux / Windows), 也支持云部署, 
 
 [![Deploy to Render](https://github.com/embykeeper/embykeeper/raw/main/images/deploy-to-render.svg)](https://render.com/deploy?repo=https://github.com/embykeeper/embykeeper/tree/stable)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Tutorial](https://github.com/embykeeper/embykeeper/raw/main/images/render-tutorial.svg)](https://blog.zetx.tech/2023/06/26/embykeeper-render-tutorial)
 
-若您有服务器, 我们推荐使用 [Docker 部署](https://embykeeper.github.io/guide/Linux-Docker-部署):
+若您有服务器, 我们推荐使用 [Docker 部署](https://emby-keeper.github.io/guide/Linux-Docker-部署):
 
 ```bash
 docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 ```
 
-您也可以使用 [Docker Compose 部署](https://embykeeper.github.io/guide/Linux-Docker-Compose-部署).
+您也可以使用 [Docker Compose 部署](https://emby-keeper.github.io/guide/Linux-Docker-Compose-部署).
 
-更多安装和配置方面的帮助请参考 [**📖 教程文档**](https://embykeeper.github.io/).
+更多安装和配置方面的帮助请参考 [**📖 教程文档**](https://emby-keeper.github.io/).
 
 本项目欢迎友善讨论与建议, 您可以通过 [Github Issue](https://github.com/embykeeper/embykeeper) 途径反馈, 并认可开发团队可以关闭与项目开发不直接相关的不友善讨论. 您也可以通过 [Telegram 讨论群](https://t.me/embykeeper_chat_bot) 获得社区帮助.
 
@@ -121,7 +121,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
   - 飞跃星空 (`feiyuemusic`): [群组](https://t.me/+FVPdVkpM8moyNjc1) [机器人](https://t.me/xingkongmusic_bot)
 
   <!-- #endregion checkiner-sites -->
-  - 测试中新签到器 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 测试中新签到器 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region checkiner-beta-sites -->
 
     - Temby (`temby`): [频道](https://t.me/tembychannel) [群组](https://t.me/tembygroup) [机器人](https://t.me/HiEmbyBot)
@@ -129,7 +129,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
     - Ciji (`ciji`): [机器人](https://t.me/MM_nastool_bot)
 
     <!-- #endregion checkiner-beta-sites -->
-  - 关服, 无响应, 或已停用签到功能 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 关服, 无响应, 或已停用签到功能 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region checkiner-ignored-sites -->
 
     - Misty (`misty`): ~~[频道](https://t.me/FreeEmbyChannel) [群组](https://t.me/FreeEmby) [机器人](https://t.me/EmbyMistyBot)~~
@@ -146,7 +146,7 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
     - Apop 压测服 (`apop`): ~~[频道](https://t.me/ApopCloud_Channel) [群组](https://t.me/apopcloud) [机器人](https://t.me/apopcloudemby_bot)~~
 
     <!-- #endregion checkiner-ignored-sites -->
-  - 其他非 Emby 相关 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 其他非 Emby 相关 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region checkiner-other-sites -->
 
     - 搜书神器 (`sssq`): [机器人](https://t.me/sosdbot?start=fromid_6489896414)
@@ -205,14 +205,14 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
   - 不给看 抢邀请码 (`bgk`): [群组](https://t.me/Ephemeralemby) [机器人](https://t.me/UnknownEmbyBot)
 
   <!-- #endregion monitor-sites -->
-  - 测试中的站点 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 测试中的站点 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region monitor-beta-sites -->
 
     - 未响 抢邀请码 (`future`): [频道](https://t.me/FutureEcho_Notice) [群组](https://t.me/FutureEcho_Chat) [机器人](https://t.me/lotayu_bot)
     - 终点站 考核辅助 (`terminus_exam`): [频道](https://t.me/embypub) [群组](https://t.me/EmbyPublic) [机器人](https://t.me/EmbyPublicBot)
 
     <!-- #endregion monitor-beta-sites -->
-  - 关服或无响应 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 关服或无响应 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region monitor-ignored-sites -->
 
     - 全局自动从众 (`follow`): 当在任何群组中发现 5 分钟内 5 条一样内容的消息, 会自动跟一句 (影响范围大默认禁用)
@@ -231,20 +231,20 @@ docker run -v $(pwd)/embykeeper:/app --rm -it --net=host embykeeper/embykeeper
 
   <!-- #endregion messager-sites -->
 
-  - 测试中的站点 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 测试中的站点 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region messager-beta-sites -->
 
     - Marmot (`marmot`) (周末早晚签到): [频道](https://t.me/Marmot_Emby_Channel) 群组 (非公开) [机器人](https://t.me/Marmot_Emby_Account_BOT)
 
     <!-- #endregion messager-beta-sites -->
-  - 关服或无响应 (默认禁用, 请参考[教程文档](https://embykeeper.github.io/guide/配置文件#service-子项)启用):
+  - 关服或无响应 (默认禁用, 请参考[教程文档](https://emby-keeper.github.io/guide/配置文件#service-子项)启用):
     <!-- #region messager-ignored-sites -->
 
     - NakoNako 自动水群 (`nakonako`): ~~[群组](https://t.me/NakoNetwork) [机器人](https://t.me/nakonetwork_bot)~~
 
     <!-- #endregion messager-ignored-sites -->
 
-**注意**: 部分功能由于涉及竞争条件和付费验证码解析服务等, 仅有[高级用户](https://embykeeper.github.io/guide/高级用户)才能使用, 您需要共享邀请码或[赞助项目](https://afdian.com/a/jackzzs)以成为永久有效期的高级用户.
+**注意**: 部分功能由于涉及竞争条件和付费验证码解析服务等, 仅有[高级用户](https://emby-keeper.github.io/guide/高级用户)才能使用, 您需要共享邀请码或[赞助项目](https://afdian.com/a/jackzzs)以成为永久有效期的高级用户.
 
 ## 支持 Embykeeper
 

@@ -29,6 +29,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.PAGES_DEPLOY_KEY }}
-          external_repository: emby-keeper/embykeeper.github.io
+          external_repository: emby-keeper/emby-keeper.github.io
           publish_branch: main
           publish_dir: docs/.vitepress/dist
